@@ -1,5 +1,7 @@
 # LaudareDataset Benchmarking Framework
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18922366.svg)](https://doi.org/10.5281/zenodo.18922366)
+
 This project provides a framework for benchmarking various tools and models for Handwritten Text Recognition (HTR), Handwritten Music Recognition (HMR), and Layout Recognition tasks on the Laudare
 Dataset. It supports experiments using 5-fold cross-validation, sequential learning, and
 cross-manuscript setups.
