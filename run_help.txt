@@ -1,0 +1,73 @@
+LaudareDataset Benchmarking Framework - Main Workflow Script
+
+USAGE:
+  ./run.sh [OPTIONS]
+
+DESCRIPTION:
+  Runs annotation generation and benchmarks for OCR, OMR, and Layout tasks
+  on the Laudare Dataset with fixed model support:
+  - OCR/OMR: TrOCR large (`large`)
+  - Layout: YOLOv8n (`yolov8n`)
+
+  Available execution modes:
+  1. 5-Fold Cross-Validation (`--n-fold`)
+  2. Sequential Learning (`--strategy`)
+  3. Train/Test Directory Mode (`--train-dir` + `--test-dir`)
+
+  Annotation generation is supported via `--task annotations`.
+  Synthetic pretraining and synthesis are not supported.
+
+MANDATORY PARAMETERS:
+  --task is always mandatory.
+  For annotations: --edition and --data-dir are mandatory.
+  For ocr, omr, and layout: --edition and --framework are mandatory.
+
+WORKFLOW CONTROL OPTIONS:
+  --help                     Show this help message and exit.
+  --debug                    Enable debug mode with reduced data/training.
+  --device DEVICE            Specify the device (default: cuda:0).
+                             Examples: cuda:0, cpu
+  --edition EDITION          [MANDATORY for ocr, omr, layout]
+                             Options: diplomatic, editorial
+  --editorial                Shortcut for '--edition editorial'.
+  --framework FRAMEWORK      [MANDATORY for ocr, omr, layout]
+                             Options: trocr, yolo
+  --task TASK                [MANDATORY]
+                             Options: annotations, ocr, omr, layout
+  --data-dir DIR             Dataset base directory (required for --n-fold and --strategy).
+  --train-dir DIR            Custom training directory (train/test mode).
+  --test-dir DIR             Custom testing directory (train/test mode).
+  --augment BOOL             Enable/disable augmentation (default: true).
+  --model-name NAME          Allowed values only:
+                             - large (required for ocr/omr; default if omitted)
+                             - yolov8n (required for layout; default if omitted)
+
+EXECUTION MODES:
+  --n-fold                   Run 5-fold cross-validation and aggregate results.
+  --strategy S               Run sequential learning mode.
+                             Options: random_sample, sequential_sample
+
+EXAMPLES:
+  # Generate annotations
+  ./run.sh --task annotations --edition diplomatic --data-dir ./data/I-Ct_91
+
+  # OCR 5-fold (TrOCR large)
+  ./run.sh --n-fold --framework trocr --task ocr --edition diplomatic --data-dir ./data/I-Ct_91 --model-name large
+
+  # OMR sequential (TrOCR large)
+  ./run.sh --strategy sequential_sample --framework trocr --task omr --edition editorial --data-dir ./data/I-Ct_91 --model-name large
+
+  # Layout train/test (YOLOv8n)
+  ./run.sh --framework yolo --task layout --edition diplomatic --train-dir /path/to/train --test-dir /path/to/test --model-name yolov8n
+
+OUTPUT:
+  - Final results: ./results/{data_dir_name}/{edition}/
+  - 5-fold aggregated results: ./results/{data_dir_name}/{edition}/aggregated/
+  - Sequential splits: ./data/{data_dir}/annotations-{edition}/processed_splits/{strategy}/
+  - Processed annotation splits: ./data/{data_dir}/annotations-{edition}/processed_splits/
+
+REQUIREMENTS:
+  - Master annotation file: data/{dataset}/annotations-{edition}/gt.json
+  - 'uv' Python package manager installed
+  - GPU with CUDA support recommended
+  - Framework environments for trocr and yolo

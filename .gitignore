@@ -1,0 +1,37 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv*
+data_test
+output_results
+results.pkl
+outputs
+dict.txt
+work_dirs/I-Ct_91-faster_rcnn
+work_dirs/svtr
+work_dirs/crnn
+biblio_cache.sqlite
+.ipynb_checkpoints
+Temp.ipynb
+augraphy_cache
+gregobase_cache.sqlite
+data/pretrain/text
+.aider*
+yolo11n.pt
+yolov8n.pt
+yolov8s.pt
+models/blla.mlmodel
+models/catmus-medieval-1.6.0.mlmodel
+
+
+logs*
+nvim_*
+temp/fonts
+gregoriofonts
+models/pretrained/calamari_ocr_0
