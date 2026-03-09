@@ -13,21 +13,9 @@ Install system dependencies:
 - [`uv`](https://docs.astral.sh/uv/getting-started/installation/) package manager
 - `curl` and `jq`
 
-1. clone all submodules:
-
-  ```
-  git submodule update --init --recursive
-  ```
-
-  or, if you haven't cloned the repo yet:
-
-  ```
-  git clone git@github.com:LaudareProject/benchmarks.git --recursive
-  ```
-
 ## Reproducibility
 
-1. **Download data**: put it in the `./data` directory: [Link to Zenodo](TODO)
+1. **Download data**: put it in the `./data` directory: [Link to Zenodo](https://zenodo.org/records/18922615)
 2. **Run the experiments**: to reproduce my experiments, just run the main script:
 
 ```bash
