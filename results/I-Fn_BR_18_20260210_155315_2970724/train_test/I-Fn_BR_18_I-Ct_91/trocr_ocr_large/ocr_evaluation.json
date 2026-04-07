@@ -1,0 +1,1828 @@
+{
+  "metrics": {
+    "WER": 39.9085,
+    "CER": 12.2537,
+    "p-CER": 12.4769,
+    "num_samples": 259,
+    "matched_files": 259,
+    "WWER": 38.8519547159388,
+    "R-WER-2": 53.355,
+    "R-WER-4": 49.1071,
+    "R-WER-8": 46.1233
+  },
+  "sample_details": [
+    {
+      "filename": "c022v",
+      "prediction": "frore grana de me aia pietança. Gram reina chi m'ebina ciascun regno sì m'affina la curina quando segno lo non degnon core tegno",
+      "reference": "fior e grana de me aia pietança. Gram reina chi inchina ciascun regno s' m'affina la curina quando segno. Io non degno 'n core tegno",
+      "sample_WER": 32.0,
+      "sample_CER": 9.0226
+    },
+    {
+      "filename": "c100v",
+      "prediction": "Madalena degna da laudare sempre dege Dio per noi pregare. Ben è degna d'essare laudata ke di humilitança di mandiam perdonan ça ke al iudicio sia dal diricto lato am.",
+      "reference": "di humilitança dimandiam perdonan ça ke al iudicio sia dal diricto lato. amen Magdalena degna da laudare sempre degge Dio per noi pregare. Ben' è degna d'essare laudata ke",
+      "sample_WER": 103.4483,
+      "sample_CER": 76.4368
+    },
+    {
+      "filename": "c130v",
+      "prediction": "In sieme sè con c'ordaro que I pagani agnadiati quatro aguiti aparechiaro lungi egnos sì e ·ffusurururati manve pie te fuoro e la vati sulla croce strettamente Iesù Cristo omnipò tente sì fo tuo consolatore. Canto aplo tadeo te lauda mo devotamente iuda fu lu nume tuo ben sapre veracem te ke per quel falso fraudulente fusti kiamato tadeo",
+      "reference": "Insieme se concordaro que i pagani agnadiati quatro aguti aparechiaro lungi e gros si e smisururati manu e piei te fuoro clavati sulla croce strectamente Ihesù Cristo omnipo tente sì fo tuo consolatore. Santo apostolo Tadeo te lauda mo devotamente Iuda fu lu nume tuo ben sapem veracemen te ke per quel falso fraudolente fusti kiamato Tadeo",
+      "sample_WER": 50.8772,
+      "sample_CER": 12.5731
+    },
+    {
+      "filename": "c039v",
+      "prediction": "Li 'n te e flume deventato per l'aver lo tuo peccato scundo s'aldo l'ài trovato de tutto ciò ke sè acusata. Fonto a te per ben l'avare padre sancto apdonare amico saldo a disposare ne la vita k'ài trovata. Aposto è nato ch'umanato per salvar la gente k'era perduta",
+      "reference": "Linte' e flum' è deventato per lavar lo tuo peccato scudo saldo l'ài trovato de tutto ciò ke sè acusata. Font' è a te per ben lavare padre sancto a perdonare amico saldo a disponsare ne la vita k'ài trovata. Cristo è nato et humanato per salvar la gente k'era perduta",
+      "sample_WER": 33.3333,
+      "sample_CER": 10.219
+    },
+    {
+      "filename": "c129v",
+      "prediction": "cantavi de' coltello fusti morto or n'aiuta quello porto ké d'an nati non siamo a te né racoman damo ki sia nostro d'efensore. Di Iesù 'n barlomeo sempre te uole laudare per amore de l'al to deo te lassasti scorteçare no te potero turbare apso di dec beato da lor fusti decollato c'umadissimo rimore. Per la tua morte doglosa Iesù Aposto sì t'à data quella gla",
+      "reference": "cantavi de coltello fusti morto Or n'aiuta quell'oporto ké dan nati non siamo a te ne racoman damo ki sia nostro defensore. Miser san Bartolomeo sempre te volem laudare per amore de l'al to Deo te lassasti scortecare non te potero turbare apostolo di Deo beato da lor fusti decollato cun grandissimo rumore. Per la tua morte doglosa Ihesù Cristo sì t'à data quella gloria",
+      "sample_WER": 35.3846,
+      "sample_CER": 12.0
+    },
+    {
+      "filename": "c036v",
+      "prediction": "de servirava balia E 'l cor nostro fa pensare di te dol çe sospirarefacte tanto te amare null' altracosa 'l cor sia. Ad te amor ave 'n cantato bella co 'l santo portato facti flar dal dectro lato possiar far teco' pagi Vergine di Dio amata kata ringina martire beata.",
+      "reference": "de servir a tua bailia. El cor nostro fa pensare di te dol çe sospirare facte tanto te amare nul'altra cos' al cor sia. Ad te amor aven cantato bella col santo portato facti star dal dextro stato possiar far teco compagnia. Vergene donçella da Dio amata Katarina martire beata.",
+      "sample_WER": 48.0,
+      "sample_CER": 16.8459
+    },
+    {
+      "filename": "c001v",
+      "prediction": "sì avocata al tuo filiol virgo pia. Pietosa regina sovrana con for ta la mente che vana grande medicina ke sana aiuta né per tua cortitia. Portese ke fai grandi doni l'amor tu mai non ci abadori pregante che tu ne perdoni tutta la nostra vollaria. Villoni peccatori semo stati amando la carne ell' peccati.",
+      "reference": "si' avocata al tuo filiol virgo pia. Pietosa regina sovrana confor ta la mente che vana grande medicina ke sana aiutane per tua cortisia. Cortese ke fai grandi doni l'amor tuo mai non ci abandoni pregan te che tu ne perdoni tutta la nostra villania. Villani peccatori semo stati amando la carne e li peccati",
+      "sample_WER": 29.0909,
+      "sample_CER": 5.8632
+    },
+    {
+      "filename": "c086r",
+      "prediction": "ke non sospiritato per amore ke tu morisse Mortre dovarsisti falso sconoscen te villano cielo pigro è veguigente.",
+      "reference": "ké non sospiri tanto per amore ke tu morisse? Morire dovaresti falso sconoscen te villano cieco pigro e negligente",
+      "sample_WER": 47.3684,
+      "sample_CER": 12.1739
+    },
+    {
+      "filename": "c097v",
+      "prediction": "l'aude fo nato Lasso richeça grandeça k'era de' gran de valore e prese aspreça ke spre ça vana glorire baldore volse basseça ke veça de' saliragnadal tore per tale via volse gire a dal to Dio servire monaço d'everne regulato. Facendo vita compita di bon facci o finati ebbe audita badrata ke sette minori frati d'agente e",
+      "reference": "là unde fo nato. Lassò richeça grandeça k'era de gran de valore e prese aspreça ke sprec ça vanagloriri' e baldore volse basseça ke 'nveça de salir a grand' al tore per tale via volse gire ad al to Dio servire monaco devenne regulato. Facendo vita compita di boni facti ordinati ebbe audita banditata ke sette minori frati da gente e",
+      "sample_WER": 40.9836,
+      "sample_CER": 10.8504
+    },
+    {
+      "filename": "c073v",
+      "prediction": "ça sè tutto 'l mondo avesse e te noaggio o dolçamor Iesù in cui osperança tu reglinio cor ke date non c'aggia ma sempre più ri strigal tuo dolçore. Dolçor ke tolli força ad ogni amaro et ogni cosa muti in tua dolceça questo sanno li sancti ke 'l trovaro ke fe'ciaro dolçe morte in amarçça ma con forçolli el dolçe l'à trovare di te Iesù ke vessand'ogn' à spreça tanto",
+      "reference": "ça se tutto 'l mondo avesse e te non agio. O dulç' amor Ihesù in cui ò sperança tu regi 'l mio cor ke da te non caggia ma sempre più ri stringa 'l tuo dolçore. Dolçor ke tolli força ad ogni amaro et ogni cosa muti in tua dulceça questo sanno li sancti ke 'l provaro ké feciaro dolçe morte in amariçça ma con fortò ·lli el dolçe latovare di te Ihesù ke vensar ogn' asprecça tanto",
+      "sample_WER": 38.4615,
+      "sample_CER": 12.3426
+    },
+    {
+      "filename": "c011r",
+      "prediction": "Ghabal grança cum umeltade fo enturbança in tua bonitade qua do in postança de la deitade fosti madre annuntiata Vergene pura per cui diviso fuor de ran gura fo 'l mondo miso porta secura del paradiso ch'era lo seppo sposata. Dio te mandòe san Gabriello ke da porto è 'l saluto bello è a nuntìoe de novello era di Dio madre ordanata.",
+      "reference": "Grand' alegrança cun umeltade fo en turbança in tua bonitade quan do in posança de la deitade fosti madre annuntiata. Vergene pura per cui diviso fuor de rangura fo 'l mondo miso porta secura del paradiso ch'er' a Ioseppo sposata. Dio te mandòe san Gabriello ke t'a portòe 'l saluto bello e anuntiòe de novello era da Dio madre ordenata.",
+      "sample_WER": 35.0,
+      "sample_CER": 8.7464
+    },
+    {
+      "filename": "c095v",
+      "prediction": "nglo per puritade apostolo per povertade martire per volutade fosti per lo grandardore. Mostro la tua scitade et la pura fidelitade lucelli da te predicate stando questi et securi. Venitentia predicasti nova regu la portasti la passione re nove 'l lasti clara stella de l'albori. Molti enferme tu sanasti ci Ge et ratracti tu sanasti morti più re fuscitasti da da da d'a alor vir i vigore.",
+      "reference": "Angelo per puritade apostolo per povertade martiro per volutade fosti per lo grand' ardore. Mostrò la tua sanctitade et la pura fidelitade l'ucelli da te predicate stando queti et securi. Penitentia predicasti nova regu la portasti la passione renovel lasti clara stella de l'alborr. Molti enferme tu sanasti cieki et ratracti tu sanasti morti più re suscitasti dando a lor vit' et vigore.",
+      "sample_WER": 36.5079,
+      "sample_CER": 8.4399
+    },
+    {
+      "filename": "c049r",
+      "prediction": "Gabriel beato Idine Cristo ordina to in te donna venir richiuso. Rinchiuso questo cum' sera può ke don no à isabetça Spirito Sancto in te verra quel k'à inse ongne potença et agia questo per sententia alor di s se la dolçe po' lçella de l'alto Dio mitengançella sia de me com' ài resposo. K'emposo tal conceo Iesù Cristo salva tore lo qual essa partino fuor de pena e de dolore in gran viltà",
+      "reference": "Gabriel beato et dix è Cristo ordina to in te donna venir rinchiuso. Rinchiuso questo cum serà puoké d'om non ài sabença? Spirito Santo in te verà quei k'à in sè ongne potença et agia questo per sententia. Alor dis se la dolçe polçella de l'alto Dio mi teng' ancella sia de me com'ài resposo. Resposo tal concepeo Ihesù Cristo salva tore lo qual essa parturio fuor de pena e de dolore in gran viltà",
+      "sample_WER": 42.6667,
+      "sample_CER": 12.1359
+    },
+    {
+      "filename": "c034r",
+      "prediction": "sperança del o tuo amore Tutti port'an reveretia cum molta gentubidença a te donna depote tia mendi regna tutto 'nore. Per la tua beatudine del o scriptiter n'al lume fontana ke sè flumine pietade per amore O dolçor de te s'afina per la maiesta divina per la tua santa doctrina sì reluce 'l tuo splendore. Tu sè via de' vizitade scala sè d'umi litade de te prese humanitade Iesù",
+      "reference": "speranç' à de lo tuo amore. Tutti portan reverentia cun molta gent' et ubidiença a te donna de poten tia in cui regna tutt' onore. Per la tua beatitudine de lo sempiter nal lume fontana ke sè flumine pietade per amore. O dolçor de te s'afina per la maiestà divina per la tua sancta doctrina sì reluce 'l tuo splendore. Tu sè via de viritade scala sè d'umi litade de te prese humanitade Ihesù",
+      "sample_WER": 37.8378,
+      "sample_CER": 10.2244
+    },
+    {
+      "filename": "c099r",
+      "prediction": "humana cum pura chiara mane ra di scientia fontana molta rivera fe' sì tornare d'errore gran di et Dio predicando la gente archa testamenti fo da l'apostoli chiarato. In grande amore di core Dio l'ebbe omnipotente ke 'l fece doctore vie tore del farò predicate et dieli kia rore splendore de' vedere vera mente la somma deitade nella gina de in festade de la quale passò el glorificato che non humil",
+      "reference": "humana cun pura chiara mane ra di scientia fontata molt' a rivera fé sì tornare d'errori gran di et vio predicando la gente archa testamenti fo da l'apostolico chiamato. In grande amore di core Dio l'ebbe omnipotente ke 'l fece doctore vic tore del faro providente et dieli kia rore splendore de vedere vera mente la somma deitade nella gran de infertade de la quale passò el glorificato.",
+      "sample_WER": 29.4118,
+      "sample_CER": 9.9744
+    },
+    {
+      "filename": "c047r",
+      "prediction": "per amore a lui fo signo di pena re Que 'l fo Signo ai Iuderi non c'ogno sequan suo misteri vda li fei veri pum suo bascio lo fece pillare. Adanna princi perdere e 'l menaro mudo nato lo spoliaro battir lo forte et Sillegaro et serlo tutto in sanquinare. Anna sì l'ebbe mandato a chi prelato quelli ke 'l mandò aperlato",
+      "reference": "per amore a lui fo signo di penare. Quel fo signo ai iuderi non cogno scevan suo misteri Iuda li feci veri per um suo bascio lo fece piliare. Ad Anna principe el menaro inudo nato lo spoliaro battirlo forte et sì 'l legaro et ferlo tutto insanguinare. Anna sì l'ebbe mandato a Chayfasso prelato quelli k'el mandò a Pilato",
+      "sample_WER": 53.3333,
+      "sample_CER": 16.358
+    },
+    {
+      "filename": "c128v",
+      "prediction": "cade morto è 'ncontente aplo deo servente prega il mon criatore. Ecoo sì lippo biato debo core nui te laudamo apso da di o kiamato a te n'era coman damo in tua storia trovamo potescirito certamento ké de l'a pagana gente fosti gran con tutitore. Per la fede corporasti noi di ogne stascione e pessa sùffensi forte pena epassione",
+      "reference": "cadde morto encontenente apostolo de Deo servente prega il nostro criatore. Sancto Filippo biato de bon core nui te laudamo apostolo da Di o kiamato a te ne racoman damo in tua storia trovamo per escritto certamente ke de la pagana gente fosti gran convertitore. Per la fede compattisti nott' e dì ogne stascione e per essa sufferisti forte pena e passione",
+      "sample_WER": 50.0,
+      "sample_CER": 19.6078
+    },
+    {
+      "filename": "c064v",
+      "prediction": "O beata Trinitade o divina ma iestade per la tua gran pietade re piene del tuo amore lo mondo L'omo de falso e destiale sathera na s né fa far male lo corpo ne volengan nare e tu n'aiuta creatore. Spirito sancto glorioso sovrano noi sia gratiosa.",
+      "reference": "O beata Trinitade o divina ma iestade per la tua gran pietade rem piene del tuo amore. Lo mondo Lo mondo è falso e desliale Satha nas ne fa far male lo corpo ne vole 'ngannare e tu n'aiuta creatore. Spirito Sancto glorioso sovra noi noi sia gratioso.",
+      "sample_WER": 35.4167,
+      "sample_CER": 9.5618
+    },
+    {
+      "filename": "c123r",
+      "prediction": "Ben e dico e ·llaudati sempre siate a tutte l'ore sancti apar beati servi del nostro splendore. Sancti apostoli voi laudaro",
+      "reference": "Benedicti e ·llaudati semp re siate a tutte l'ore sancti apostoli beati servi del nostro Segnore. Sancti apostoli voi laudamo",
+      "sample_WER": 35.0,
+      "sample_CER": 16.6667
+    },
+    {
+      "filename": "c005r",
+      "prediction": "dangel foste salutata. De le vergine sè verdore de le spose se' honore a tutta gente port amore tanto se ingratiata. Nella lingua po' contare come tu sè da laudare lo tuo nome fa tremore s'achana s' a mi ·lle fiata. Pregoi avocata mia ke né met ti è 'n bona via questa nostra comparia siate sempre com cybate. Commendate questa terra ch'i",
+      "reference": "d'angel foste salutata. De le vergin sè verdore de le spose sè honore a tutta gente port' amore tanto sè ingratiata. Nulla lingua po' contare come tu sè da laudare lo tuo nome fa tremare Sathanas a mille fiata. Prego t' avocata mia ke ne met ti en bona via questa nostra compania siate sempre commendata. Commendamte questa terra che",
+      "sample_WER": 33.3333,
+      "sample_CER": 10.6825
+    },
+    {
+      "filename": "c058v",
+      "prediction": "andar cum pretiosunguento l'angel dire nonne quie in Galilea ké li retiò voi preced' era gratioso Gaudendo via aparbe a l'an mangelena nell'orto dice man a pi raparbe in altra mena",
+      "reference": "andar cun pretios' unguento l'angel dixe nonn è qui è in Galilea ké surrexìo voi precederà gratioso. Gratios' essendo 'n via apparbe a la m Magdalena nell'orto dixe Mari a poi raparbe inn altra mena",
+      "sample_WER": 65.7143,
+      "sample_CER": 24.1379
+    },
+    {
+      "filename": "c090r",
+      "prediction": "a per niente amici non vole né parti quando viene al separare. Contra liei non vale forteça? piença né belleçça curre ne palaço né grandeça tutte le fa abandonare. alomo ke neco e bene asciato al usumeri ke m'al fo' nato mon to è amaro questo dectato k'à no se vole e medare.",
+      "reference": "à per niente amici non vole né parenti quando viene al separare. Contra liei non vale fortecça sa piença né bellecça turre né palacço né grandecça tutte le fa abandonare. A l'omo k'è ricco e bene asciato a l'usurieri ke mal fo nato molto è amaro questo dectato ki non se vole emendare.",
+      "sample_WER": 43.3962,
+      "sample_CER": 12.7946
+    },
+    {
+      "filename": "c078r",
+      "prediction": "buono servidore. Servire a te Iesù miamoro più ke nul' altro delecto gemai e 'l core non trova altro riposo in non seente Iesù amor perfecto ké de li tuoi servi sè consolatore. consolare non poi terrena cosa l'anima ke facta a tua semplaca. piu ke tutto 'l mondo e pretiosa enobile sopra ogni altra su s tatia e solo tu Iesù li poi dare posa è riempiere sua bastança",
+      "reference": "buono servidore, Servire a te Ihesù mi' amoroso più ke nul' altro delecto gemai el core non trova altro riposo si non se en te Ihesù amor perfecto ke de li tuoi servi sè consolatore. Consolare non pò terrena cosa l'anima k'è facta a tua semblança più ke tutto 'l mondo è pretiosa e nobil è sopra ogni altra sus tantia e solo tu Ihesù li pòi dare posa e rimpiere sua bastança",
+      "sample_WER": 38.3562,
+      "sample_CER": 10.8527
+    },
+    {
+      "filename": "c098r",
+      "prediction": "nita fallita for morti e dicolla ti predicando la croce vdendo quel la voce de martirio fo in amorato Fostale inteça partença divene frate minore et pui deça l'argòe ça d'essare predicatore l'amiserre deça fallenleça confondiero ogne erro re la intra pagana et la 'lege Cri anai n'agarei per essare tommato. Con quello dissuire compire mon sarse in terrare in ave al nostro sire piacere non fo di lor gen",
+      "reference": "nita fallita for morti e dicolla ti predicando la croce udendo quel la voce de martirio fo inamorato. Fo tale intença partença divenne frate minore et providença larghe ça d'essare predicatore la miscre dença fallença confondier o ogne erro re là in terra paganaet la lege cristi ana innaçaret per essare tormentato.innalçareana innaçaret per essare tormentato. Con quello dissuire compire mos sarse intraro in nave al nostro sire piacere non fo di lor gdavegdasire piacere non fo di lor gdave",
+      "sample_WER": 48.75,
+      "sample_CER": 25.8449
+    },
+    {
+      "filename": "c089v",
+      "prediction": "Tutta gente cum tremore vive sepre cum gratia tremore eperciò ke son securi di passar per questo manre. Papa co' ·llor peradori cardinali e gratia signori iusti et sci et pecca tori fa la morte raguallare. La morte viene come furore spogla l'omo come ladrone satolli et freschi fa degiuni e la pelle remutare Non recve donamente le recheçe",
+      "reference": "Tutta gente cun tremore vive sempre cun gran tremore empercioké son securi di passar per questo mare. Papa coll'onperadori cardinali e gran signori iusti et sancti et pecca tori fa la morte ragualliare. La morte viene come furore spogla l'omo come ladrone satolli et freschi fa degiuni e la pelle remutare. Non receve donamente le recheçe",
+      "sample_WER": 25.0,
+      "sample_CER": 8.8235
+    },
+    {
+      "filename": "c071r",
+      "prediction": "li angeli li for mostrati en figura humanata. Quando vide trefigure adoro un creatore ciascio date da te segnore la so fe' fo confirmata. Entutte le creatire sì relve 'l tuo splendore come dicon le scriptù re et e verita trovata. La potença inereando sapiença in ordinando bonita Igubermo ogne cosa tutta fiata. Tu padre celestiale per lor gu' dar",
+      "reference": "li angeli li for mostrati en figura humanata. Quando vidde tre figure adorò un creatore e 'mperciò da te da te Segnore la so fe fo confirmata. En tutte le creature sì reluce el tuo splendore come dicono le scriptu re et è verità provata la potença in creando sapiença in ordinando bonità in gubernando ogne cosa tutta fiata. Tu Padre celestiale per lor guardar",
+      "sample_WER": 44.6154,
+      "sample_CER": 12.2283
+    },
+    {
+      "filename": "c008r",
+      "prediction": "te davate a la belissima. Quando nel monte venia vidd' e la dona ke salix li angeli sua copania tutta laire plenissima E delli plange chi amo molto do la creme sì la valuolto thesa uro ke mise tolto gemma pretiosa Giamai quice non me muto sì ne mi dai del tuo aiuto fa' sì ke mi sì à creduto donna laudatissima. Li rana sè destrende bea ke non sin Sign' è imperioso sì discire.",
+      "reference": "te davante a la belissima. Quando nel monte venia vidde la donna ke salia li angeli sua compania tutta l'aire plenissima. Ed elli plange e kiamò molto de lacrime si lava 'l volto thesa uro ke mi sè tolto gemma pretiosissima. Giamai quince non me muto si n mi dai del tuo aiuto fa' sì ke mi sia creduto donna laudabilissima. La raina se destrenge vidde ben ke non si 'nfigne in presente si discinge",
+      "sample_WER": 52.0,
+      "sample_CER": 19.5
+    },
+    {
+      "filename": "c067v",
+      "prediction": "c'u dolçe aulor pretioso Tutti isci fai gaudere cum tanto amor per mane ke ciascun al suo volere di nullo bene invidioso M'alto fanno gran laudore tanto itene in grandonore come ricco creatore donni ben del tioso Li angeli cantan gloria Iesù dolçe me moria splendoria terribile et abundoso. Tu dol core cum dolceça tu suave du piageçato potente per forteça",
+      "reference": "cun dolçe aulor pretioso. Tutti i sancti fai gaudere cun tanto amor permanere ke ciascun à 'l suo volere di nullo ben è invidioso. Multo fanno gran laudore tanto i tène in grand' onore come ricco creatore d'onni ben delitioso. Li angeli cantan gloria Ihesù dolçe me moria Spiritu de victoria terribile et abundoso. Tu dolçore cun dolçeça tu suave cun piageça tu potente per forteça",
+      "sample_WER": 46.9697,
+      "sample_CER": 13.2653
+    },
+    {
+      "filename": "c105r",
+      "prediction": "de Madalena sì amorosa k'è cosco Agvisa de sua sposa nel suo amore la volse con fervare Quando Cristo fo passiana coli di seipoli era raunata Maria magdalena in quello stato Iesù Cristo andò a visitare. L'angelena avea seco portato un oguento delicato unse Iesù Cristo d'ogne lato giuda falso prese amormorare Di ·ssé questo e' grande perdemento",
+      "reference": "de Madalena sì amorosa ke con seco a guisa de sua sposa nel suo amore la volse conservare. Quando Cristo fo passionato co li di scipoli era raunata Maria Magdalena in quello stato Ihesù Cristo andò a visitare. Magdalena avea seco portato un onguento delicato unse Ihesù d'ogne lato Giuda falso prese a mormorare. Disse questo è grande perdemento",
+      "sample_WER": 37.2881,
+      "sample_CER": 12.5714
+    },
+    {
+      "filename": "c041v",
+      "prediction": "Molti messi ave mandati la divina maiestade e le gente predecate co me dicom le scripture Intra quali nostro fo trovato nullo privilegiato d'arme nove corre dato cavalieri a tantore A la Verna monte santo cum gram pianto turnocanto lo serapym consolatore. Quando fo da Dio mandato san Frances cisco lo beato lo mondo k'eratene brato recevette gran splendore.",
+      "reference": "Molti messi ave mandati la divina maiestade e le gente predecate co me dicom le scripture. Intra quali non fo trovato nullo privilegiato d'arme nove corre dato cavalieri a tant' onore. A la Verna monte santo cun gram pianto turnò 'n canto lo serapyn consolatore. Quando fo da Dio mandato san Fran cisco lo beato lo mondo k'era 'ntene brato recevette gran splendore.",
+      "sample_WER": 19.0476,
+      "sample_CER": 6.5574
+    },
+    {
+      "filename": "c046r",
+      "prediction": "Dastella sè c'ansaro ritarre rode capitaro t'ài novele li portaro ke 'l fecer molto dolente Apostolo da Cri Chedioso Reparata Ave Ma quando. ta ciascuna. flore sì per a Iesù Dissar nate re benigno quel kemp perìo d'ogne regno en ciel ne ap pariton segno ke ·lle nato veramente. E 'l re fo molta dirato colli savico tastato davoi m'è sia tostonse guato lave pessa n'asente puose 'n mente luna via vi' dar ke Belcem nascea quici be' huma la gente",
+      "reference": "Da la stella se cansaro ritt' a ·rre 'Rode capitaro tai novelle li portaro k'el fecer molto dolente. Et Erode a loro dicia che da lor saper volia duv' è nato quello Mes sia el qua l da re si fa venente. Dissar nat' è 're benigno quei k'è 'm perio d'ogne regno en ciel n'è ap parito segno k'ell' è nato veramente. El re fo molt' adirato colli savi con tastato da voi me sia tosto 'nse gnato là 've pote star nasente. Puosen mente in una via vider ke 'n Meleem nascea quei k'alumina la gente.",
+      "sample_WER": 77.551,
+      "sample_CER": 33.4004
+    },
+    {
+      "filename": "c119r",
+      "prediction": "se divino tu fai l'ù suraphyno di tua gloria isfl'amare. ch'erubin et li altri chori apli gran predicatori martiri et con fessori virgene fai io cum dare. Patriarche et prophetù li traiesti de la rete di te amor a vien gran sè ma nostro sì crebro Or son consolati è tutto di te gau udio cum disducto tu sè canto sença lucto cielo e tra fai cantare.",
+      "reference": "sè divino tu fai lu saraphyno di tua gloria inflammare. Cherubin et li altri chori apostoli gran predicatori martiri et con fessori virgene fai iocundare. Patriarche et prophe tu li traiesti de la rete di te amor avien gran sete mai non si credian sati. Or son consolati en tutto di te ga udio cun disducto tu sè canto sença lucto cielo e terra fai cantare.",
+      "sample_WER": 34.8485,
+      "sample_CER": 13.3333
+    },
+    {
+      "filename": "c088v",
+      "prediction": "grande boce ke fenda elpolmo ne e 'n fine a la fece e' transmortisse Transmortissi cuore e va gridando e pire amore amòe amoc an mado ke no l'ài puramente ama to va dolornato è purturisce. Chi vole lo mondo desprec çare sempre la morte dea' pensare.",
+      "reference": "grande boce ke fenda el polmo ne enfine a la foce e transmortisse. Transmortisci cuore e va' gridando e pure amore amore amore am mando ké no l'ài puramente ama to va' dolorando e parturisce. Chi vole lo mondo despreç çare sempre la morte dea pensare.",
+      "sample_WER": 47.8261,
+      "sample_CER": 10.9804
+    },
+    {
+      "filename": "c068r",
+      "prediction": "come Signor poneroso. Garço de l'apran sperança a te Cristo per pietança tu n'ài facti a tua sè bia ça prego ke ne ne né riposo. Spirito Sancto da servire. daval core de te sentire. Spiriti di ventade e fontana de",
+      "reference": "come Signor ponderoso. Garço de la gran sperança a te Cristo per pietança tu n'ài facti a tua sembian ça prego ke ne dea riposo. Spirito Sancto da servire da' ·nn al core de te sentire. Spiritu di veritade e fontana de",
+      "sample_WER": 30.9524,
+      "sample_CER": 10.7143
+    },
+    {
+      "filename": "c042r",
+      "prediction": "Per divino spiramento falli dato entendimento de' salvar da' perde mento molti k'eran peccatori A laude de l'altinitate l'ordine tre da lui perlatate per lo mondo dilata te fanno fructo cum aulore. Li poveri frati minore de Cristo sè guitatore de le gente son doctori predecando sençerrore L'altre son le pretiose Margarite gratiose vergeni donne rechiuse per amor del Criatore.",
+      "reference": "Per divino spiramento folli dato entendimento de salvar da perde mento molti k'eran peccatori. A laude de la Trinitate l'ordine tre da lui plantate per lo mondo dilata te fanno fructo cun aulore. Li poveri frati minore de Cristo se guitatore de le gente son doctori predecando senç'errore. L'altre son le pretiose margarite gratiose vergeni donne renchiuse per amor del criatore.",
+      "sample_WER": 21.3115,
+      "sample_CER": 5.0
+    },
+    {
+      "filename": "c010v",
+      "prediction": "madre beata. Ave Maria gratia stella diana luce serena divita via per cui de pena e la gente liberata.",
+      "reference": "madre beata. Ave Maria gratia plena stella diana luce serena de vita via per cui de pena è la gent liberata.",
+      "sample_WER": 23.8095,
+      "sample_CER": 10.0917
+    },
+    {
+      "filename": "c099v",
+      "prediction": "B'uono começare sperare fa laude ella finita perseverare fa dare gio ie compiute et gratita possa recrea re formare de lui ki b'è servita cioè bon compimento lasù è quello convento l'aveciascunob' è meritati sempre a legnaça condança taccia lo Padovano ke tale orança a le grança abbe di Dio sovrano ke de a possança guardança di quello d'umili et piano non volse ké f'al li ·ssé di cio ke predisse ke padva",
+      "reference": "Buono commençare sperare fa laude ella finita perseverare fa dare gio ie compiute et gradita possa recrea re formare de lui k'à ben servita ciò è bon compimento lasù en quello convento là uv' è ciascuno ben meritato. Sempre alegrança con dança faccia faccia lo padovano ké tale orança ale grança abbe da Dio sovrano ke de a possança guardança di quello humili et piano non volse ke fal lisse di ciò ke predisse ke Padua",
+      "sample_WER": 39.4737,
+      "sample_CER": 14.7465
+    },
+    {
+      "filename": "c022r",
+      "prediction": "O divi confortate in a legrança voi k'à vete in Dio la gratia sperança mandò na cum Iesù nostra baldança tutt' or a lo patre sonno presente Madre de Cristo piena di scientia invoi esolaco gioie sapiença per pietà ci dona co'gnosceça ke sempre teco sia la nostra mente O Maria donelia sè fontana",
+      "reference": "Or vi confortate in alegrança voi k’ a vete in Dio la gran sperança madon na cun Ihesù nostra baldança tuttor a lo Patre sonno presente. Madre de Cristo piena di scientia in voi è solaço gioi e sapiença per pietà ci dona cognoscença ke sempre teco sia la nostra mente. O Maria d’omelia sè fontana",
+      "sample_WER": 41.0714,
+      "sample_CER": 11.2903
+    },
+    {
+      "filename": "c085r",
+      "prediction": "mor maravellioso Maravellioso con fervença quando verra a iudicare con angelica sè queça Cristo starà in su nellare non fie sì iusto ke tremore non facia quando d'ara sententia ki no' li avara factubientia diva ra benessare timoroso. Timorosa pietança la corona fue a vedere la croce Ichiovi et la l'ancia coi pati gran martire l'aceto e 'l fel' è k'ebbe abere chei fo",
+      "reference": "mor maravellioso. Maravellioso con fervença quando verrà a iudicare con angelica se quença Cristo starà in su nell'aire non fie sì iusto ke tremare non facia quando darà sententia ki no li avarà fact' ubidientia duvra rà ben essare timoroso. Timorosa pietança la corona fie a vedere la croce i chiovi et la lancia coi patì gran martire l'aceto e 'l fèle k'ebbe a bere che i' fo",
+      "sample_WER": 38.2353,
+      "sample_CER": 10.0515
+    },
+    {
+      "filename": "c111r",
+      "prediction": "ciascun sciente. Sovete lo laudiamo et abien ça ciascun li facia cum gram revereça k'ell' è ministro de",
+      "reference": "ciascun scente. Sovente lo laudiamo et ubiden ça ciascun li facia cun gram reverença k'ell' è ministro de",
+      "sample_WER": 27.7778,
+      "sample_CER": 5.5556
+    },
+    {
+      "filename": "c055v",
+      "prediction": "Quanto è di gna da laudare core. nolo però pensare legua no lo po con tare la verace sancta croce. Questol Egno pretioso edi legno virtuoso lo nemico a confuso per la força de la croce.",
+      "reference": "Quanto è digna da laudare core no lo pò pensare lengua no lo pò contare la verace santa croce. Questo legno pretioso è di legno virtuoso lo nimico à confuso per la força de la croce.",
+      "sample_WER": 47.2222,
+      "sample_CER": 10.1064
+    },
+    {
+      "filename": "c114r",
+      "prediction": "Fervetissimo segnore ké li sanc ti ài rimflamati et dogla et do nore tu li à in ciel è 'ncoronati constitusti redemptore nel per petvi imperiati vivendo dei fe cati con teco alto 'mperadore. Ré filiol de' grande inperio ké regente tutto 'l mondo per virtù di gram miserio de lo Spirito locundo a voi sì facian prego ro ke madiate pace al mondo ke non viva istanto errore.",
+      "reference": "Ferventissimo Segnore ke li sanc ti ài rimflamati et de gloria et d'o nore tu li ài 'n ciel encoronati constituisti redemptore nei per petui imperiati vivendo deifi cati con teco alto 'mperadore. Re filiol de grande imperio ke regete tutto 'l mondo per virtù di gram misterio de lo spirito iocundo a voi sì faciam preghe ro ke madiate pace al mondo ke non viva in tanto errore.",
+      "sample_WER": 39.1304,
+      "sample_CER": 9.4488
+    },
+    {
+      "filename": "c018r",
+      "prediction": "divina virtù gratiosa belleça formosa di Dio sè sè sè plança. Teplo sacrato ornato vasello in nutiato da san Gabriello incarnato nel tuo ventre ben fructo novello cum gran dilectança. Verginitade a Dio permente viva nita co' ·llui con umigote cum piude",
+      "reference": "divina virtù gratiosa belleça formosa di Dio sè semblança. Templo sacrato ornato vasello an nuntiato da san Gabriello Cristo incarnato nel tuo ventre bello fructo novello cun gran delectança. Verginitade a Dio prometteste uma nità co ·llui coniungeste cun purità",
+      "sample_WER": 45.0,
+      "sample_CER": 18.1481
+    },
+    {
+      "filename": "c116r",
+      "prediction": "avieno li viven segne cum saluto de l'ectoso. que 'l saluto alor fo' tanto pie no de' spusco ke iobi nel fu ò canto exulto fo gaudioso. propheto la ve kiarella k'avea ogne Cristo fosto gaudioso. ta tu pulçella piena del sol l'umino. Ogn' om canti novel canto",
+      "reference": "avieno li vive 'nsegne cun saluto delectoso. Quel saluto alor fo tanto pie no de Spiritu Sancto ke Iohanni nel su o canto exultò fo gaudioso. Prophetò la vekiarella k'avea en corpo l'alta stella benedic ta tu polçella piena del sol luminoso. Ogn' om canti novel canto",
+      "sample_WER": 53.1915,
+      "sample_CER": 23.7037
+    },
+    {
+      "filename": "c079r",
+      "prediction": "ma sè lo suo palato fosse sano agustare sia gran dilectamento sovr'ogn' altro sireste lo meglore. Meglore cosa de te e nell'amente non po desiderare e 'nperciò dova rebe el core con teco la Iesù sempre collamente converrare oi cre atura de' quagiu per lo tuo a more è 'niente reputare et so lo te pensare dolce segnore. Signore ki te vole dare la mente pura non te dea dare altra",
+      "reference": "ma se lo suo palato fosse sano a gustare sìa gran delectamento sovr' ogn' altro sireste lo meglore. Meglore cosa de te enella mente non pò desiderare emperciò dova rebe el core con teco laisù sempre colla mente conversare oni cre atura de quagiù per lo tuo a more eniente reputare et so lo te pensare dolce Segnore. Signore ki te vole dare la mente pura non te dea dare altra",
+      "sample_WER": 32.3944,
+      "sample_CER": 7.6316
+    },
+    {
+      "filename": "c101v",
+      "prediction": "Lo suo peccato pianse cum dolore ed el mondo volse uscire d'errore ra Cristo cum verace amore in suoi mani sì volse comedare. Molto despreçço la sua grandeçça perciò k'è se vedea intata basseçe ça lo suo corpo molto lo dispreçe ça ke nostro sè credea pietà trovare Simon Pharisco fece convito a Iesù Cristo fece uno grande convito açi ke 'l magiare fosse compito magdalena andava percerçare.",
+      "reference": "Lo suo peccato pianse cun dolore e del mondo volse uscire d'errore et a Cristo cun verace amore in suoi mani si volse commendare. Molto despreççò la sua grandeçça per ciò ke se vedea in tanta basseçc ça lo suo corpo molto lo dispreç ça ké non se credea pietà trovare. Simon Phariseo fece convito a Ihesù Cristo fece uno grande convito ançi ke 'l mangiare fosse compito Magdalena andava per cercare.",
+      "sample_WER": 37.5,
+      "sample_CER": 9.2233
+    },
+    {
+      "filename": "c072r",
+      "prediction": "pietade ke nostra humilitade en vita e ·tna sì exaltata. Iroppo per del tempo ki benni tama dolç' amor Iesù sovra gna morre.",
+      "reference": "pietade ke nostra humilitade en vita eterna si' exaltata. Troppo perde 'l tempo ki ben non t'ama dolç' amor Ihesù sovr'o gn' amore.",
+      "sample_WER": 52.1739,
+      "sample_CER": 15.7895
+    },
+    {
+      "filename": "c024r",
+      "prediction": "amoria ke ma coremal me mena la c'aten à mentrena d'esto mondo sì 'l seendo merçé d'amine sprecança? Con Regina sovrana de gram pietade ente dolçe madre agiam reposança. Etella chianta col grande splendore.",
+      "reference": "memoria ke m'acor' e mal me mena la catena m'enterrena d'esto mondo s'il secundo merçè damme spreçança. Regina sovrana de gram pietade et te dolçe madre agiam reposança. Stella chiarita col grande splendore",
+      "sample_WER": 57.5758,
+      "sample_CER": 17.4528
+    },
+    {
+      "filename": "c010r",
+      "prediction": "sè fa kiamare. Penctena penetia domandala con reveretia omgno pensi la sentitia ke non sè dia mai revocare. Iesù Cristo manda pace sempre da la formace la qual gemai altro non face chei peccatori atormentare. Ave Maria gratia plena di geve",
+      "reference": "se fa kiamare. Penetentia penetentia domandala con reverentia omgnom pensi la sententia ke non se dia mai revocare. Ihesù Cristo manda pace scampane da la fornace la qual gemai altro non face che i peccatori atormentare. Ave Maria gratia plena vergene",
+      "sample_WER": 34.1463,
+      "sample_CER": 9.9206
+    },
+    {
+      "filename": "c044v",
+      "prediction": "Nel prescpe era beato quoi ke 'n in edo è contemplato dai santi de siderato regiardando disvò splendore. Parturito laco canto pieno de lo Spirito santo de li bracia li fe mato cum grandissimo fervore Poi la madre gloriosa stella d'a e luminosa lato sol desiderosa lactava cum gram dolçore.",
+      "reference": "Nel presepe era beato quei ke 'n in celo è contemplato dai santi desiderato reguardando el suo splendore. Parturito l'à cun canto pieno de lo Spiritu Santo de li bracia li fé manto cun grandissimo fervore. Poi la madre gloriosa stella cla e luminosa l'ato sol desiderosa lactava cun gram dolçore.",
+      "sample_WER": 35.2941,
+      "sample_CER": 9.6667
+    },
+    {
+      "filename": "c004r",
+      "prediction": "a l'alta donna è 'n coronata. Fresca vergine donçella primo fior rosa novella tutto 'l mondo are la pella nella bonoi fosti non",
+      "reference": "a l'alta donna encoronata. Fresca vergene donçella primo fior rosa novella tutto 'l mondo a te s'apella nella bon' or fosti nata.",
+      "sample_WER": 45.4545,
+      "sample_CER": 13.8462
+    },
+    {
+      "filename": "c072v",
+      "prediction": "Amor ki tama non sta o tioso tan to li par dolçe de te gustare ma vittioso nive desideroso come te possa strecto più amare ke",
+      "reference": "Amor, ki t'ama non sta otioso tan to li par dolçe de te gustare ma tuttasor vive desideroso come te possa strecto più amare",
+      "sample_WER": 29.1667,
+      "sample_CER": 9.6
+    },
+    {
+      "filename": "c115r",
+      "prediction": "Dio per sua gratia Gabriel com prophetia mandò a sancta chana k'avarea fu 'l gioioso Vechio vechia m'ogne ave disableet no de via ave del dei potta privilegiato",
+      "reference": "Dio per sua gran cortesia Gabriel cun prophetia mandò a san Ça charia k'avarea filiol gratioso. Vechio vechia mogle avea Elisabet non dovea aver fili ol d' ei potea per natura esser",
+      "sample_WER": 70.9677,
+      "sample_CER": 31.5217
+    },
+    {
+      "filename": "c124r",
+      "prediction": "E Erami foste de Iesù Cristo e Signo ste il suo vaggio perravere quel dolçaquisto lo qual nostrov va paraggio tutti cum fermo coraggio vo' prega cum reverença ke naitiati a la senteria k'i no nanciamo è 'n quello ardore. Voi chiama per avo canti noete e di ogni sta scione upostoli glorificati pieni deo solatione per la sancta passone ké dal mundo reccueste ella sca gla",
+      "reference": "Servi foste de Ihesù Cristo e sequi ste il suo viagio perr avere quel dolç' aquisto lo qual non trov va paraggio tutti cun fermo coragio vo pregam cun reverença ke n'aitiati a la sentetia ki no n andiamo en quello ardore. Voi chiamàm per avocati nocte e dì ogni stascione apostoli glorificati pieni de con solatione per la sancta passione ke dal mundo receveste ella sancta gloria",
+      "sample_WER": 54.4118,
+      "sample_CER": 14.5455
+    },
+    {
+      "filename": "c107r",
+      "prediction": "sì piena sì la strege cum forte catena ke 'l suo core non poten a passare. Del suo amore andava cercan do et tuttoragia piango e la primando di Iesù andava dimando kius pvia potea tro vare. Poi ke Cristo fo re surrexito al ten ço die sì come avete udito a la Magdalena fo apparito in umorto per li èi consolare.",
+      "reference": "sì piena sì la strenge cun forte catena ke 'l suo core non pote a passare. Del suo amore andavan cercan do et tuttora già piangendo e lagrimando di Ihesu andava dimando kiunque per via potea tro vare. Poi ke Cristo fo resurrexito al ter ço die sì come avete udito a la Magdalena fo apparito in un orto per liei consolare.",
+      "sample_WER": 32.2581,
+      "sample_CER": 8.8957
+    },
+    {
+      "filename": "c038r",
+      "prediction": "laterra mandò e 'l banditore ké cia scun venisse a falli honore già no fosse in sì l'onga contrata ké venissai a ·ll'otributo al suo Dio k'era s'ordòe muto a null' om per se po dare aiuto è quest' è la ver ta trovata. E lo peradore sacrificando tutta l'alta sequitando la k'atenna u Dio met ter lo bando è mantenete fo maravelli era liata.",
+      "reference": "la terra mandò el banditore ke cia scun venisse a falli honore già non fosse in sì longa contrata. Ke venissar' a da' ·llo tributo al suo Dio k'era sordo e muto a null'om per sè pò dare aiuto e quest'è la ver tà provata. E lo 'mperadore sacrificando tutta l'altra gente sequitando la Katerina udìo met ter lo bando e mantenete fo maravelliata liata.",
+      "sample_WER": 52.3077,
+      "sample_CER": 15.9218
+    },
+    {
+      "filename": "c035v",
+      "prediction": "Voi k'aveten ciel lamenti or canta te dolçemente Cristo iusta voi pre sente cla vergene Maria. De quel amor sì gioioso ognon canti glorioso ciascun de noi stea somoroso a servillo tutta via. Or canti amo conalegrança de la bella nostra amança k'ell' è nostra consolança sempre benedicta sia Alta donna gloriosa madre de Iesù pietosa del paradiso tu sè rosa la più bella ke mi sia.",
+      "reference": "Voi k'avete 'n ciel la mente or canta te dolçemente Cristo iusta voi pre sente e la vergene Maria. De quel' amor sì gioioso ogn'on canti glorioso ciascun de noi ste' asomoroso a servillo tuttavia. Or cantiamo con alegrança de la bella nostra amança k'ell' è nostra consolança sempre benedicta sia. Alta donna gloriosa madre de ihesù pietosa del paradiso tu sè rosa la più bella ke ni sia.",
+      "sample_WER": 26.087,
+      "sample_CER": 4.2821
+    },
+    {
+      "filename": "c088r",
+      "prediction": "no sia più date c'aciato e non fugisse Fue cor mio ke sè messo è n cacia la carne el mondo e 'l diauolo te menacia ma purgate l'amor Iesù li braccia ke non perisse. perire potaresti sì nostro sè d'efeso dal grande amor Iesù da cui sè ateso volte abracciare es' t'à en croce desteso salvi venisse Vienne cor mio andiamone a la croce sospira e piange et lassa sì",
+      "reference": "non sia più da te caciato e' non fugisse. Fuge cor mio ké se' messo en cacia la carne e 'l mondo e 'l diavolo te menaccia ma porgate l'amor ihesù li braccia ke non perisse. Perire potaresti si non sè defeso dal grande amor Ihesù da cui sè ateso volte abracciare e sta en croce desteso s'a lui venisse. Vienne cor mio andiamone ala croce sospira e piange et lassa sì",
+      "sample_WER": 40.2778,
+      "sample_CER": 10.7527
+    },
+    {
+      "filename": "c048r",
+      "prediction": "Amoroso veramente fo di noi cum gram pietança poi ke d'alto 'ni potente discese ad nostra sembluca or nostro fo grande disiança per no",
+      "reference": "Amoroso veramente fo di noi cun gram pietança poi ke d'alt' omni potente discese ad nostra semblança or non fo grande disiança per noi",
+      "sample_WER": 25.0,
+      "sample_CER": 9.4891
+    },
+    {
+      "filename": "c066v",
+      "prediction": "ke donasti pace al mondo tu sì gnor fresche iocondo tu ne guar da del perfundo di quel lo gotenebu broso. Lava nulla luce ogne reo virico duce ki vi canto cuocè già me non starà o tioso A tuo regno né conduca san ma il core in Iesù Iesù Iesù Iesù ke duca ke per te e virtuoso ké possi adornare colli sci te laudare o veder gloricare",
+      "reference": "Ke donasti pace al mondo tu Si gnor fresch' e iocondo tu ne guar da del profundo di quel logo tenebro broso la v' à nulla luce ogne reo vi si con duce ki vi cade tutto cuoce gia mai non starà otioso. Al tuo regno ne conduca san Ma theo Marco et Luca san Iohanni quei k'è duca ke per te è virtuoso ke possiam teco regnare colli sancti te laudare et veder glorificare",
+      "sample_WER": 53.3333,
+      "sample_CER": 25.2033
+    },
+    {
+      "filename": "c070r",
+      "prediction": "Alta trinità beata di noi sempre sì à dorata. Inita gloriosa unita maravili osa tu sè manna savorosa a la tor",
+      "reference": "Alta Trinità beata da noi sempre si' adorata. Trinitade gloriosa unità maravilli osa tu sè manna savorosa a tutor desiderata",
+      "sample_WER": 50.0,
+      "sample_CER": 22.8346
+    },
+    {
+      "filename": "c129r",
+      "prediction": "li pagani sença rascione sulla croce te legaro manù è per t'à 'n to ti raro ke moristi in amaròe Li laudamo sancto Mathico on fra li altri evangelisti de' Cristo figlolo deo multe vageli sì facisti colla donna manu servi visti la sua sancta passione la qual da compictione ad ogne suo servidore. De la fedicavia l'age ni conforto quando l'amissa",
+      "reference": "li pagani sença rascione sulla croce te legaro manu e pei tan to tiraro ke moristi inn amarore. Ti laudamo sancto Matheo enfra li altri evangelisti de Cristo figlolo de Deo mult' evageli sì facisti culla tua manu scri visti la sua sancta passione la qual dà compuntione ad ogne suo servidore. De la fide predicavi ai paga ni conforto quando la missa",
+      "sample_WER": 46.0317,
+      "sample_CER": 14.2045
+    },
+    {
+      "filename": "c112v",
+      "prediction": "Gaudente starpo cum gran sciguran ça ch'in questo mondo apace et consolança sancto Michel l'alta a l'abiliança fo ·lle chi mi son resta fervente. Fciamo laude a ti ·tti sancti colla vergine magnire dubuon",
+      "reference": "Gaudente star pò cun grande sciguran ça chi 'n questo mondo à pace et consolança sancto Michel l'aita a la bilança foll' è chi 'm soperbia resta fervente. Faciamo laude a tutt' i sancti colla vergene maggiure de buon",
+      "sample_WER": 56.4103,
+      "sample_CER": 19.8198
+    },
+    {
+      "filename": "c060v",
+      "prediction": "e la mirabile ascensione. Di Iesù Cristo filiol de Dio ch'al suo Padre se negio custod di enci el salio san Marco 'l dice in suo",
+      "reference": "e la mirabile ascensione di Iesù Cristo filiol de Dio ch' al suo Padre se ne gio e 'n cotal dì en ci el salio san Marco 'l dice in suo",
+      "sample_WER": 38.7097,
+      "sample_CER": 11.7647
+    },
+    {
+      "filename": "c059r",
+      "prediction": "atutti schiaro la serena chei per se lasso toccare gratia postoli con taro d'andar alor so' difioso. Delioso lor contare ciò k'è Cristo dol t'avea lo lor decto d'espreçaro cre diano fosse fantasia poi rapar ben quella dia a duo disempli fe' cena al castello de mau apen l'à visar lo fo nascoso. Acoso lui recordanso ciò k'è rode al c'a ·minò quando con tanto sè parento lor pelegrino che",
+      "reference": "a tutti schiarò la serena ché i pei se lassò toccare gite ad li apostoli contare d'andar a lor so' desioso. Desiose lor contare ciò ke Cristo dec t' avea lo lor decto despreçaro cre diano fosse fantasia poi rapar be ìn quella dia a duo discipuli fe' cena al castello d'Emau apena l'avisar lo' fo nascoso. Ascoso lui recordarse ciò che 'ro dixe al camino quando co' ·llui adunar se parendo lor pelegrino disser",
+      "sample_WER": 56.0,
+      "sample_CER": 19.9041
+    },
+    {
+      "filename": "c081v",
+      "prediction": "o dolce redemptore Redemptore questo e mio volere d'amarte e de servire quatro potesse o dolce Cristo debiate piacere ke 'l mio core del tuo amore sempisse quella ora fall'ame vedere ké tu Iesù e 'l mio core tegnese edé me fos se' cobo bascitore. Pasce me o pane celestiale è do gn' altra cosa fare e 'nfastire o cobo de vita sempretnale ki ben",
+      "reference": "o dolce redemptore. Redemptore questo è mio volere d'amarte e de servire quanto io potesse o dulce Cristo debiate piacere ke 'l mio core del tuo amore s'empisse quella ora fa' ·lla me vedere ke tu Ihesù el mio core tegnesse de me fos se cibo pascitore. Pasceme o pane celestiale e d'o gn' altra cosa fame enfastidire o cibo de vita sempr'eternale ki ben",
+      "sample_WER": 41.5385,
+      "sample_CER": 11.236
+    },
+    {
+      "filename": "c113v",
+      "prediction": "dore per divina privileça tutti sancti per amore intendiam cur excellenta de' far festa alor pia gente con gratissimo fervore.",
+      "reference": "dore per divina providença tutt' i sancti per amore intendiam cum excellença de far festa a lor pia gença cun grandissimo fervore.",
+      "sample_WER": 50.0,
+      "sample_CER": 12.0301
+    },
+    {
+      "filename": "c069v",
+      "prediction": "Tu mostrasti a san francesco e 'l sè raphin crucifixo le piaghe de Iesù Cristo in lui facesti restlorire. Li discepoli m'udasti confortasti et in fhabasti le lor lingie tu ne tasti per ogne lingua savere. L'anima ke te sente ben postare allegramente di te amar nonse pente per cui pensa ben finire. Deli vusti sè dolçore patre delipec catora l'anime fai sce et pure di a gloria pervenire",
+      "reference": "Tu mostrasti a san Francesco el se raphìn crucifixo le piaghe de Ihesù Cristo in lui facesti reflorire. Li discipuli mundasti confortasti et infiabasti le lor lingue tu mu tasti per ogne lingua savere. L'anima ke te sente ben pò stare alegramente di te amar non se pente per cui pensa ben finire. De li iusti sè dolçore patre de li pec catori l'anime fai sancte et pure et a gloria pervenire.",
+      "sample_WER": 38.8889,
+      "sample_CER": 8.8161
+    },
+    {
+      "filename": "c095r",
+      "prediction": "L'altre sono le pretiose Maga rite gratiose verdone donne rechiuse per amor del salvatore. E li frati continenti o vugati Pe nite ti stando al mondo sant' a mente per servire al creatore. San Francesco glorioso tutto sè de sideroso de Dio fosti copio so amoroso cum dolçore. per la virtude sancta a Dio data tutta quata questa dolçe lan de cata di te fresco fresco co",
+      "reference": "L'altre sono le pretiose marga rite gratiose vergini donne renchiuse per amor del Salvatore. E li frati continenti coniugati pe nitenti stando al modo santa mente per servire al Creatore. San Francesco glorioso tutto sè desideroso de Dio fosti copio so amoroso cun dolçore. Per la virtude sancta a Dio data tutta quanta questa dolçe lau de canta di te Francesco franco core.",
+      "sample_WER": 36.5079,
+      "sample_CER": 8.2228
+    },
+    {
+      "filename": "c027r",
+      "prediction": "Vergine pura purturisti è de poi partù permasti vergene perké cre desti agabriel sença fallança. Tu sè co' l'umba sença fell dolçe a gustar più ke mole porta de' cui eçe chi e 'l disse ke sempre era clausança. Donna de laude sè degna ké porta sti l'altansegna lo salvator ke vivet regna per cui sè ford'umalingnaça De Maria deiçella sia avoi luce",
+      "reference": "Vergene pura parturisti e depoi partu permansisti vergene perké cre desti a Gabriel sença fallança. Tu sè columba sença fiele dolçe a gustar più ke mele porta de cui Eçechiel disse ke sempre era 'n clausança. Donna de laude sè degna ké porta sti l'alta 'nsegna lo Salvator ke viv' et regna per cui sem for di malignança. O Maria Dei cella sia a voi luce",
+      "sample_WER": 50.0,
+      "sample_CER": 12.6027
+    },
+    {
+      "filename": "c032v",
+      "prediction": "com laudore disse plena davore cielo e terra fai fluente. Giovana virgo flore aulorita d'ogne a ·llore. Tu sè glorke sempre grane molta",
+      "reference": "cun laudore. Sì ·ssè plena de savore cielo e terra fai fluente. O divina virgo flore aulorita d'ogne aulore. Tu sè flor ke sempre grane molta",
+      "sample_WER": 42.3077,
+      "sample_CER": 17.931
+    },
+    {
+      "filename": "c114v",
+      "prediction": "Tutta gente dicanave a la verge suarnato dei sancti kell'ami gengosa kiave ke li serra tutti quanti ell' è porto lor su ave ell' è stella del rranti tut ta la celestial corte la regvar da tutte l'ore. San Iovanni al mode nato dolore vi di Dio pietoso.",
+      "reference": "Tutta gente dican ave a la vergen sua madre dei sancti k'è ‧lla 'm gemgnosa kiave ke li serra tutti quanti ell' è porto lor su ave ell' è stella deli 'rranti tut ta la celestial corte la reguar d' a tutte l'ore. San Iovanni al mond' è nato laudi Dio pietoso.",
+      "sample_WER": 36.5385,
+      "sample_CER": 14.7727
+    },
+    {
+      "filename": "c028r",
+      "prediction": "al largon terra. O Maria cum fort amasti ké l'alto Dio asciasti ke de cielo a diel chiamasti sì forte te fasti bella. O Maria cum t'adornasti a Dio piace ta sutilliasti ke sovrai cieli a lui mandasti perrarer inde nova stella O Maria cum u militade veneste la sigma citade verusalem si fa chia mere per te vitramo e poss ella O Maria virgine madre sempre",
+      "reference": "albergo 'n terra. O Maria cum fort amasti ké l'alto Dio asediasti ke de cielo ad te 'l chiamasti sì forte te fasti bella. O Maria cum t'adornasti a Dio piacere t'asutilliasti ke sovr'ai cieli a lui mandasti per trarer inde nova stella. O Maria cun umilitade venceste la summa citade Ierusalem si fa chia mare per te intramo e possedella. O Maria virgine madre sempre",
+      "sample_WER": 34.8485,
+      "sample_CER": 8.6957
+    },
+    {
+      "filename": "c080v",
+      "prediction": "so tenuto per lo grande preço ke per me pagasti per me davoi sia inconusciuto o dolce crea tore quanto mobligasti ad ami re più keo nono puruto ne non posso sença voi confortatore Conforto lo mio core ké per te l'anguosce ke sença te non vo le altro conforto oi me lasso piu degiuno è 'n debeblesce el co re ke tu nostro basci e 'l vivo e morto m'à sè lo tuo",
+      "reference": "so' tenuto per lo grande preço ke per me pagasti per me da voi sia reconusciuto o dulce crea tore quanto m'obligasti ad ama re più k'eo non ò pututo né non posso sença voi confortatore. Conforta lo mio core ke per te languesce ké sença te non vo le altro conforto oimè lasso più degiuno endebelesce el co re ke tu non pasci el vivoe morto ma se de lo tuo",
+      "sample_WER": 44.4444,
+      "sample_CER": 13.2231
+    },
+    {
+      "filename": "c124v",
+      "prediction": "gente a recevar grandonore Nui avermo sì mi sperança ke per vostra pregaria Cristo ne dia riposança colli sancti in cor npagnia e la vergine Maria e 'n presente stia cum voi apregare dio per noi è per ogni peccatore. Eco pietro deo t'à messo ke pena segnoragi lu suo polo t'acomesso k'i puoi ascio glare e li gare or te placia per do nare tutto 'l nostro a fe' demicto",
+      "reference": "geste a recevar grand' onore. Nui avemo firma sperança ke per vostra pregaria Cristo ne dia riposança culli sancti in com pagnia e la virgine Maria en presente stia cun voi a pregare Dio per noi e per ogni peccatore. Sancto Pietro Deo t'à messo ke possa segnorigi lu suo popolo t'à commesso ki puoi ascio glare e ligare or te placia perdo nare tutto 'l nostro afendemento",
+      "sample_WER": 48.5294,
+      "sample_CER": 12.0
+    },
+    {
+      "filename": "c103v",
+      "prediction": "Estimo quello carne è paruto no quel ke più picciolo dono a vuto ma quelli ke m'aiure la recevuto quelli è più degno de meritare Aposto li rispose etfei vedere bene ai iudicato cum savere perk'è sia dato menavere no dea però la fede menemare Poi ke nel tuo al bengo fui venu to nostro me desti bascio né salv to questa re de tutto lo tributo",
+      "reference": "Estimo quello c'a me è paruto non quel ke più picciolo dono à 'vuto ma quelli ke maiure l'a recevuto quelli è più degno de meritare. Cristo li rispose et fe' i vedere bene ài iudicato cun savere perké sia dato men avere non dea però la fede menemare Poi ke nel tuo albergo fui venu to non me desti bascio né salu to questa rende tutto lo tributo",
+      "sample_WER": 34.7826,
+      "sample_CER": 8.7571
+    },
+    {
+      "filename": "c024v",
+      "prediction": "gente amarite traheste d'errore regi gi la vita sì che tutte l'ore reservan leança. Or so lucente e rosaulita a tutta gente sè madre pietosa no né perdie kiente sè riposa manta agna baldança. Fructo piacente coi grande splendore.",
+      "reference": "gente smarite traheste d'errore reg gi la vita sì ch' a tutte l'ore reserviam leança. Oro lucente e ros' aulita a tutta gente se' madre pietosa non è perdente ki en te se reposa ma sta a gran baldança. Fructo piacente col grande splendore",
+      "sample_WER": 54.5455,
+      "sample_CER": 12.8099
+    },
+    {
+      "filename": "c116v",
+      "prediction": "lasaiovanni aulente fiore. Diovanni fresc' aurora moltera tarrone alora quando Cristo cum dei ch'era aposto te fece è partore",
+      "reference": "a san Iovanni aulente fiore. O Iovanni fresc' aurora molt' era garçone alora quando Cristo cun gran cura apostolo te fece e pastore.",
+      "sample_WER": 60.8696,
+      "sample_CER": 20.3008
+    },
+    {
+      "filename": "c085v",
+      "prediction": "dato colla sponsia quando in croce fece pugna per noi miseri cordioso. Misericordioso sire non già ma sire ciascu meritato secundo ké pui to avara l'aul bene el male fie retrovato chiamara quel dal dimento lato del mio padre bene denti voi ke sè puri et necti ve nite argno del tioso. O me lasso e fresco lo mio core",
+      "reference": "dato colla spongia quando in croce fece pugna per noi miseri cordioso. Misericordioso sirà? Non già ma sirà ciascun meritato sekundo ke serv ito avarà là u' 'l bene e 'l male fie retrovato chiamarà quel' dal diricto lato del mio Padre bene decti voi ke sète puri et necti ve nite a regno delitioso. Oimè lasso e freddo lo mio core",
+      "sample_WER": 43.5484,
+      "sample_CER": 13.0178
+    },
+    {
+      "filename": "c098v",
+      "prediction": "fallo revenire curire in cicilia suave a portello in romagna per fare di lui magna tutta la chies grande chierçato. Ben foductura e altura avesse in Dio poteça con' omilitade pura misura ebbe grande obedienta da mere divina oscura o perfecte as timeça tene sempre o culta la scien ça posciata sì fine ke de' predica resone forçato Giade lumera es piera fone al agei",
+      "reference": "fallo revenire currire in Cicilia suave aportòllo in Romagna per fare di lui magna tutta la chiesa grande chiercato. Ben fo dirictura e altura avesse in Dio potença con omilitade pura misura ebb' e grande obediença d'a mare dura osscura o perforte as tinença tene sempre oculta la scien ça presciata sì fineké de predica re fone forçato. Grande lumera e spiera fone a la gete",
+      "sample_WER": 53.0303,
+      "sample_CER": 12.7937
+    },
+    {
+      "filename": "c019v",
+      "prediction": "recasti a ·ffrankeça k'era a vileça per molta offesança. De la dolçore kente è tanta lingua ne core non perdier quata garço doctore di voi donna canta virgene sanctita honoraça. Fami cantar l'amor dila bea quella ki de Cristo sta gaudente",
+      "reference": "recasti a frankeça k'era a vileça per molta offesança. De la dolçore ke 'n te è tanta lingua né core non pò dicer quanta Garço doctore di voi donna canta virgene sancta cun tutto honorança. Fami cantar l'amor di la beata quella ke de Cristo sta gaudente.",
+      "sample_WER": 40.4255,
+      "sample_CER": 12.1673
+    },
+    {
+      "filename": "c037v",
+      "prediction": "Fillia fo de re ede rana la beata santa katherina de li erranti gram medicina di sputa do da lor vene rata. Etando nel palao gratiosa tutta fosti de Dio amorosa cum gran volu ta desiderosa a Iesù dilecto disposata. quel amor te fece io cum dare lo qual tu' prendesti per amare per lui sapia spendare donare ke de' sè te fece renfiamata In cridel tu ranno pien d'errore per",
+      "reference": "Fillia fo de re e de raina la beata santa Katerina de li erranti gram medicina disputando da lor vene rata. Stando nel palacço gratiosa tutta fosti de Dio amorosa cun gran volun tà desiderosa a Ihesù dilecto disponsata. Quel' amor te fece iocundare lo qual tu prendesti per amare per lui sapi' a spendar e donare ke de se te fece renfiammata. Un crudel tiranno pien d'errore per",
+      "sample_WER": 43.4783,
+      "sample_CER": 8.9239
+    },
+    {
+      "filename": "c087v",
+      "prediction": "d' e' pensare a tutte l'ore maio non Venisse. Fine pone a la tua sconoscença a la tua gratia et nigligenti a vorrea ke de l'amore obedi ença nostro te partisse. Partite da ogne è redemento ke non te podara se no né perde mento farate stare l'amore de' se o tanto sè lo redisce. obedeo et aparechiato al grande amore Iesù desiderato sè viene",
+      "reference": "de n pensare a tutte l'ore maio non fenisse. Fine pone a la tua sconoscença a la tua gran pigritia et nigligenti a vorrea ke de l'amore obedi ença non te partisse. Parte te da ogne etendemento ke non te pò dare se none perde mento faratte stare l'amore de sé contento se l'obedisce. Obedesce e sta' aparechiato al grand' amore ihesù desiderato se viene",
+      "sample_WER": 41.5385,
+      "sample_CER": 15.1261
+    },
+    {
+      "filename": "c015r",
+      "prediction": "Nella cita di Galilea la vera l'age te videa favell'avano il bengna ebrea in cita dicastello. Ché kiamata n'acarchilia ril gene naque a stette sponsata. ora a Iosech' è serrato la legge",
+      "reference": "Nella cità di Galilea là 'v' era la gen te iudea favellavano in lengua ebrea in cità et in castello ch' è kiamata Naçareth la u' la vir gene naque et stette sponsata era a Iosephe secondo la legge",
+      "sample_WER": 69.2308,
+      "sample_CER": 27.8607
+    },
+    {
+      "filename": "c104v",
+      "prediction": "de laudore Cristo con ognoscendo lo suo fervore con seco lace in a ginare. Sì ke sua disciresa la fece come la scriptura el cota et dice poi rimase apostolà in sua vece per lo suo vangelio predicare. Ben seguìo a plica vita inciò fo la sua gratia cum pita quella ke de Cristo fosto fiorita con seco la volse compagnare. La vergene madre pretiosa fo",
+      "reference": "de l'ardore. Cristo cognoscendo lo suo fervore con seco la ce i ma gniare. Sì ke sua discipula la fece comme la scriptura el conta et dice poi rimase apostola in sua vece per lo suo vangelio predicare. Ben seguio apostolica vita in ciò fo la sua gratia cumpita quella ke de Cristo fo fiurita con seco la volse compagnare. La vergene madre pretiosa fo",
+      "sample_WER": 32.3077,
+      "sample_CER": 8.8068
+    },
+    {
+      "filename": "c106v",
+      "prediction": "grande paneto l'angelo prese aloro a favellare. Di ne 'n te già non dubita Iesù risto ke voi domandate suscita te per certo lo sapiate et io so qui perciò denuctiare. Ind' e grande conforto alora fo dato quando viddaro lo lapi de levato ciò k'è l'anglo a dinu tiato per ke morto lo crede a trovare Bola sè partìo la Magdalena quella k'era del suo amore sì",
+      "reference": "grande pavento l'angelo prese a loro afavellare di niente già non dubita Ihesù Cristo ke voi domandate suscita t' è per certo lo sapiate et io so' qui per ciò denuntiare. Unde grande conforto alora fo dato quando viddaro lo lapi de levato ciò ke l'angelo à dinun tiato per ke morto lo credean trovare. Sola se partio la Magdalena quella k'era del suo amore sì",
+      "sample_WER": 39.3939,
+      "sample_CER": 10.1093
+    },
+    {
+      "filename": "c082v",
+      "prediction": "et melle fali di sallare ereno vare la mente cum fervore. Fervente amore li dai Iesù ki canta lo delecto de' sì grande alte ça es fine ki vive intra de' qua gìù tu regi la sua vita è 'n gran necteça solaço li dai de te Iesù e poi li doni gioia de la tua con teça e regna teco tutte l'ore. Etomme allegro et latioso",
+      "reference": "et melle fali distillare e reno vare la mente cun fervore. Fervente amore li dai Ihesù ki canta lo delecto de sì grande alte ça enfinekì vive in terra de qua giù tu regi la sua vita en gran necteça solaço li dai de te Ihesù e, poi li doni gioia dela tua con teça e' regna teco tutte l'ore. Stomme allegro et latioso",
+      "sample_WER": 32.8125,
+      "sample_CER": 8.3333
+    },
+    {
+      "filename": "c060r",
+      "prediction": "meto ke li mani ellato d'ore non né serò credente poi raparbe so la mente per lui k'era sì dubitoso Dubituso è icredulo viene cerca le mie ferute non Sian è redulo ma fedele mai per cose non vedute k'è magiur merito è virtude da credar quello ke absente ke de quello ke parente è ciel ne figaudio Laudamo la resurrectione cla",
+      "reference": "metto ke li mani e 'l lato dixe non ne serò credente poi raparbe so lamente per lui k'era sì dubitoso. Dubitoso e incredulo viene cerca le mie ferute non sia 'ncredulo ma fedele mai per cose non vedute k'è magiur merito e virtude de credar quello k'è absente ke de quello k'è presente e 'n ciel ne fi' più gaudioso. Laudamo la resurrectione e la",
+      "sample_WER": 40.9091,
+      "sample_CER": 13.6752
+    },
+    {
+      "filename": "c119v",
+      "prediction": "Dolce amore di te nasce la spe rança come nasce unde al pec cator tu la sce pietança adimadi Poi ke cielo lo 'ntedi tu cortese ke tare di tu medesmo sì te sem di kite the savriçare. Tu amore sè cocordia tu pace ano di scordia per la tua mia ne venisti a visitare. Del La croce lo mostrasti ke per noi tu miliasti ai nostri ma li non giuderi sì te lasciasti",
+      "reference": "Dolce amore di te nasce la spe rança c'omo pasce unde al pec cator tu lasce pietança adimandare. Poi ke 'n cielo lo intendi tu cortese ke t'arendi tu medesimo sì te spen di ki te thesauriçare. Tu amore sè concordia tu sè pace non discordia per la tua misericordia ne venisti a visitare. Nella croce lo mostrasti kè per noi t'umiliasti ai nostri ma li non guardasti sì te lasciasti",
+      "sample_WER": 36.6197,
+      "sample_CER": 13.4021
+    },
+    {
+      "filename": "c084r",
+      "prediction": "ke ciascun sireremo d'esto dilecto fetoroso. Fetoso foco et martirio giù delo fermo salira unaltro del purga torio lo terço da ciel verra lo primo li d'appnati ardara l'altro pungara ki fue salvato et per lo teço fie purgato tutto 'l mondo l'uminoso.",
+      "reference": "ke ciascun sirà remondo d'esto dilecto fetoroso. Fetoso foco et martirio giù de lo 'n ferno salirà un altro del purga torio lo terço da ciel verrà lo primo li dampnati ardarà l'altro purgarà ki fie salvato per le lo terço fie purgato tutto 'l mondo luminoso.",
+      "sample_WER": 38.2979,
+      "sample_CER": 11.2782
+    },
+    {
+      "filename": "c084v",
+      "prediction": "L'umosi splendienti angeli da ciel verano le corpora de le gente tutte quale rifarano altri cum tude sonando diranno amorti sirevette dinaçi al iudice venite di render rascion d'ognotioso. O sancto Suscitati serano qua sì inus momento in duo parti raunati per laudir lo parla mento quel c'andran à dannamento staran interna aman sinistra. li visiti staranno adertra cum ti",
+      "reference": "Luminosi splendienti angeli da ciel verrano le corpora de le gente tutte quante rifaranno altri cun tube sonando diranno ai morti surrexite dinançi al iudice venite di render rascion d'ogn' otioso. Osamente suscitati seranno qua si inn um momento in duo parti raunati per audir lo parlamento quei c'andran' a dannamento staran' in terra a man sinistra li iusti staranno a dextra cun ti",
+      "sample_WER": 53.125,
+      "sample_CER": 12.4352
+    },
+    {
+      "filename": "c039r",
+      "prediction": "avesti nel vangelio a sai lodata. L'alçaro fo tuo fratello santo iusto buono ch'ello Cristo amo sença ri bello poi ke lui fosti tornata. Fosti piena de' peccato gisti a Cristo re beato nel convito l'à trovato d'ymo ke t'aspresciata. Andasti dentro continore plangesti c'um gram dolore basciasti piel cum grandamo per la gratia k'ài trovata.",
+      "reference": "avesti nel vangelio asai lodata. Laççaro fo tuo fratello santo iusto buono e bello Cristo amò sença ri bello poi k'a lui fosti tornata. Fosti piena de peccato gisti a Cristo re beato nel convito l'à' trovato de Symon ke t'à spresciata. Andasti dentro cun timore plangesti cun gram dolore basciast' i piei cun grand' amore per la gratia k'ài trovata.",
+      "sample_WER": 36.0656,
+      "sample_CER": 9.2697
+    },
+    {
+      "filename": "c100r",
+      "prediction": "ne starebbe alto stato. Preghiam laudando cantando lo scus simo Antonio da Dio pregando scusando noi a tutti perdoni et sem pre stando orando ci 'nperti quel gran dono di paradiso 'l regno sì ke ciascun sia degno esser c'ullu i acompagniato. Sia gloriata laudata l'altissima maiesta rigratiata orra che del mo de' podestà de la beata orna ta virgo nato confessata lui cui gra",
+      "reference": "ne starebbe alto stato. Preghiam laudando cantando lo sanctis simo Antonio da Dio pregando scusando noi a tutti perdoni et sem pre stando orando c'inpetri quel gran dono di paradiso 'l regno si ké ciascun sia degno esser cu ·llu i acompagniato. Sia gloriata laudata l'altissima maiesta ringratiata orra ke del mod' è podesta de la beata orna ta virgo nato con festa lui cun gran",
+      "sample_WER": 24.2424,
+      "sample_CER": 8.399
+    },
+    {
+      "filename": "c029r",
+      "prediction": "respondesti èco m'è k'io sur suancella. O Mari virgine pura porta sè del cielo sicura ké per te ventra no trova mura né serra me ké lo regna O Maria cum gram pietade a voi kiama cum humilitade ké tu ce debia sempitare dal numi co ke nostro et prenda Ave vergine gaudente mand",
+      "reference": "respondesti eccome k'io sun sua 'ncella. O Maria virgine pura porta sè del cielo sicura ke per te v'entra non trova mura né serrame ke lo retegna. O Maria cun gram pietade a voi kiamam cun humilitade ke tu ce debia sempr' aitare dal nimi co ke non ce prenda. Ave vergene gaudente madre",
+      "sample_WER": 46.2963,
+      "sample_CER": 14.2857
+    },
+    {
+      "filename": "c111v",
+      "prediction": "lo omnipotença per l'anime receper da la gente La gente crianDi è comissa per guardar et perdur pace fra essa ma la suppia in fra noi sì me sa ke 'l suo contra è venuto aniente. Fiente quasi nel pacificare tanto",
+      "reference": "l'omnipotença per l'anime receper da la gente. La gente cristiana li è commissa per guardar et per condur pace 'nfra essa ma la superbia in fra noi sì me sa ke 'l suo contrario è venuto a niente. Nient' è quasi nel pacificare tant'è",
+      "sample_WER": 36.3636,
+      "sample_CER": 13.0252
+    },
+    {
+      "filename": "c003r",
+      "prediction": "con' tar nol porren. Po' trebedea per amança etut ta sentir de l'ectança chi beati portasse li ança nel cuor sì come dovea. Doverebbe ciascun rifrutare per te tutto 'l mondo d'amare e te dolçe madre laudare col pia dolçe filiol che sia. Giate apiacere florosa ki canta tua lauda amorosa de farli la mente studiosa.",
+      "reference": "contar nol porea. Potrebbe t'aver per amança e tut ta sentir delectança chi ben ti portasse liança nel cuor sì come dovrea. Dovrebbe ciascun rifrutareper te tutto 'l mondo d'amare e te dolçe madre laudare col più dolçe filiol che sia. Sia te a piacere gloriosa ki canta tua lauda amorosa de farli la mente studiosa",
+      "sample_WER": 42.8571,
+      "sample_CER": 9.3458
+    },
+    {
+      "filename": "c023r",
+      "prediction": "tuo figura chiar e pura ch'ongne mal me nobiança. Rosaulente splendiente fa venire me fallente tuo servente obedire. cui Çcchire rivenire te laudando ho norando agia de te consolança. chiara spera gram lumera d'a confon to k'io non perà standon' era nel mal",
+      "reference": "tuo figura chiar' e pura ch'ongne mal m'è 'n obliança. Ros' aulente spelendiente fa venire me fallente tuo servente obedire cun çechire reverire te laudando ho norando agia de te consolança. Chiara spera gram lumera dà confor to k'io non pera stando nera nel mal",
+      "sample_WER": 37.7778,
+      "sample_CER": 9.3633
+    },
+    {
+      "filename": "c110v",
+      "prediction": "Avedelai fo 'l suo corpo porta to in e fine composto è consacra to Iesù presenta ke signor be ato be finire ki fe' questo trovare. L'alto prençe archangelo lucente sancto Michel laudi",
+      "reference": "A Verdelai fo 'l suo corpo porta to ine fone conposto e consacra to Ihesù consenta k'è signor be ato ben finire ki fe' questo trovare. L'alto prençe archangelo lucente sancto Michel laudi",
+      "sample_WER": 33.3333,
+      "sample_CER": 8.4211
+    },
+    {
+      "filename": "c123v",
+      "prediction": "de bon core nocte et dia et a voi racomandamo tutta nostra compagnia mantenente ent'altua ke' periam per averare a servire e da lauda re Cristo nostro redemptore.",
+      "reference": "de bon core nocte et dia et a voi racomandamo tutta nostra conpagnia manteneten en tal via ke potiam perseverare a servire ed a lauda re Cristo nostro redemptore.",
+      "sample_WER": 34.4828,
+      "sample_CER": 9.2593
+    },
+    {
+      "filename": "c070v",
+      "prediction": "de siderata Da' voi mai desiettena deitade sem pitna la citade ke superna kiara te e l'umina Noi credem sença fallança ferma ment cum sperança tre per sone una sustantia da li sancti venerata. Li annali exulati ke vangelisti som chiamati lauda l'alta pote ste cum la voce concordata. Abram entrida intese la di tade",
+      "reference": "desiderata. Da voi maiestad' eterna deitade sem piterna la citade k'è superna kiaramen te è lumina. Noi credem sença fallança ferma ment cun sperança tre persone una sustantia da li sancti venerata. Li animali oculati ke 'vangelisti som chiamati lauda l'alta pote ste cun la voce concordata. Abraam en Trinide intense la deitade",
+      "sample_WER": 43.3962,
+      "sample_CER": 12.3123
+    },
+    {
+      "filename": "c104r",
+      "prediction": "de servire no sè po' satare Lo servire face con amore stava dubitosa cum temore avel co re a ·fficto de dolore ké suo tepo sempre m'al portare. Tanto e nel fino amore nas coso ke gia un qua non cura d'altra cosa sopra quel tesau ro sì riposa ke per noi sè lasso verdeiare. Sì fosti et forte nel suo amore c'ave 'l core apreso",
+      "reference": "de servire non se pò satiare. Lo servire face con amore stava dubitosa cun temore ave 'l co re afflicto de dolore ké suo tempo seppe mal portare. Tanto è nel fino amore nas scoso ke già unqua non cura d'altra cosa sopra quel tesau ro si riposa ke per noi se lassò incrociare. Sì fo ferma et forte nel suo amore c'ave 'l core apreso",
+      "sample_WER": 33.3333,
+      "sample_CER": 12.4629
+    },
+    {
+      "filename": "c109v",
+      "prediction": "degine parlare Per lo nome de la dona mia non te vollio di re k'io sia ma ria gemena cum tanta villaria magdalena mi solliono kiamare. prego te per Dio kami venisti ke tu marechi el corpo el san gue de Cristo ell'Ibro de la fede ke credesti elastola ke lassò la madre. Sora mia tu sè pensal porto di",
+      "reference": "degime parlare. Per lo nome de la donna mia non te vollio dire k'io sia Ma ria femena cun tanta villania Magdalena mi solliono kiamare. Prego te per Dio k'a mi venisti ke tu m'arechi el corpo e 'l san gue de Cristo e 'l libro de la fede ke credesti e la stola ke lassò la madre. Sora mia tu sè pres' al porto di",
+      "sample_WER": 36.3636,
+      "sample_CER": 8.3067
+    },
+    {
+      "filename": "c102r",
+      "prediction": "Diepo a cui avea lo suo amore da to et tanto lo certo in ogne lato ke casa de' simon l'abbe trovato cant' amore prese a dubitare Tanta humilitade illei abuda ke a crimare prese puergonna quando Cristo amesa sè sogiorno derietro se ·lli pose a genukiare A li piei de Cristo simchinoe et mol to dolcemente li bascione di la grimen tutti li basgnòe collica pel li presele aschiugare.",
+      "reference": "Di Cristo a cui avea lo suo amore da to et tanto lo cercò in ogne lato ke 'n casa de Simon l'abbe trovato cun timore prese a dubitare. Tanta humilitade in liei abunda ke a acrimare prese per vergogna quando Cristo a mensa se sogiorna de rietro se ‧lli pose a genukiare A li piei de Cristo si 'mchinoe et mol to dolcemente li bascione di la grime tutti li bagnoe co ‧lli capel li prese le a 'schiugare.",
+      "sample_WER": 42.5,
+      "sample_CER": 13.5468
+    },
+    {
+      "filename": "c038v",
+      "prediction": "Ré c'a ·tte nominata m'adalena da Dio amata Madalena decta stecti dal castel nel qual nascesti Maria per sorore",
+      "reference": "Peccatrice nominata Madalena da Dio amata. Magdalena decta stesti dal castel nel qual nascesti Marta per sorore",
+      "sample_WER": 41.1765,
+      "sample_CER": 15.3153
+    },
+    {
+      "filename": "c003v",
+      "prediction": "ke laudi ben nocte e dia. Piana stella lucente letitia de tutta la gente tutto 'l mondo e perdente sença la tua vigoria Vigorosa potente beata per te e questa laude cantata tu la nostra avocata la più fede 'l ke mai sia. Laude novella sia cantata",
+      "reference": "ke laudi ben nocte e dia. Diana stella lucente letitia de tutta la gente tutto 'l mondo è perdente sença la tua vigoria. Vigorosa potente beata per te è questa laude cantata tu se' la nostra avocata la più fedel ke mai sia. Laude novella sia cantata",
+      "sample_WER": 14.8936,
+      "sample_CER": 4.7431
+    },
+    {
+      "filename": "c037r",
+      "prediction": "Tu fosti beata da fantina perké fon te la gratia divina nata fosti tu terra al exandrina in omgni son collaudata.",
+      "reference": "Tu fosti beata da fantina perké fo 'n te la gratia divina nata fosti in terra alexandrina in omgni scientia collaudata.",
+      "sample_WER": 28.5714,
+      "sample_CER": 9.1667
+    },
+    {
+      "filename": "c058r",
+      "prediction": "sumerimento facoli victorioso Victorioso e 'l terço die facesti fur reximento pungen le tre ruati de lo tuo corporal monn",
+      "reference": "surreximento facesti victorioso. Victorioso el terço dìe facesti sur reximento per unger le tre Marie de lo tuo corpor al monimento",
+      "sample_WER": 61.9048,
+      "sample_CER": 19.5489
+    },
+    {
+      "filename": "c065v",
+      "prediction": "Allor sì fo a tutto aperto omi li sua parlo certo ke lo Spruo converto ciascun fece copioso Tutto 'l mondo sì rinfresca lengua hebrea e fracesca e la tina e gregença ogn' omo era timoroso. Tutta gente s'à sutitia de la grande maravillia ke ciascuno s'asì mi 'l lia suo linguagio perrioso. Laudiam Cristo veramente l'alto po dre omnipotente de' ·llui fervente ke fa tanto delectoso.",
+      "reference": "Allor sì fo a tutto aperto omni lingua parlò certo ké lo Spiritu con coverto ciascun fece copioso. Tutto 'l mondo sì renfresca lengua hebrea e francesca e latina e gregesca ogn' omo era timoroso. Tutta gente s'asutillia de la grande maravillia ké ciascuno s'asimil lia suo linguagio pretioso. Laudiam Cristo veramente l'alto Pa dre omnipotente de Spiritu fervente ke fo tanto delectoso.",
+      "sample_WER": 39.6825,
+      "sample_CER": 12.0205
+    },
+    {
+      "filename": "c097r",
+      "prediction": "so forçare volse piccolo etagio tuttore pensare formare coma Dio fare humagio potesse di las bona sì parte sè o sume la legen",
+      "reference": "soforçare volse piccolo etagio. tuttore pensar e formare com' a Dio fare humagio potesse d'Ulis bona si parte sì com' suna la legenda",
+      "sample_WER": 60.8696,
+      "sample_CER": 13.3333
+    },
+    {
+      "filename": "c117v",
+      "prediction": "Si fortemente parlasti del tbesa uro ke cercasti ke nullo cota i pasti trovò ornato sapore. De l'ectoso evangelisto ké cora la mor fo questo qual te demos stro Cristo stando nel crude 'l dolore La verità questo dice la sua madre tu la fece a li è te lassò sua vece en sulla cena de la morte. A Dio dolçe sença pare",
+      "reference": "Sì fortemente parlasti del thesa uro ke cercasti ke null' om cota i pasti trovò de tanto sapore. Delectoso evangelisto ke coral a mor fo questo qual te demos strò Cristo stando nel crudel dolore. La verità questo dice la sua madre tu la fece a liè te lassò 'n sua vece en sulla cena de la morte. Amor dolçe sença pare",
+      "sample_WER": 32.2581,
+      "sample_CER": 9.2308
+    },
+    {
+      "filename": "c050v",
+      "prediction": "nui tormenti far essenbro da radi voi far vergona et legarvala colona è ripie k'inone doloroso. Doloroso flagell'adoronaro di spina viset corpo sanguina do' di noi fer gran disciplina cum gran tempesta cum nuina vi fecer la croce portare et menaro a diustitiare ad guila de l'adoronotioso. Dontioset forte iudiciosi da Dio te con dennato et messo ad grande fu plicio nella crucen chiavellato.",
+      "reference": "più tormenti far essembro dar ad voi et far vergogna et legarv' a la colona empi e ki non è doloroso? Doloroso flagellando incoronaro di spina vis' et corpo sanguinando di voi fer gran disciplina cum gram tempesta cum ruina vi fecer la croce portare et menarv' ad iustitiare ad guisa de ladron otioso. D'omtios et forte iudicio fuste ad mor te condempnato et messo ad grande sup plicio nella cruce chiavellato",
+      "sample_WER": 56.9444,
+      "sample_CER": 16.7883
+    },
+    {
+      "filename": "c032r",
+      "prediction": "sesmera di te sol prende la spera però ke sè relucente honorata sè dal padre di cui tu sè filia et madre intraita sancta quadre in sustantia luce ardente. Tu thes' auro tu rich'eçça tu virtude tu l'argeçça tu semperial forteça per corona respondente. O Maria virgo degna priega Cristo ke né tegna al suo regno né sov' e gna per noi sìentionedente. Barço canta cum dolçore per te veri",
+      "reference": "se smera di te sol prende sa spera peroké sè relucente. Honorata sè dal Padre di cui tu sè filia et madre in Trinità sancta quadre in sustantia luce ardente. Tu thesauro tu richeçça tu virtude tu largheçça tu sè 'mperial forteça per corona resplendente. O Maria virgo degna priega Cristo ke ne tegna al suo regno ne sove gna per noi sia entercedente. Garço canta cun dolçore per te versi",
+      "sample_WER": 36.6197,
+      "sample_CER": 10.5
+    },
+    {
+      "filename": "c083v",
+      "prediction": "mondo pien d'errore signor fa ite penitentia ke saprocci' al granderrore ké 'l nemico aral valore ciò fie a la fine del mondo",
+      "reference": "questo mondo pien d'errore signor' fa ite penitentia ké s'aproccia 'l grand' errore ké 'l nimico arà 'l valore ciò fie a la fine del mondo",
+      "sample_WER": 38.4615,
+      "sample_CER": 14.0845
+    },
+    {
+      "filename": "c120r",
+      "prediction": "con ficare. Kidete amor be' pensa giamai no te farà offensa tu sè fruquestu ma sa ove d'ogne gloriare. Amor dolçe trato n'ame k'alto re gno bene né kiami satiamo d'ogne fanne sì dolçe Agustare. Amor pien de' cantade tu verace maiestade Iesù una deitade sempre dove venerare. Amor be' fo di gna cosa ke talo amaça delectosa deita facesti",
+      "reference": "conficcare. Ki de te amor ben pensa giamai non te farà offensa tu sè frutuosa men sa ov' è d'ogne gloriare. Amor dolçe tanto n'ame k'al to re gno ben ne kiami satiando d'ogne fame sì dolçe a gustare. Amor pien de caritade tu verace maiestade in cui una deitade sempre dovem venerare. Amor ben fo digna cosa ke 'n tale amança delectosa deità facesti",
+      "sample_WER": 47.6923,
+      "sample_CER": 13.2022
+    },
+    {
+      "filename": "c045r",
+      "prediction": "Et ella nuovanfarla gente k'apaiusti novamente stella k'apparistal mundo quando na quel re iocondo stette",
+      "reference": "Stella nuova 'n fra la gente k'aparvisti novamente. Stella k'apparist' al mundo quando naqque 'l re iocondo stett' e",
+      "sample_WER": 73.6842,
+      "sample_CER": 16.3793
+    },
+    {
+      "filename": "c029v",
+      "prediction": "de lo 'nnipotente Lo Signor per maravegla de te fei ce madre e Silia rosa biam che vempgla sovr'ogl' altro fiore aulente. Eravamen perdimento per lo nostro",
+      "reference": "de l'Omnipotente. Lo Signor per maravegla de te fei ce madre e filia rosa biamch' e vermegla sovr'ogl' altro fiore aulente. Eravamo 'n perdimento per lo nostro",
+      "sample_WER": 29.6296,
+      "sample_CER": 8.805
+    },
+    {
+      "filename": "c007r",
+      "prediction": "florissima Per la tua scientia pura conser vasti la scriptura tutta gente sa sicura a te dona purseima. Dimandasti per pietança de li apar consolança a la tua transnita ça lor corporia carissima. Però ke li era giti per lo mondo dispanti per tuo prego for redeci davanti a te gaudissima. Quando tu stavi in orare sì fo facti adunare no dove più",
+      "reference": "florissima. Per la tua scientia pura conser vasti la scriptura tutta gente s'asicura a te donna purissima. Dimandasti per pietança de li apostoli consolança a la tua transmutan ça lor compania carissima. Però k'el eran giti per lo mondo dispariti per tuo prego for rediti davant' a te gaudissima. Quando tu stavi in orare sì fo facti adunare non dove' più",
+      "sample_WER": 26.2295,
+      "sample_CER": 8.0332
+    },
+    {
+      "filename": "c126v",
+      "prediction": "de çebedeo divirtude be' sè gno frate del figlolo deo collo predicare tuo conver tisti multa gente apostolo de Dio servente de la fede amaistra d'ore. Per lo tuo amastimento li pu gan te piglaro fra lor feciaro statuto e di insieme s'acordaro lu do capo te muçaro sì commo scripto se crede per ote humanare. cede ke tu sia nostro altatore.",
+      "reference": "de Çebedeo di virtude ben sè digno frate del figlolo de Deo collo predicare tuo conver tisti multa gente apostolo de Dio servente de la fede amaistradore. Per lo tuo amaistramento li pa gani te piglaro fra lor feciaro statuto ed insieme s'acordaro lu tuo capo te muçaro sì commo scripto se crede però te kiamàm mer çede ke tu sia nostro aitatore.",
+      "sample_WER": 33.871,
+      "sample_CER": 10.1695
+    },
+    {
+      "filename": "c020v",
+      "prediction": "Feminagloriosa sì benigna nul l'altra sè né trova tanto degna come sè tu madona c'ài la segna del Cretore altissimo vivente. Splendien luce d'ogne mondo difin locido di sopra rin perfundo un do gne core stallegro è iocundo di quel canto la mente a Dio intendente. Conformi di te madonna mia. figiorno et nocte alora pla dia. come sè dolçe a chi amar Maria. ke par ke rimbal disca tutta gente",
+      "reference": "Femina gloriosa sì benigna nul l'altra se ne trova tanto degna come sè tu madonna c'ài la 'nsegna del Creatore altissimo vivente. Splendiente luce d'ogne mondo diffin lo cielo di sopra et in profundo und' o gne core sta 'llegro e iocundo di quel c'ànno la mente a Dio intendente. Confortami di te madonna mia et giorno et nocte a l'ora de la dia come sè dolçe a chiamar Maria ke par ke rimbaldisca tutta gente.",
+      "sample_WER": 46.0526,
+      "sample_CER": 11.2981
+    },
+    {
+      "filename": "c052v",
+      "prediction": "iuderi fo designato sè tu sè Cristo da Dio mandato descendegui securare Lo santo lato san que menao et tut ti noi recomparao da lo nemico ke gannò per uno pomo sì vilmente San Iovanni lo vangelisto quando guardava suo maiestro vediclo croce molterna tristo i doloroso di de la mente. L'asci compagni l'abandonaro tutti fugiero e lui lasciaro stando torno to forte et amarode lo suo corpo",
+      "reference": "iuderi fo designato se tu sè Cristo da Dio mandato descende giù securamente. Lo santo lato sangue menao et tut ti noi recomparao da lo nemico ke 'ngannao per uno pomo sì vilemente. San Iovanni lo vangelisto quando guardava suo maiestro vedielo 'n croce molt' era tristo et doloroso de de la mente. Li soi compagni l'abandonaro tutti fugiero e lui lasciaro stando tormen to forte et amaro de lo suo corpo",
+      "sample_WER": 26.3889,
+      "sample_CER": 8.867
+    },
+    {
+      "filename": "c083r",
+      "prediction": "questo mondo delectando mal iudicio rimenbrato sto dolente aposo. Padroso e difallanda questo",
+      "reference": "questo mondo delectando ma 'l iudicio rimenbrando sto dolente et pauroso. Pauroso è di fallança",
+      "sample_WER": 60.0,
+      "sample_CER": 23.7113
+    },
+    {
+      "filename": "c094v",
+      "prediction": "to intendimento de' salvare da perdemento molti k'era peccatori Quando fo da Dio mandato san fancesco l'obo lo mondo kera è 'nternebrato recevette grande splendore. A laude de la Trinitade o dire tre da lui platate per lo mondo de l'atate fano fructo cavalore. Li povari frati minori de Cristo sono seguitatori de' legente son doctori predicando seça crude",
+      "reference": "to intendimento de salvare da perdemento molti k'eran peccatori. Quando fo da Dio mandato san Francesco lo beato lo mondo k'era entenebrato recevette grande splendore. A laude de la Trinitade ordine tre da lui plantate per lo mondo delatate fano fructo cun alore. Li povari frati minori de Cristo sono seguitatori de le gente son doctori predicando sença errore.",
+      "sample_WER": 35.5932,
+      "sample_CER": 8.8154
+    },
+    {
+      "filename": "c016v",
+      "prediction": "uole avere se non voi con Dio favello Fribiol di l'altissimo fie chiamato. Iesù Cristo inoni lato per lui fil mon do salvato et tanto de le man del fello Tu sè regina et elli creie virgo Maria crede amie nonaura fi ne il dico a teie lo sò regno al tissimo e bello Chylabeto tua c'ognata in sua ve kieça con gravidata no ne",
+      "reference": "vole avere se non voi con k' io favello. Filiol di l'Altissimo fie chiamato Ihesù Cristo in oni lato per lui fi' 'l mon do salvato et tracto de le man del fello. Tu sè regina et elli è reie virgo Maria crede a meie non avrà fi ne il dico a teie lo so regno al tissimo e bello. Elysabeth tua cognata in sua vechieça è 'ngravidata non è",
+      "sample_WER": 42.8571,
+      "sample_CER": 12.9032
+    },
+    {
+      "filename": "c040v",
+      "prediction": "ti è non poenti ma dei servidori er amo facto da c'Ulvi tracti ke tutor fallente. Lo fresco gillio bianco è vermeglo nata questo mondo per dar con seglo de' fugir pillio de quel",
+      "reference": "ti e non serventi ma deiservidori eramo facti da cului tracti k'è tutor fallente. Lo fresco gillio bianco e vermeglo nat' è 'n questo mondo per dar con seglo de fugir pillio de quel",
+      "sample_WER": 41.1765,
+      "sample_CER": 13.6612
+    },
+    {
+      "filename": "c110r",
+      "prediction": "gustare suave cum diporto et lo sè tanto quello conforto ke 'l tuo core apuso a desiate. In suo mano fo confessat tato et commolte la grande de' pianto può receve il corpo e 'l sanque scomall' ora fine non dia più d'emorare. De Magdalena pongo fine ke fuore del deserto et de le spine nella etrnale gloria sença fine et per restoro d'ogne suo penare.",
+      "reference": "gustare suave cun diporto et io se t'areco quello conforto ke 'l tuo core à preso a desiare. In suo mano fo confessa ‧t tanto et con molte lagrime de pianto può recevè il corpo e 'l sangue sancto allor a fine non dia più demorare. De Magdalena pongo fine k'è fuore del deserto et de le spine nella eternale gloria sença fine et per restoro d'ogne suo penare.",
+      "sample_WER": 31.8841,
+      "sample_CER": 11.2022
+    },
+    {
+      "filename": "c014r",
+      "prediction": "Ave flore cum bello o d'ore fructo c'um dolçe savore stella cum grande splendore madre de nostra salvança. Ave virgo puosa più donulla amorosa tutta io cuda et gio sa madre de' gran delectança. Ave madre incoronata sovrai cieli exaltata da tutti li sancti ve n'erata del peccatori sè spança Ave porto de' salute ki ben t'ama tu la lute guardare di far c'a du te traici for di dubitança.",
+      "reference": "Ave flore cun bello odore fructo cun dolce savore stella cun grande splendore madre de nostra salvança. Ave virgo pretiosa più de nulla amorosa tutta iocunda et gioio sa madre de gran delectança. Ave madre incoronata sovra i cieli exaltata da tutti li sancti venerata dei peccatori sè sperança. Ave porto de salute ki ben t'ama tu l'aiute guardane di far cadu te traici for di dubitança.",
+      "sample_WER": 37.3134,
+      "sample_CER": 8.3969
+    },
+    {
+      "filename": "c006r",
+      "prediction": "supernaleente virgo virgine le discese benignissima. La nostra redemptione prese en car natione ke sença corruptione dee te donna sanctissima. Etanda 'l mondo sença 'l mondo tutto fo per te iocondo lo suono e 'l profondo e la ere suavissima",
+      "reference": "supernale en te virgo virginale discese benignissima. La nostra redemptione prese encar natione k'è sença corruptione de te donna sanctissima. Stand' al mondo sença 'l mondo tutto fo per te iocondo lo superno e 'l profondo e l'aere suavissima.",
+      "sample_WER": 38.4615,
+      "sample_CER": 7.3171
+    },
+    {
+      "filename": "c036r",
+      "prediction": "Poi sè bella di stella casta filla sovrana in l'amor fioregrana. dente fa sua drudita. E 'n gratiata fosti in tutto de' tena quel dolçe fructo ke spugnone l'amar lucto de la infernal tenebria Regina bella da legrata de noi agia pietança la sciar volemo ongn' altra maça et servir avoi tutta via. Kidi te a sentimento non curauro ne argente sìe grande lo fl'amamento",
+      "reference": "Più se bella di stella casta filia sovrana in l'amor fior' e grana de te fa sua drudiria. Engratiata fosti in tutto de te na que 'l dolçe fructo k'espugnòne l'amar lucto de la infernal tenebria. Regina bella d'alegrança de noi agia pietança lasciar volemo ongn' altr' amança et servir a voi tutta via. Ki di te à sentimento non cur' auro né argento si è grande lo flamamento",
+      "sample_WER": 55.0725,
+      "sample_CER": 12.5326
+    },
+    {
+      "filename": "c105v",
+      "prediction": "ke sì fa de questo pretiuso unguento mello vedare di nari tremero et darlo a li povari per loro consolare. Questo fo 'l principio e l'acascio né per ke vida fece tradiscioen Giaguisa d'un vile schiavone vedeo Cristo e fecelo tormentare. Era preso de quello unguento ke madalena fece cum giachi mento Cristo soffirio per noi tor mento et morio in croce per noi",
+      "reference": "ke si fa de questo pretiuso unguento mellio vendare denari trecento et darlo a li povari per loro consolare. Questo fo 'l principio e la cascio ne perké Iuda fece tradiscione et a guida d'un vile schiavone vendeo Cristo e fecelo tormentare. Era preso de quello unguento ke Magdalena fece cun giachi mento Cristo soffirio per noi tor mento et morio in croce per noi",
+      "sample_WER": 27.6923,
+      "sample_CER": 7.9452
+    },
+    {
+      "filename": "c052r",
+      "prediction": "sanquinato con miò falso amaramente Poi li menarapilato e nel o se ·lliò ademandato da li iuder fo o den nato de quella falsa n'à gente Tutti gridaro alta voce motal fal so mioia l'velloce abrigatamente sì à posto en croce ke non turbi tutta la gente Del suo valto li sputaro e la sua Barba sì l'apelaro facendo beffé be putato ke Dio sè facto fa' la mente Poi ke 'n croce fo kiavellato da li",
+      "reference": "sanguinato commo falso amaramente. Poi 'l menar a Pilato e nel consellio ademandato da li iuder' fo condemp nato de quella falsa ria gente. Tutti gridaro alta voce moia 'l fal so moia 'l veloce sbrigatamente sia posto en croce ke non turbi tutta la gente. Nel suo vulto li sputaro e la sua barba sì la pelaro facendo beffe li 'putaro ke Dio s'è facto falsamente. Poi ke 'n croce fo kiavellato da li",
+      "sample_WER": 46.6667,
+      "sample_CER": 15.25
+    },
+    {
+      "filename": "c009r",
+      "prediction": "al dolçe Cristo ke né degia perdonare. Madonna sancta Maria che n'a mostrata la via ore sca et resia nel vole ki vol terra",
+      "reference": "al dolçe Cristo ke ne degia perdonare. Madonna sancta Maria che n'ài mostrata la via or escacia ogne resia receve ki vol tornare.",
+      "sample_WER": 34.7826,
+      "sample_CER": 18.3206
+    },
+    {
+      "filename": "c016r",
+      "prediction": "ke salvira lo mondo tutto v del di auolo a viva corcedo sì parra grande 'l flagello. La donna fo tutta turbata la rana incoronata et dioi sì gran mirata di quel ke disse Gabriello. Come fue quel che tu ài decto. no 'l credo atorto né a dritto et bene posso far disdictiono co gnosco hom vechio né facello. L'angelo disse non temere tu sè a Dio sì apiacere a terra madre",
+      "reference": "ke salvirà lo mondo tutto unde 'l diavolo avirà corocto sì parrà grande 'l flagello. La donna fo tutta turbata la raina incoronata et diei sì gran mirata di quel ke disse Gabriello. Come fie quel che tu ài decto? Nol credo a torto né a dritto et ben ne posso far disdetto non co gnosco hom vechio né fancello. L'angelo disse non temere tu sè a Dio sì a piacere altra madre non",
+      "sample_WER": 35.1351,
+      "sample_CER": 10.6218
+    },
+    {
+      "filename": "c062v",
+      "prediction": "lo cotal maravilliate Iesù Cristo ne val suo Padre e' d'onostra redemptore. Allato d'orto del suo Padre sì sedd' e l'umanitade I sieme colla deita de Dio th'omo ogni stascione. Interta rimasi la gloriosa lau gine madre pretiosa sancta Maria pietosa ke nostra consolatore. L'apostoli poi n'andaro per tutto 'l modo predicaro la vita eina",
+      "reference": "lo cotal maravilliate Ihesù Cristo ne va 'l suo Padre ed è nostra redemptione. Al lato dritto del suo Padre s'asedde l'umanitade insieme colla deitade Dio et homo ogni stascione. In terra rimasi la gloriosa la ver gine madre pretiosa sancta maria pietosa k'è nostra consolatone. Li apostoli poi n' andaro per tutto 'l mondo predicaro la vita eterna",
+      "sample_WER": 54.2373,
+      "sample_CER": 11.9658
+    },
+    {
+      "filename": "c102v",
+      "prediction": "E 'l pariseo grande invidia avea Dio k'amagdalena far vedea verso quelli ke tutto sapça con falso pensieri credea parlare. Be questi è propheta corioso discien tia nostro sirea coi toso sè sapesse cioca e ·llei nascoso no la di gna rebbe di guardare. Ese sapesse come peccatrice c'ave d'ogne vito a sè radice poi recve dalamente tutto suo invitio per be fare.",
+      "reference": "El phariseo grande invidia avea di ciò k' a Magdalena far vedea verso quelli che tutto sapea con falso pensieri credea parlare. Se questi è propheta copioso di scien tia non siria coitoso se sapesse ciò c'à en liei nascoso no la digna rebbe di guardare. Se sapesse com' è peccatrice c'ave d'ogne vitio in sé radice poi receve da la meretrice tutto suo servitio per bene fare.",
+      "sample_WER": 54.4118,
+      "sample_CER": 16.273
+    },
+    {
+      "filename": "c045v",
+      "prediction": "meççço a tutto 'l mondo peraluminato. nar la gente. Ie tre Magi l'abber veduto tosto le bber co'gnosciuto di ser nate lo saluto Dio padre omnipotente. O rischedun col suo remile suo prese a seguitare correctione da laudare la qualfo moltava mente",
+      "reference": "meçço a tutto 'l mondo per alumi nar la gente. Le tre 'Magi l'abber veduto tosto l'ebber cognosciuto diser nat' è lo saluto Dio Padre omnipotente. Ciaschedun col suo reame sì lo prese a seguitare co ·rricc' offerte da laudare la qual fo molt' avenente.",
+      "sample_WER": 53.3333,
+      "sample_CER": 19.0661
+    },
+    {
+      "filename": "c049v",
+      "prediction": "chotal segnore civene per noi da re exemplo non ci trovò magio ne templo ovei potesse averreposo. Riposo c'a mi net forte citro cià scunandia picciol fantei volse morte da re rede cum fellitia Cristo e lo seppo cum Maria fugiero intra degiato et canpar per tal respecto de li mani del 'nipuitoso. Di quitoso falso trovol preso vidaico predicadol vero don ci a sancti farisei et l'aico più forduri",
+      "reference": "chotal Segnore ci venne per noi da re exemplo non ci trovò magion né templo ov' ei potesse aver reposo. Riposo? Camin et forte ci trovò cia scuna dia picciol fante i' volse morte dar Erode cun fellunia Cristo e Ioseppo cun Maria fuggiero in terra d'Egipto et campar per tal respicto de li mani del niquitoso. Niquitoso fals' e reo trovò 'l popolo iudaico predicando 'l vero Deo ci ascun farisei et laico più for duri",
+      "sample_WER": 64.9351,
+      "sample_CER": 18.0523
+    },
+    {
+      "filename": "c108r",
+      "prediction": "Non parea creatura humana tutta era pulosa como lana agiacca purrena piana altro al bergo già nostro fece fare. Andava passendo per la l'anda ke la nonavea altra vivanda permisericordia Dio li mand angelico cibo per gustare. Ch'è sabbato da vesperonnati per li teni c'a sofferti tati li agli la portavano cum gran canti a ·ssé tire lo dolçore gloriare.",
+      "reference": "Non parea creatura humana tutta era pilosa commo lana et giacea pur en terra piana l'altro albergo già non fece fare. Andava pascendo per la landa ké ià non avea altra vivanda per misericordia Dio li manda angelico cibo per gustare ché sabbato da vespero innanti per li tempi c'à sofferti tanti li angeli la portavano cun gran canti a sen tire lo dolçore gloriare.",
+      "sample_WER": 47.6923,
+      "sample_CER": 13.7838
+    },
+    {
+      "filename": "c073r",
+      "prediction": "tato sta per te lo cor gioioso k'i no 'l sentisse nol sapri' e parlare quate dolçagustar lo tuo savor Savor cui non si trova sper Iesù dolasso lo mio cor peco c'ài sì gia nul' altra cosa non me o sola",
+      "reference": "ké tanto sta per te lo cor gioioso ki no 'l sentisse no 'l saprìe parlare quant'è dolç' a gustar lo tuo savore. Savor cui non si trova similliança ça o lasso lo mio cor poco t'asag gia null' altra cosa non m'è consolan",
+      "sample_WER": 50.0,
+      "sample_CER": 22.2222
+    },
+    {
+      "filename": "c106r",
+      "prediction": "ricomparare. puoi ke Cristo fue sepelito mag dalena c'avea cor ferito del do lo re ke Cristo avea patito unge no potea requare. Co' ·lle Maria andò a lo sepulero ove Iesù Cristo era sepulto co nuguento pretioso molto per le sue piaghe vgnare et curare. Quando guardaro vermolmo namento viddaro l'anglo chi aro più k'argento vellebaro",
+      "reference": "ricomparare. Puoi ke Cristo fue sepelito Mag dalena c'avea 'l cor ferito del do lore ke Cristo avea patito unqua non potea requiare. Co ‧lle Marie andò a lo sepulcro ove Ihesù Cristo era sepulto co n unguento pretioso molto per le sue piaghe ugnare et curare. Quando guardaro verso 'l mo numento viddaro l'angelo chi aro più k'argento und' ell' ebbaro",
+      "sample_WER": 38.7097,
+      "sample_CER": 10.1124
+    },
+    {
+      "filename": "c115v",
+      "prediction": "doloroso. Dubito fo facto muto è nel na scer fo absaluto de' spusco è 'n piato perfecto de l'atioso. Elizabeth angravidato qual sèi mensi fel portato poi fo anutiato da quel age 'l digtoso Ben cotenente la sovrana vegne Maria diana per li morti tosta dava venal parto corioso. Per miracol abe pregne lu na a l'altra si viene è corpo",
+      "reference": "doloroso. Dubitò fo facto muto e nel na scer fo absoluto de Spiritu Sancto em piuto perfecto delatioso. Elisabeth à 'ngravidato qual sei meisi fè 'l portato poi fo Cristo anuntiato da quel angel dignitoso. Encontenente la sovrana vergene Maria diana per li monti tost' an dava ven' al parto copioso. Per miracol ambe prengne l'u na a l'altra si viene en corpo",
+      "sample_WER": 53.9683,
+      "sample_CER": 18.5083
+    },
+    {
+      "filename": "c057v",
+      "prediction": "ti converte per te sta abracia aperte sì nell'egno de la croce. Iesù Cristo la fratna tu la cresce e la govema de la gla sempitna per la virtù de la croce. I Iesù Cristo glorioso a te sia laude è gechimento ké per noi",
+      "reference": "ti converte per te sta a bracia aperte su nel legno de la croce. Ihesù Cristo la fraterna tu la cresce e la governa de la gloria sempiterna per la virtù de la croce. Iesù Cristo glorioso a te sia laude e çechimento ké per noi",
+      "sample_WER": 28.2609,
+      "sample_CER": 9.1304
+    },
+    {
+      "filename": "c048v",
+      "prediction": "prender humanitate et darsi in altrui podestade quoi ke sovra gne poderoso. Poderoso fe' discesa chiusamente fe' me saggio ad quella morosap presa dona di grandumilitagio annuntiolle con messaggio l'angelo",
+      "reference": "prender humanitate et darsi in altrui podestade k'è sovr' o gne poderoso? Poderoso fe' discesa chiusamente fe' messaggio ad quella amoros' a ppresa donna di grand' umiltaggio annuntiòlle com messaggio l'angelo",
+      "sample_WER": 45.1613,
+      "sample_CER": 11.8483
+    },
+    {
+      "filename": "c061r",
+      "prediction": "sermone. Poi gente dice a li suoi frati li apostoli sciificati nel la fede fuor confirmati aloraldisse e comandone Per tutto 'l mondo ve n'andate el mi ò evangelio predicate e nel mio nome bapticate con grande benedictione. E nostro debiate aver paura piedi cate ad ogne creatura ki crede",
+      "reference": "sermone. Poi gente dice a li suoi frati li apostoli sanctificati nella fede fuor confirmati alora 'l disse e comandòne. Per tutto 'l mondo ve n'andate el mi o evangelio predicate e nel mio nome baptiçate con grande benedictione. E non debiate aver paura predi cate ad ogne creatura ki crede",
+      "sample_WER": 21.5686,
+      "sample_CER": 6.5068
+    },
+    {
+      "filename": "c012r",
+      "prediction": "sì e 'l tuo donaio vera a te dona morata. Tu in cignerai et più che gillio più ra sirei dolce fallìo parturl per te mi nepiliò de quale grande donata. Non dubitare ché Dio potente lo po benfare lo suo' piacente fallio ki amare en fra la gente non sì è turbata. Fue figlo degno de l'alto Dio per lo segno ke n'acario e terra e regno del Signor mio ke non finalcuna fiata.",
+      "reference": "fie 'l tuo donaio verà in te dona inorata. Tu incignerai et più che gillio pu ra sirai dolce filio parturirari per te mi ne 'mpillio de quale gratia t'è donata. Non dubitare ché Dio potente lo pò ben fare lo suo placente fillio ki amare en fra la genta non sie turbata. Fie figlo degno de l'alto Dio però lo 'n segno k'è naçario entra e regno del Signor mio ke non fin' alcuna fiata.",
+      "sample_WER": 43.4211,
+      "sample_CER": 17.1355
+    },
+    {
+      "filename": "c075v",
+      "prediction": "d'amor alor ci desti quan per noi pen desti en sullo legno nelle tue sce magne ci deserivisti per noi Salvare et darei lo tuo regno lege la tua scriptura buon scriptore. Seripti sul sancto libro de' la vita per tua pietà Iesù ne representa la tua scriptura Ia non sia falli ta e 'l nome ke porta de te non men ta la mente nostra fa di te conbi ta dalcissimo Iesù sì ke te senta",
+      "reference": "d'amor alor ci desti quando per noi pen desti en sullo legno nelle tue sancte magne ci descrivisti per noi salvare et darci lo tuo regno lege la tua scriptura buon scriptore. Scripti sul sancto libro de la vita per tua pietà Ihesù ne representa la tua scriptura ià non sia falli ta e 'l nome ke portam de te non men ta la mente nostra fa' di te condi ta dulcissimo Ihesù siké te senta",
+      "sample_WER": 21.0526,
+      "sample_CER": 6.1697
+    },
+    {
+      "filename": "c126r",
+      "prediction": "sia la dia ke da Dio fu sì kiama kiamato tosto fusti a parekiato obedisti il suo comando de lui visti predicando e mostrando fu o valore. Tu pagani fusti piglato servo de Dio vera luce e da loro fusti ligato è moristi in sulla erve ti laudamo a d'alta voce e prega umilitmente ke per noi devota mente preghi Cristo salvatore. Sancto Iaçobo benigno figlo",
+      "reference": "sia la dia ke da Dio fusti kiama kiamato tosto fusti aparekiato obedisti il suo comando de lui 'visti predicando e mostrando su o valore. Dai pagani fusti piglato servo de Dio vera luce e da loro fusti ligato moristi in sulla cruce ti laudamo ad alta voce e pregamti umilimente ke per noi devota mente preghi Cristo salvatore. Sancto Iacobo benigno figlolo",
+      "sample_WER": 23.8095,
+      "sample_CER": 7.0225
+    },
+    {
+      "filename": "c092v",
+      "prediction": "remanisti tanto el portasti in core Fi presesti Cristo al amo le piaghe ente sì menovaro ello tuo corpo sì trovaro sì commò l'ebbe e 'l salvatore. E n vita tua santificasti molti mi raculi mostrasti quando del mondo trapassasti è n cielo n'aparve grande spledore. O di e troni se ne' virtaro per l'alti segni ke in te trovaro tutta la corte aparechiaro per te recevar adonore. A Cristo c'ulli angeli tutti quanti et la",
+      "reference": "remanisti tanto el portasti in core. Sì prendesti Cristo a l'amo ke piaghe en te si renovaro ello tuo corpo si trovaro sì commo l'ebbe el Salvatore. En vita tua santificasti molti mi raculi mostrasti quando del mondo trapasasti e' in cielo n' aparve grande splendore. Celi e troni se ne mutaro per l'alti segni ke in te trovaro tutta la corte aparechiaro per te recevar ad onore. Cristo culli angeli tutti quanti et la",
+      "sample_WER": 40.0,
+      "sample_CER": 9.0476
+    },
+    {
+      "filename": "c015v",
+      "prediction": "collandilo. L'angelo fo messo da Dio be co meço et ben finio saviamte sem ça rio annuntiolo suo liberio. Ave Maria gratia plena Dio ti sal vi stella serena Dio è corteco che ti mi negnel paradiso bello. Fra le temene sè benedecta più ke null' altra ke sia d'erta fig sancto sì t'à electa per la mello seça ribello. Del tuo ventre uscura tal fructo",
+      "reference": "coll'anello. L'angelo fo messo da Dio ben co mençò et ben finìo saviamente sen ça rio anuntiò lo suo libello. Ave Maria gratia plena Dio ti sal vi stella serena Dio è con teco che ti mena ennel paradiso bello. Fra le femene sè benedecta più ke null'altra ke sia decta Spiritu Sancto sì t'à electa per la melior sença ribello. Del tuo ventre uscirà tal fructo",
+      "sample_WER": 32.8358,
+      "sample_CER": 11.3514
+    },
+    {
+      "filename": "c053r",
+      "prediction": "per la gente. Moltera trista sancta Maria quando o figlio en croce vedea cum gran do lore forte piangenua dicendo trista lassa dolente. Dam conforto Dio c'alceçamen ì carita perfecta I amorança.",
+      "reference": "per la gente. Molt' era trista sancta Maria quando 'l su o filglio en croce vedea cun gram dolore forte piangeva dicendo trista lassa dolente. Dami conforto Dio et alegrança et carità perfecta et amorança.",
+      "sample_WER": 45.7143,
+      "sample_CER": 14.9038
+    },
+    {
+      "filename": "c078v",
+      "prediction": "emperciò ke tu sè solo suo m'ave. Maiure ungano non me pare ke sia ke de' volere quello ke non se trova come fa l'anima k'è fuore de la via crude ké 'l mondo lempia e fare né vole lege nova ma nostessare ké ·l monde minore. Manderare se vole el core villano ke del mondo sè kiama contem volere te Iesù amore sovrano cambare ello terreno è 'ntero",
+      "reference": "empercioké tu sè solo suo maiure. Maiure engano non me pare ke sia ke de volere quello ke non se trova como fa l'anima k'è fuore de la via crede ke 'l mondo l'empia e fare ne vole lege nova ma non pot' essare ké 'l mond' è minore. Minorare se vole el core villano ke del mondo se kiama contento volere te Ihesù amore sovrano cambiare ello terreno entendemento",
+      "sample_WER": 34.2857,
+      "sample_CER": 13.9726
+    },
+    {
+      "filename": "c063v",
+      "prediction": "lo cor alumina la mente che ·lli el alto amor potente lo qual passa ogne dolçore Li apostoli né fuoi ripieni ciasci po li dipo veri vero fuoi forti e fece et tutte èt benand' e splendore.",
+      "reference": "lo cor alumina e la mente ch'elli è l'alto amor potente lo qual passa omgne dolçore. Li apostoli ne fuor ripieni disci poli di Cristo veri però fuor forti e fedeli e tutte entesaro le scripture.",
+      "sample_WER": 55.5556,
+      "sample_CER": 24.3655
+    },
+    {
+      "filename": "c120v",
+      "prediction": "posa sovr'ogn' altra d'onorare. Quella vergene beata poi ke fa morata sempre stecte temperata tu la voleste obsubare. Amor grande foranisura di cui nulla che atura puote avere in se natura di te amar sì sascusare. Dolçe amore amoroso cum dolço re savoroso di te gareo gaudio so sovr'ogn' altro sè d'amare.",
+      "reference": "posa sovr'ogn' altra d'onorare. Quella vergene beata poi ke fo inna morata sempre stecte temorata tu la voleste obumbrare. Amor grande for misura di cui nulla creatura puote avere in sè natura di te amar si sa scusare. Dolce amore amoroso cun dolço re savoroso di t'è garço gaudio so sovr'ogn' altro sè d'amare.",
+      "sample_WER": 29.6296,
+      "sample_CER": 8.5443
+    },
+    {
+      "filename": "c131r",
+      "prediction": "da ogne predicatore. Venire visiti predicando per la fioe anditamente la scriptura d'emostrato e 'n fra la pagana gente da lor fusti certamente preso e ferito è morto prega Dio nostro conforto ke n'è sì a perdonatore. Apostolo sancto Mathia sempre sia da nui laudato tu sè qulla copagnia fragla pli kiamato iuda per lo suo peccato sì se",
+      "reference": "da ogne predicatore. Senpre visti predicando per la fide arditamente la scriptura demostrando enfra la pagana gente da lor fusti certamente preso e ferito e morto prega Dio nostro conforto ke ne si a perdonatore. Apostolo sancto Mathia sempre sia da nui laudato tu sè 'n quella compagnia fra gl'apostoli kiamato Iuda per lo suo peccato sì se",
+      "sample_WER": 29.3103,
+      "sample_CER": 9.0379
+    },
+    {
+      "filename": "c091v",
+      "prediction": "Sì fosti pieno de caritade ké isigna vi a l'anima li come dovessaro laudare lo suo dolçe creatore. Tanto fosti amico a Deo ke lebestie tubidieno luciedi in mano et e venieno audire lo tuo Symone Per lo mondo gisti predicando et sempre pace a murtade fede de Cristo o finan de I confondendo on' era dire. Insanctoria tu passasti sença tendre di predicasti lo marmio de siderasti fervente laudore.",
+      "reference": "Sì fosti pieno de caritade ke insigna vi a l'animali com' e' dovessaro laudare lo suo dolçe creatore. Tanto fosti amico a Deo ke le bestie t'ubidieno l'ucielli in mano a te venieno a udire lo tuo sermone. Per lo mondo gisti predicando et sempre pace anuntiando fede de Cristo confirman do et confondendo oni errore. En saracinia tu passasti sença timore ci predicasti lo martirio desiderasti fervetemente per ardore.",
+      "sample_WER": 44.2857,
+      "sample_CER": 14.7971
+    },
+    {
+      "filename": "c107v",
+      "prediction": "Quando venne el die de la scesi one Cristo sì li fece primissione de la sua altissima mascione in vita e ·nn'à sempre dea regnare. Madalena sì fo di partita sen ça alcuno retegno de sua vita quasi comagvisa di remita nel deserto ado a dubitare. Longo tempo stecte in gran tormenti to al fresco et al caldo et aluento gia nostro li rimasi vestimento in pace utilsè tal pena portare.",
+      "reference": "Quando venne el die de l'ascensi one Cristo sì li fece promissione de la sua altissima mascione in vita eterna sempre dea regnare. Magdalena si fo dipartita sen ça alcuno retegno de sua vita quasi com' a guisa di remita nel deserto andò ad abitare. Longo tempo stecte in gran tormen to al freddo et al caldo et al vento già non li rimasi vestimento in pace volse tal pena portare.",
+      "sample_WER": 29.5775,
+      "sample_CER": 11.1979
+    },
+    {
+      "filename": "c109r",
+      "prediction": "de vergenitade Si ke fo be purificato I sè ogne vito de' peccato tutto li era per ma perdonato da c'Ului cui e l'anra e 'l mare Ei come da Dio formandato u n'omo c'avea ordene sacrato a Dio era reduto et è commedato trovo la Magdalena cum stare Econ iuro te per Dio et sì te di co sì tu sè per Batafma è nimen tute parti et non stea più comico",
+      "reference": "de vergenitade. Sì ke fo ben purificato in sè ogne vitio de peccato tutto li era priec ma perdonato da cului cui è la terra e 'l mare Sì come da Dio fo mandato u n omo c'avea ordene sacrato a Dio er' arenduto et e commendato trovò la Magdalena cusì stare. Sconiuro te per Dio et sì te dico si tu sè phantasma o nimico ke tu te parti et non stea più con meco",
+      "sample_WER": 47.3684,
+      "sample_CER": 16.3934
+    },
+    {
+      "filename": "c127r",
+      "prediction": "Saniovanni evangelista te lau damo nocte e dia nostro segnor Iesù Cristo quandolla croce predea la sua madre virgo pia a te la ra comandone in tua guardia la lassone ke l'altasse al suo dolore. Lo tue corpo dolicato iusto sco è benigno da lui fe' daccielo kiamato e 'nperciò ke n'era d'og de recevare quel regno d'ave loco e da legnaça o te piacia",
+      "reference": "San Iovanni evangelisto te lau damo nocte e dia nostro segnor Ihesù Cristo quando lla croce pendea la sua madre virgo pia a te la racomandone in tua guardia la lassòne ke l'aitasse al suo dolore. Lo tuo corpo delicato iusto sancto e benigno da lui fo da cielo kiamato enpercioké n'era dego de recevare quel regno duv' è ioco ed alegrança or te piacia",
+      "sample_WER": 43.0769,
+      "sample_CER": 12.1127
+    },
+    {
+      "filename": "c025r",
+      "prediction": "satia la mente reempe lo core sia motamente fontana d'amore di age pietança. Giardin ornato de fresca verdura fosti serrato de forte clausura tu o' fructo nato non pose natura ma grande sperança. Bel gillio d'orto cristallo splendente. lo 'm ch'era morto facesti vivente se' gran conforto alom penitrice. e dalli fermança. Alta rana de' sole amantata corona",
+      "reference": "satia la mente reempe lo core sia mot' a mente fontana d'amore et agge pietança. Giardin ornato de fresca verdura fosti serrato de forte clausura tu o fructo nato non pose natura ma grande sperança. Bel gillio d'orto cristallo splendente l'om ch'era morto fecesti vivente sè gran conforto a l'om penitente e daili fermança. Alta raina de sole amantata corona",
+      "sample_WER": 28.3333,
+      "sample_CER": 6.3536
+    },
+    {
+      "filename": "c117r",
+      "prediction": "O Giovanni amor dilecto Cristo a te se fece lecto quando li dormisti su' pecto nella cena de l'amore Quando era vate a cena del tradi mento era mena ciascun avea gram pena de te k'er o soladore Facesti vita beata cum Giovanni quella fiata de quella forte sa carata ke nol potera cotal core. De quel be' ke sempre abunda tra iesti mana iocuda come 'l ma gecta fuor lor vedesti del gi dolore",
+      "reference": "O Giovanni amor dilecto Cristo a te se fece lecto quando li dormisti 'n sul pecto nella cena de l'amore. Quando eravate a cena del tradi mento era mena ciascun avea gran pena de te k'er' consoladore. Facesti vita beata cun Giovanni quella fiata de quella fonte sa crata ke nol poterà contar core. De quel ben ke sempre abunda tra iesti manna iocunda come 'l mar gecta fuor l'onda facesti del grand ardore.",
+      "sample_WER": 29.7297,
+      "sample_CER": 9.1133
+    },
+    {
+      "filename": "c050r",
+      "prediction": "ka ciàiài donaço di 'n te dar quel la gente pava quantesso più mi raculava ciascu gliera più invidioso Invidiosi miscedenti quanto Cristo in iuraste sanicando vostre gente suscitando l'acusaste a' dipilato et puoi pigliaste conparadolo dal traditore ke suo ministrare fac tore per tormentar lo glorioso. Glorioso forte pene v'ordinar co mi rimenbro ke nudo nelle cate ne vi batter per congne membro per",
+      "reference": "k'aciaio indonaco d'intendar quel la gente prava quant' esso più mi raculava ciascun gli era più invidioso. Invidiosi miscredenti quanto Cristo iniuriaste sanicando vostre gente suscitando l'accusaste ad Pilato et puoi pigliaste comparandolo dal traditore ke suo ministr' ar' e fac tore per tormentar lo glorioso. Glorioso forte pene v'ordinar co m'i' rimembro ké nudo ne le cate ne vi batter per ongne membro per",
+      "sample_WER": 46.1538,
+      "sample_CER": 9.8558
+    },
+    {
+      "filename": "c013r",
+      "prediction": "Ave pulera Margarita splendida luce clanta fresca rosa et aulenta nostro gaudio et a legreça. Ave regina adorata virgine ma dre beata poi ke fosti salutata. madre sé de gratia pietança.",
+      "reference": "Ave pulcra margarita spendida luce clarita fresca rosa et aulorita nostro gaudio et alegreça. Ave regina adorata virgene ma dre beata poi ke fosti salutata madre sè de gran pietança.",
+      "sample_WER": 36.6667,
+      "sample_CER": 8.1081
+    },
+    {
+      "filename": "c033r",
+      "prediction": "gratia in te permane tu portastil vino e pane ciòe 'l nostro redemptore. Ave vergene benigna tu ke sola fosti degna di portar l'altan segna do l'altissimo segnore Tu es sacra virgo pia tu dalcissi ma Maria tu ke sè la dricta va preveniradSalvatione.",
+      "reference": "gratia in te permane tu portasti 'l vino e pane ciò è 'l nostro redemptore. Ave vergene benigna tu ke sola fosti degna di portar l'alta 'nsegna de l'altissimo Segnore. Tu es sacra virgo pia tu dulcissi ma Maria tu ke sè la dricta via per venir ad salvatione.",
+      "sample_WER": 28.5714,
+      "sample_CER": 6.8966
+    },
+    {
+      "filename": "c056r",
+      "prediction": "Poi ke Cristo fosto stellamente fo legato d'ogne parte fo l'orme tato è donato a la croce. Iesù Cristo redemptore come falso bu Padore come latro è tra di to re fo donato a la croce le sue mebra dolicate fuoroste sè e'turate tutti quante in sangui nate e kiavato Iesù la croce. Saniovanni evangelista lo suo core molto era tristo quando viddel suo maiestro stare Iesù",
+      "reference": "Poi ke Cristo fo pillato strectamente fo ligato d'ogne parte fo tormen tato e donato a la croce. Ihesù Cristo redemptore come falso bufadore come latro e tradito re fo donato a la croce. Le sue membra delicate fuoro ste se e tirate tutti quante insangui nate e kiavate in su la croce. San Iovanni evangelista lo suo core multo era tristo quando vidde 'l suo maiestro stare n innu",
+      "sample_WER": 48.5714,
+      "sample_CER": 12.8947
+    },
+    {
+      "filename": "c080r",
+      "prediction": "de la sua faccia tu ke d'ogne Belleça sè factore Fame solo te Iesù per pensare e d'ogn' altro pensiero d'al mio core scacia è tutto questo mon do lo non posso trovare exau ra ke me satisfacia o dolce Iesù fanne te amare e dona me gra tia ke 'l mio amore te piacia tu ke d'ogne gratia sè datore. Dame tanto amor Iesù de te ke me basti ad amare quanto io",
+      "reference": "de la tua faccia tu ke d'ogne belleça sè factore. Fa' me solo te Ihesù perpensare e d'ogn' altro pensiero dal mio core scacia en tutto questo mon do io non posso trovare creatu ra ke me satisfacia o dulce Ihesù famme te amare e doname gra tia ke 'l mio amore te piacia tu ke d'ogne gratia sè datore. Dame tanto amor Ihesù de te ke me basti ad amare quanto io",
+      "sample_WER": 24.6575,
+      "sample_CER": 5.7692
+    },
+    {
+      "filename": "c017v",
+      "prediction": "splendore in voi dolçe amore agiam consolança. Ave regina pulçell' amorosa stella manna ke non stariascosa luce",
+      "reference": "splendore in voi dolçe amore agiam consolança. Ave regina pulçell' amorosa stella marina ke non stai nascosa luce",
+      "sample_WER": 16.6667,
+      "sample_CER": 4.3103
+    },
+    {
+      "filename": "c128r",
+      "prediction": "tello te percosse alor l'anima semosse e di Dio prese sentore Eco Iacobo al peo aplo glo noso predicare di l'alto deo molto fosti gloroso lu tuo parlare gratioso dei pagami fe grande aquisto e tornara Iesù nostro padre e gui datore. lossese cum gratia temperata un pal gano agnadiato d'ubastone su nella testa tormente t'aver dato l'Uluo corpo diligato",
+      "reference": "tello te percosse alor l'anima se mosse e di Dio prese sentore. Sancto Iacobo Alpheo apostolo glo rioso predicare di l'alto Deo molto fosti goloroso lu tuo parlare gratioso dei pagani fé grande aquisto e tornar a Ihesù Cristo nostro padre et guidatore. Mossese cun gran tempesta un pa gano agnadiato d'un bastone su 'nnella testa fortemente t' avir dato lu tuo corpo diligato",
+      "sample_WER": 50.0,
+      "sample_CER": 13.5279
+    },
+    {
+      "filename": "c054r",
+      "prediction": "Dami letitia gaudio et diporto enel mio core d'apianto di con forto k'io superi et canti et stia sì decto k'io non perda la tua finança. O grande bene dilecto di la mati so l'aço gaudio et dolceça disci ke fai li cenni tali gli sembiati di tut tol mondo fai far rifivitança O grande bene di quello di paradi so raluminal mio cor del tuo Bel viso ke menestia la mente el core aceso dami siglita degnare",
+      "reference": "Dami letitia gaudio et diporto e ·nnel mio core da' pianto di con forto k'io suspiri et canti et stia sì docto k'io non perda la tua fin' amança. O grande bene dilecto di l'amanti solaço gaudio et dolceça dei sancti ke fai li cenni tali et li senblanti di tut to 'l mondo fai far rifiutança. O grande bene di quello di paradi so ralumina 'l mio cor del tuo bel viso ke me ne stia la mente e 'l core aceso dami saglita d'ogn' altra",
+      "sample_WER": 35.6322,
+      "sample_CER": 11.2385
+    },
+    {
+      "filename": "c132v",
+      "prediction": "gram solennitate ki sape v'era cemente ke per la sua uilitade la divina maiestade fo di O n'amorata.",
+      "reference": "gram solennitate ki sapem vera cemete ke per la sua umilitade la divina maiestade fo di lei innamorata.",
+      "sample_WER": 33.3333,
+      "sample_CER": 8.7379
+    },
+    {
+      "filename": "c125v",
+      "prediction": "sentisti a li sue paravole credesti començasti a predicare orte piacia lui pregare ke ne dia del suo dolçore. Multa gente convergio la tua lingua benedictà e tornò a la lio Dio e da sua 'lege diritta quella gente male dicca peri vidia te piglaro la tua testa decollaro cum gratissimo fue Te laudamo tutta via sancto area segnor beato benedicta",
+      "reference": "sentisti a li sue paravole credesti començasti a predicare or te piacia lui pregare ke ne dia del suo dolçore. Multa gente convertìo la tua lingua benedicta e tornò a l'a lto Dio ed a sua lege diritta quella gente maledicta per in vidia te piglaro la tua testa decollaro cun grandissimo furore. Te laudamo tuttavia sant'An drea segnor beato benedicta",
+      "sample_WER": 31.1475,
+      "sample_CER": 7.9096
+    },
+    {
+      "filename": "c044r",
+      "prediction": "vellioso face ho desideroso lo benigno creatore. De la vergene sovrana lucente stella diana de li erranti tramora na puer nato de l'afioso Pace 'n terra sia cantata gloran cielo desiderata la donçella ose crata parturit' à 'l salvatore.",
+      "reference": "vellioso fact' è hom desideroso lo benigno creatore. De la vergene sovrana lucente stella diana de li erranti tramonta na puer nato de la fiore. Pace 'n terra sia cantata gloria 'n cielo desiderata la donçella conse crata parturit' à 'l salvatore.",
+      "sample_WER": 21.4286,
+      "sample_CER": 7.2
+    },
+    {
+      "filename": "c026v",
+      "prediction": "A mosti certo veramente l'alto Dio omnipotente ch'à per saluto de l'angente suo filiol in te prese baldança. Vano forte natura quando verge né pura lo Signor prese figura sença carnal dilectança. A Ioseo desponsata quando fosti salu tata concepisti fe' crudata lo re k'è pien de' pietança. Segine vergine del mondo lo re cel lesti al iocondo portasti nel tuo corpo modo ke ne trasse d'ogne pesança?",
+      "reference": "Amotti certo veramente l'alto Dio omnipotente cha per saluto de la gente suo Filiol in te prese baldança. Variò forte natura quando 'n te verge ne pura lo Singnor prese figura sença carnal delectança. A Iosep desponsata quando fosti salu tata concepisti fecundata lo re k'è pien de pietança. Regina vergene del mondo lo Re cel lestial iocondo portasti nel tuo corpo mondo ke ne trasse d'ogne pesança.",
+      "sample_WER": 33.8235,
+      "sample_CER": 8.5995
+    },
+    {
+      "filename": "c007v",
+      "prediction": "dimorare regina gentilissima Co'gnoscesti ben per certo ké la scia vi lo deserto su nel cielo k'era aperto adasti dilectissima. In lor mani ti mutasti credo ke t'adormetasti ad alta vita transla tasti sempre mai securissima Apostume k'era visitato sì ebbero collocato lo suo corpo osecrato. c'un pietà grandissima. Sanctomasso veramente nonera collor presente sì venia tostamen",
+      "reference": "dimorare regina gentilissima. Cognoscesti ben per certo ke lascia vi lo deserto su nel cielo k'era aperto adasti dilectissima. In lor mani ti mutasti credo ke t'adormentasti ad altra vita transla tasti sempre mai securissima. A costume k'era usitato sì ebbero collocato lo suo corpo consecrato cun pietà grandissima. Sancto masso veramente non era co ·llor presente sì venia tostamen",
+      "sample_WER": 31.6667,
+      "sample_CER": 5.4264
+    },
+    {
+      "filename": "c089r",
+      "prediction": "La morte e tera e dura e forte runpe mura e passa porte ella ene sì comune sorte ké nel no nepo campare.",
+      "reference": "La morte è fera e dura e forte runpe mure e passa porte ella ène sì comune sorte ke neu no ne pò campare.",
+      "sample_WER": 33.3333,
+      "sample_CER": 11.0092
+    },
+    {
+      "filename": "c011v",
+      "prediction": "In nacareth de Galilea l'angelo stel te ke respladea tua fede 'l credente quando dicea di Dio sì fai obberata. Maravigliosa fo suo parvente sì O alta cosa stella lucente dolce respondo sa destin presente poi ke fosti salutata. Per tutto 'l mondo voce suave desti dicendo come si rave quello chi tendo ben senbra grave non sono adomo stata. Rispose a talto messaio in suo Bel canto rosa de maiò Spi sancto",
+      "reference": "In Naçareth de Galilea l'angelo stet te ke resplendea tua fede 'l credette quando dicea de Dio sirai obumbrata. Maravegliosa fo 'n suo parvente sì alta cosa stella lucente dolce respo sa desti 'n presente poi ke fosti salutata. Per tutto 'l mondo voce suave desti dicendo come sirave quello ch'in tendo? Ben senbra grave non sono ad omo 'contata. Respose a tantalto mesaio in suo bel canto rosa de maio Spiritu Sancto",
+      "sample_WER": 39.726,
+      "sample_CER": 11.6945
+    },
+    {
+      "filename": "c019r",
+      "prediction": "traesti et di pena la gente terra k'era gran turbança. Donna placente ke fi foste humana fonto surgente sovr'ogne fontana istrovamente la gente verpiana ho no sia vana la nostra sperança. L'umilia la somma potença quando collastila tua sapientia signoria asti cum grande excellença sì c'ài li bio di far perdonança. Vergine pura cum tutta bellego mi sura e la tua gratia deçança na",
+      "reference": "traesti et di pena la gente terrena k'era 'n gran turbança. Donna placente ke sì foste humana fonte surgente sovr'ogne fontana istievi a mente la gente cristiana ke non sia vana la nostra sperança. Humiliasti la summa potença quando an cillasti la tua sapientia signorigi asti cun grande excellença sì c'ài licentia di far perdonança. Vergene pura cun tutta belleça sença misura è la tua grandeça nostra natura",
+      "sample_WER": 41.1765,
+      "sample_CER": 16.3507
+    },
+    {
+      "filename": "c056v",
+      "prediction": "do in sulla croce. La sua madre edolete multo tris ta la sua mente piange edole amaramente stando a piede de la croce. La sua madre cum dolore kiama edice dolçe amore oimè fillio e signore per ke fosti posto i druce La sua madre di de' olliò aulo rito più ke gillio perké fo questo O sì ·llo ke morisse nella croce. Dio Cristo o madre mia questo",
+      "reference": "do in sulla croce. La sua madre è dolente multo tris ta la sua mente piange e dole amaramente stando a piede de la croce. La sua madre cun dolore kiama e dice dolçe amore oimè fillio e Signore perké fosti posto in cruce? La sua madre dice o fillio aulo rito più ke gillio perké fo questo consillio ke morisse nella croce? Dice Cristo o madre mia quest' è",
+      "sample_WER": 30.0,
+      "sample_CER": 10.8033
+    },
+    {
+      "filename": "c054v",
+      "prediction": "delectança. Rament'ame la pena ké portasti amor è quando a la croce andasti fusti battuto et tutto e 'n sangui nasti oimè lasso di tal doloracea Fosti battuto è spoliato es k'irnito e da' Iudei fortemente col pito eduna la cia conel cor ferito è per in vidia fuo t'alargantia. Piangete meco spose in amorate voi ke vivete caste ad ocrina te venite amati et virgine beate",
+      "reference": "delectança. Ramentame la pena ke portasti amore quando a la croce andasti fusti battuto et tutto ensanguinasti oimè lasso de tal dolorança. Fosti battuto e spoliato e skirnito e da' iudei fortemente colpito d'una lancia ennel cor ferito e per invidia fuo tal arogantia. Piangete meco sponse inamorate voi ke vivete cast' e adoctrinate venite amanti et virgine beate",
+      "sample_WER": 55.9322,
+      "sample_CER": 11.1413
+    },
+    {
+      "filename": "c118v",
+      "prediction": "Tu amore ké oi ungi cui più ami spesso pugi o mi piage poi ke lungi sença verguento fai salvare. Dolce amore tu sè sper me k'io ne ama sempre temè nasce et cresce del tuo seme ke bon fructo fa' granare. Dio tu non abandoni k'i' t'o tare sì perdoni e di gla cili co Ave Iesù Berniliare. San Gabololce fino isercato",
+      "reference": "Tu amore ke coniungi cui più ami spesso pungi omni piaga poi ke l'ungi sença unguento fai saldare. Dolce amore tu sè speme ki be ne ama sempre teme nasce et cresce del tuo seme ke bon fructo fa granare. Amor tu non abandoni ki t'o fende sì perdoni e di gloria e di co rone ki si sa humiliare. Amore grande dolce fino increato",
+      "sample_WER": 46.1538,
+      "sample_CER": 20.3647
+    },
+    {
+      "filename": "c074r",
+      "prediction": "fosti suave in li lor cori. Orché te non sente ben postar tristo Iesù letitia et gaudio de l'a gente solaço non potessar sença Cristo t'appino chév non tanto ben fervente ki far potesse tutto ogni altro aquisto et te non agia di tutte perdente et sença te sì re be in amarore. A Maro inullo core puote stare cui tua dolceça dona condimen to ma tuo savor Iesù non po",
+      "reference": "fosti suave in li lor cori. Cor che te non sente ben pò star tristo Ihesù letitia et gaudio de la gente solaço non pot' essar sença cristo taupino ch'eu non t'amo ben fervente. Ki far potesse totto ogni altro aquisto et te non agia di tutt' è perdente et sença te sireb be in amarore. Amaro in nullo core puote stare cui tua dolceça dona condimen to ma tuo savor Ihesù non pò",
+      "sample_WER": 32.4324,
+      "sample_CER": 10.1563
+    },
+    {
+      "filename": "c026r",
+      "prediction": "fontana da legrança. Ave fonte o signata di la estirpe daun nata più de null' altra sè beata ave sti 'n Deo verace amança.",
+      "reference": "fontana d'alegrança. Ave fonte consignata de la stirpe David nata più de null'altra sè beata ave sti 'n Deo verace amança.",
+      "sample_WER": 42.8571,
+      "sample_CER": 8.7302
+    },
+    {
+      "filename": "c087r",
+      "prediction": "stilliate cor mio aben videre or no fallisse. Fallir cor mio spesso t'è retrovò se' de l'amor mio lo desiderio trovo stude pensar lui essci Pe na può or non doscisse. Vir ne convenza dentra la gente erestregnar tutto è nell'amente de tutol mondo non parlare nien te in te u disse O di è intende del mio core a cdonate agaudere d'amore vorre ke",
+      "reference": "sotilliate cor mio a ben videre or non fallisse. Fallir cor mio spesso te retrovo se de l'amor mio lo desiderio trovo s' tu de pensar lui essci pe na provo or no' 'nd' oscisse. Uscir ne converrea d'entr'a la gente e restregnar tutto enella mente de tuto 'l mondo non parlare nien te et no' 'nde udisse. Odi e intende bel mio core aconciate a gaudere de l'amore vorrea ke",
+      "sample_WER": 52.1127,
+      "sample_CER": 16.4865
+    },
+    {
+      "filename": "c063r",
+      "prediction": "el regno caro Dio ne dea per guardandone am Spirito Sancto dolçe amore tu sè nostro guidatore. Lo fresù che foco ardente",
+      "reference": "e 'l regno caro Dio ne dea per guidardone. amen. Spiritu Sancto dolçe amore tu sè nostro guidatore. Lo Spiritu Sancto è foco ardente",
+      "sample_WER": 33.3333,
+      "sample_CER": 18.5185
+    },
+    {
+      "filename": "c031v",
+      "prediction": "fortet dura non fallasti perké tem Cri priudente Sovrannoi avea facto lo nemico L'grandacatto tu li desti scacco mato tal ke sempre sta dolente Benedictà tu reina colla gratia divina archa piena de' doctrina d'abundatia corrente Tu sè fede tu sperança da cui vie ne consolança bene gioia et alle grança a chi del tuo dolçor sente. Li rai de la tua l'um' era splendiente",
+      "reference": "fort' et dura non fallasti perké tam eri prudente. Sovr'a ·nnoi avea facto lo nimico grand' acatto tu li desti scacco matto tal ke sempre sta dolente. Benedicta tu reina colla gratia divina archa piena de doctrina d'abundantia corrente. Tu sè fede tu sperança da cui vie ne consolança ben è gioia et alle grança a chi del tuo dolçor sente. Li rai de la tua lumera splendiente",
+      "sample_WER": 29.4118,
+      "sample_CER": 7.3107
+    },
+    {
+      "filename": "c040r",
+      "prediction": "e descaduta nel primer parente nato è Cristo per fare aquisto di noi peccatori ke fa partiti è di spir titi dai suoi fu di dori perké fallen",
+      "reference": "e descaduta nel primer parente. Nato è Cristo per fare aquisto de noi peccatori k'eram partiti e dispar titi dai suoi servidori perké fallen",
+      "sample_WER": 45.8333,
+      "sample_CER": 11.2676
+    },
+    {
+      "filename": "c127v",
+      "prediction": "per pietacea d'essar nostro avocatore. Eco tovasso a Deo servisti nocte di ogne stascione illa sua morte plangisti cum grande devotiose de la sua resurrection n fortenente dubitasti fin kellato noi cercasti no ne fosti credetore. Molta gente convertisti a l'a sancta fede pura li dole c'ador fa coste k'era poste nelle mura un pago semo salora del col col",
+      "reference": "per pietança d'essar nostro avocatore. Sancto Tomasso a Deo sirvisti noct' e dì ogne stascione alla sua morte plangisti cun grande devotione de la sua resurrectio ne fortemente dubitasti fin ké 'l lato no i cercasti non ne fosti credetore. Multa gente convertisti a la sancta fede pura l'idole cader fa ceste k'eran poste nelle mura un pagan se moss' alora del col",
+      "sample_WER": 49.2063,
+      "sample_CER": 12.2616
+    },
+    {
+      "filename": "c081r",
+      "prediction": "amore a lagiasse re vivisce. edorme a vita amore è questo porto t'à ke sè sopra ogne al tro aitatore. Altame amore che non perisca amore dolce ke per amore io tadomando prego te ké 'l tuo amore non me fallesca receve li miei suspini ké io te mandò se tu voli ke io per te la guesca fa ke me piacia k'io vollio morire amando per lo tuo amore",
+      "reference": "amore asagiasse revivisce ed or me aiuta amore en quest' oporto tu ke sè sopra ogne al tro aitatore. Aitame amore che non perisca amore dolce ké per amore io t'adomando pregote ke 'l tuo amore non me fallesca receve li miei suspiri ke io te mando se tu voli ke io per te languesca fa' ke me piacia k'io vollio morire amando per lo tuo amore",
+      "sample_WER": 34.3284,
+      "sample_CER": 8.7719
+    },
+    {
+      "filename": "c086v",
+      "prediction": "ke per amor non vivi fervente sì ke languise L'angusci ripessando la tua no ia ke de l'amore Iesù t'à tolta gioia prego cor mio la mia vi ta croia più non seguisse. Seguità l'amor ke po' valere pi ù ke tutto 'l mondo apostedere",
+      "reference": "ke per amor non vivi fervente sì ke languise. Languisci ripensando la tua no ia ké de l'amore ihesù t'à tolta gioia prego cor mio la mia vi ta croia più non seguisse. Seguita l'amor ke pò valere pi ù ke tutto 'l mondo a possedere",
+      "sample_WER": 19.5652,
+      "sample_CER": 5.9322
+    },
+    {
+      "filename": "c017r",
+      "prediction": "ipostiliolo cosa nata fare al re manvello. Rispose l'à kiara stella io son qui ke so' suancella sia scundo la tu a favella cum sì mi chiamo et apello. Questà dona intendente agla mor çe de la gente pregil padre con nipotente ke possamo essanc con ello. Altissima lor col grande",
+      "reference": "impossibile cosa nata fare al re 'Manuello. Respose la kiara stella io son qui ke so' su' ancella sia secundo la tua favella cusì mi chiamo et apello. Questa donna intercedente agia mer çé de la gente pregi 'l Padre om nipotente ke possamo essare con ello. Altissima luce col grande",
+      "sample_WER": 45.098,
+      "sample_CER": 13.3333
+    },
+    {
+      "filename": "c091r",
+      "prediction": "ben perfecto e suo dividore. Tutto el mondo abandonasti no vell'ordine per lontasti pace intra annuntiasti como fece dis alvatore Intutte cose lo seguisti vita da postoli facesti multa gente con tisti a laudare e 'l suo gran nome The ordine plantasti li miori in prima vocasti e puori donna reserasti li conducti a perfectione",
+      "reference": "ben perfecto e suo diricto servidore. Tutto el mondo abandonasti no vell' ordine plantasti pace in terra annuntiasti como fece el salvatore. In tutte cose lo seguisti vita d'a postoli facesti multa gente conver tisti a ludare el suo gran nome. Tre ordine plantasti li minori imprima vocasti e puoi li donni reserasti li continenti a perfectione.",
+      "sample_WER": 45.614,
+      "sample_CER": 13.0435
+    },
+    {
+      "filename": "c125r",
+      "prediction": "per quello sancto tormento ke patisti per suo amore. Per la fede predicare fusti ella cruce clavato già noce vole sti stare con me Cristo Dio beato al angeli fosti voltato sì co' ·ffo tuo placemento feciarte mor re cum tormento quella gente pien d'errore. Eco Paulo sia laudato ke à do te converisti da lui sisti illu minato l'ora ke 'l",
+      "reference": "per quello sancto tormento ke patisti per suo amore. Per la fede predicare fusti ella cruce clavato già non ce vole sti stare commo Cristo Dio beato a la 'ngiù fusti voltato sì co' ·ffo tuo placemento feciarte mori re cun tormento quella gente pien d'errore. Sancto Paulo sia laudato ke a Deo te convertisti da lui fusti illu minato 'lora ké 'l",
+      "sample_WER": 27.4194,
+      "sample_CER": 8.2857
+    },
+    {
+      "filename": "c101r",
+      "prediction": "fos peccatrice nominata per servire fo ben meritata Iesù Cristo volse seguitare. com molta humilitade lo seguìo quel perfecta fede sençorio quel predicare audio del suo amore prese a dimflamare.",
+      "reference": "foe peccatrice nominata per servire fo ben meritata Ihesù Cristo volse sequitare. Con molta humilitade lo seguio et cun perfecta fede sença rio quando Cristo predicare audio del suo amore prese ad imflammare.",
+      "sample_WER": 39.3939,
+      "sample_CER": 13.8095
+    },
+    {
+      "filename": "c002v",
+      "prediction": "ke tu li farai perdonança più k'a domandar no saperia. Gapese la gente criana ké sconoscente e villana gustar dee te dolçe fontana d'amarte puù gran sete avarea. Avente per nostra richeça volente sovana belleça ki tua non se te dolceça troppo la sua vita ria. Ria vita del peccatori che non pen sano nelli lor cori de' tanto ga udio son fuori ke lingua",
+      "reference": "ké tu li farai perdonança più k'adomandar non saperia. Sapesse la gente cristiana k'è sconoscente e villana gustar de te dolçe fontana d'amarte più gran sete avarea. Avente per nostra richeça volente sovrana belleça ki tua non sente dolceça tropp' è la sua sua vita ria. Ria vita dei peccatori che non pen sano nelli lor cori de tanto ga udio son fuori ke lingua",
+      "sample_WER": 26.1538,
+      "sample_CER": 6.7204
+    },
+    {
+      "filename": "c065r",
+      "prediction": "Ke con gran dolçore venisti la penteco ste conpisti li discepoli rinpisti del tuo amore gaudioso. Co' ·lla via virtù potente del gran sono ke fo Repente lo splendore venne aulente ke fo molto paurao",
+      "reference": "Ke con gran dolçore venisti la Penteco ste tu compisti li discipuli rinpisti del tuo amore gaudioso. Colla tua virtù potente del gran sono ke fo repente lo splendore venne ardente ke fo molto pauroso.",
+      "sample_WER": 25.7143,
+      "sample_CER": 9.901
+    },
+    {
+      "filename": "c064r",
+      "prediction": "null' omo puote bene amare sem peccato vole stare lo Spu sancto La permale daralli pena edolore Gettara 'l nell'afornace l'ave son l'ardente brasce e 'l 'nformal foco penace ke separadol peccatore Due son li m'al carbone k'abiuso an li peccatori et I vison li acu satori ke don sapiento a tutte l'ore. Spirito benedecto guardare da questo decto e menança dolce Cristo lo qual debbie dipotore.",
+      "reference": "Null' omo puote bene amare se 'n peccato vole stare lo Spiritu Sancto l'à per male darà ·lli pena e dolore. Gettarà 'l nella fornace là uve son l'ardente brasce e l'enfernal foco penace ke sepr' arde 'l peccatore. Due son li mal' carbone k'abrusci an li peccatori et ivi son li acu satori ke don spavento a tutte l'ore. Spiritu Sancto benedecto guardane da questo decto e menane al dolçe Cristo lo qual è nostro redemptore.",
+      "sample_WER": 48.0519,
+      "sample_CER": 18.6047
+    },
+    {
+      "filename": "c057r",
+      "prediction": "lo bediença mia ke sè compia in questa dia k'io molta croce Lo suo sì ·lliÇlla fructa orsì compie questa guerna lo nemico è dato in terra per la força de la croce. Questo disse yesaià in sua vera per phetia come Agnello sì todea ci poniasin nella croce. Questo pianse pere mia quando kiamava e dicea voi c'andate per lavia vedete la pena de la croce Kiama e piange duramente carpò",
+      "reference": "l'obediença mia ke se compia in questa dia k'io moia nella croce. Lo suo fillio l'afavella or si compie questa guerra lo nimico è dato in terra per la força de la croce. Questo disse Ysaia in sua vera prophetia come agnello si tondea et ponias' innella croce. Questo pianse Yeremia quando kiamava e dicea voi c'andate per la via vedete la pena de la croce. Kiama e piange duramente e a Cristo",
+      "sample_WER": 39.726,
+      "sample_CER": 14.9367
+    },
+    {
+      "filename": "c006v",
+      "prediction": "Quasi come la vitrera quadi rai del sole la fiera dentro passa quella spera ke tanto splendissia Stando colle porte kiuse en te Cristo se' renchiuse quando de te se dischiuse permasti pungima Altresi per tua munditia venne 'l spl de la iustitia in te donna di letitia sì foste predicissima. Tu sè porta e tu sè d'omo di te nacque divit' abomo arbore coll dolçe ponto ke sempre sta",
+      "reference": "Quasi com'è la vitrera quando li rai del sole la fiera dentro passa quella spera k'è tanto splendidissima. Stando colle porte kiuse en te Cristo se renchiuse quando de te se deschiuse permansisti purissima. Altresì per tua munditia venne 'l sol de la iustitia in te donna di letitia sì foste preclarissima. Tu sè porta e tu sè domo di te naqque Diu et homo arbore col dolçe pomo ke sempre sta'",
+      "sample_WER": 27.7778,
+      "sample_CER": 11.0
+    },
+    {
+      "filename": "c025v",
+      "prediction": "fina de stelle te data gran divina ta facta amata ke t'am venerança. Tu retrovasti e 'l the s'auro smeruto tu retrovasti lo 'm k'era c'aduto. quandascoltasti lo dolçe saluto. con grande fi dança. Amor frondosa ke fai dolçe fructo de Cristo se sposa ke nostro conducto dacti riposo de questo gran lucto. gì donalegrança am A te dei genitade",
+      "reference": "fina de stelle t'è data gratia divina t'à facta amantata ke t'ài 'n venerança. Tu retrovasti el thesauro smaruto tu retrovasti l'om k'era caduto quand' ascoltasti lo dolçe saluto cun grande fidança. Arbor frondosa ke fai dolçe fructo de Cristo se' sposa k'è nostro conducto dacti riposo de questo gran lucto et don' alegrança. Ave Dei genitrix",
+      "sample_WER": 54.386,
+      "sample_CER": 15.3409
+    },
+    {
+      "filename": "c113r",
+      "prediction": "core cum dolçe canto per amor del creatore. Per amor del creatore cum timor erevença exultando et bal",
+      "reference": "core cun dolçe cant per amor del Creatore. Per amor del Creatore cun timor e reverença exultando cun bal",
+      "sample_WER": 42.1053,
+      "sample_CER": 10.3774
+    },
+    {
+      "filename": "c012v",
+      "prediction": "Orgelarda bene grande certeça gran ke venne ke sua vechieça al fio e tene ognalegreça disabet c'ogta A lor respondisti bella donçella poi lo fedesti v'ora novella sì che dioesti lo sone quella d'alto Dio cui sono donata. Ave regina gloriosa plena d'ogne consolança.",
+      "reference": "Or guarda bene grand' è certeça gratia ke venne ke sua vechieça à 'l fillio e tene ogn' alegreça elisabet cognata. Alor respondisti bella donçella poi lo 'n tendesti vera novella sì che dicesti io sone quella de l'alto dio cui sono donata. Ave regina gloriosa plena d'ogne consolança.",
+      "sample_WER": 42.8571,
+      "sample_CER": 13.3562
+    },
+    {
+      "filename": "c096v",
+      "prediction": "laudar sovente l'alto santato 'n O beato Diascun laudare et amare lo dea de buon coragio ke deb e fare",
+      "reference": "laudar sovente l'alto sant' Atoni o beato. Ciascun laudare et amare lo dea de buon coragio ké de ben fare",
+      "sample_WER": 40.0,
+      "sample_CER": 13.2075
+    },
+    {
+      "filename": "c001r",
+      "prediction": "Venite a laudare per amore cantare l'amorosa vergine ma Maria gioiosa bé sempre molto laudata preghia k'era",
+      "reference": "Venite a laudare per amor e cantare l'amorosa vergene Maria. Maria gloriosa bia sempre si molto laudata preghiam ke n'",
+      "sample_WER": 50.0,
+      "sample_CER": 16.1017
+    },
+    {
+      "filename": "c043v",
+      "prediction": "de l'onimico serpente anti quo nostro signatore de' cui valore doni a tututt' ore a k'i' li sente. Glorian cielo e pace terra na t' è 'l nostro salvatore. Nat' è Cristo glorioso l'alto Dio van",
+      "reference": "de lo nimico serpente antiquo nostro inganatore de cui valore doni a tututt' ore a ki li consente. Gloria 'n cielo e pace 'n terra na t' è 'l nostro Salvatore. Nat' è Cristo glorioso l'alto Dio mara",
+      "sample_WER": 34.2105,
+      "sample_CER": 10.5
+    },
+    {
+      "filename": "c021v",
+      "prediction": "pona col dolçe frudù savorita l'an ke la saggia par amarita non cura mai desta presente vita perciò k'el tuo savor suave sente. Vergene piena di tutto l'amore kiu se' sin voi la gloria cum dolçore sospi ri sì ti mandò col mio core? Ké tu da mor mi facci stare ardente. Voi ke vivete col carnale amore cantivi ke dormite in amarore non c'ognoscete Dio nostro signore. quei ke dolçe sovra dolçor potente.",
+      "reference": "Poma col dolçe fructu savorita l'anima ke t'asaggia par smarita non cura mai d'esta presente vita percioké 'l tuo savor suave sente. Vergene piena di tutto l'amore kiu sesi 'n voi la gloria cun dolçore sospi ri sì ti mando col mio core ke tu d'a mor mi facci stare ardente. Voi ke vivete col carnale amore captivi ke dormite in amarore non cognoscete dio nostro signore quei ke dolç' è sovra dolçor potente.",
+      "sample_WER": 29.7297,
+      "sample_CER": 9.1787
+    },
+    {
+      "filename": "c108v",
+      "prediction": "Finalunidi ke 'l sole nasce de quello ci bon gaudioso nasce ke benedecto Iesù ke noi sì la sce con dolçe fructo savorare. Molto fo de' grande abstinetia ke trista anni fece peniteçia. cortra li viti misse sua poten ça nullo in verbiei potere durare. Ristoro la sua corectone cum lei uniò toratione aquisto per asprectone privilegio pi de",
+      "reference": "Fin a lunidì ke 'l sole nasce de quello cibo gaudioso pasce ke benedecto Ihesù ke noi sì lasce così dolçe fructo savorare. Molto fo de grande abstinentia ké trenta anni fece penitençia contra li vitii mise sua poten ça nullo inver' liei potere' durare. Ristorò la sua correctione cun ieiunio et oratione aquestò per asprectione privilegio li de'",
+      "sample_WER": 52.5424,
+      "sample_CER": 12.6761
+    },
+    {
+      "filename": "c002r",
+      "prediction": "viden ke n'al mondo è 'nganati defendanne la tua gran balia. Baldia ne dona è potentia. omadre de' far penitentia. volemo a te fare obedientia. e stare a la tua signoria signoria kafranchi lo core Dio e la tua madre d'amore sel sapesse lo peccatore a te donna retornaria etorni a tua gran sì ornça l'omo cum grande sperança.",
+      "reference": "viden ke n'à 'l mondo engannati defendane la tua gran bailia. Bailia ne dona e potentia o madre de far penitentia volemo a te fare obedentia e stare a la tua signoria. Signoria k'afranchi lo core è la tua madre d'amore se 'l sapesse lo peccatore a te donna retornaria. Retorni a tua gran fidança l'omo cun grande sperança",
+      "sample_WER": 45.7627,
+      "sample_CER": 12.6154
+    },
+    {
+      "filename": "c027v",
+      "prediction": "sempiterna O Maria savia d'amore si fort amasti Dio signore ke de te feci sua mascione a ·llor ke prese",
+      "reference": "sempiterna. O Maria savia d'amore sì fort' amasti Dio signore ke de te feci sua mascione allor ke prese",
+      "sample_WER": 21.0526,
+      "sample_CER": 7.6923
+    },
+    {
+      "filename": "c030v",
+      "prediction": "nostro sire volle morte sofferi re per recomparar la gente Bençalchun offensione sì soste né passione per trarer di possessi one lo invidioso Serpente. Quando tu 'l vedesti morto né con cel tuo diporto la sperança fo consorto de te dona cognoscente Quella pena ter amara ké 'l videver stare inara comangnello ke sè spera stava molto patiente. Quel te fo' dolor de' pario k'el videnti",
+      "reference": "nostro sire volle morte sofferi re per recomparar la gente. Senç'alchun' offensione sì sosten ne passione per trarer di possessi one lo 'nvidioso serpente. Quando tu 'l vedesti morto ne cro ce 'l tuo diporto la sperança fo conforto de te donna cognoscente. Quela pena t'er' amara ké 'l videve stare in ara com' angnello ke se spara stava molto patiente. Quel te fo dolor de parto ké 'l videvi",
+      "sample_WER": 40.0,
+      "sample_CER": 9.3199
+    },
+    {
+      "filename": "c005v",
+      "prediction": "la guardi d'ogne gu' era bensen ganna etroperra kita fende O beata. A te donna santissima regina potentissima. La vertù celestiale colla grana",
+      "reference": "la guardi d'ogne guerra ben s'en ganna e trop' erra ki t'afende o beata. Ave donna santissima regina potentissima. La vertù celestiale colla gratia",
+      "sample_WER": 50.0,
+      "sample_CER": 10.8108
+    },
+    {
+      "filename": "c118r",
+      "prediction": "tu Cristo per amare. Tmor seça comiciança sè tu na dre in sba intraita per ama ça fallio et splendore.",
+      "reference": "tu Cristo per amare. Amor sença cominciança sè tu Pa dre in substança in Trinità per aman ça Fillio et Spiritu regnare.",
+      "sample_WER": 50.0,
+      "sample_CER": 24.8
+    },
+    {
+      "filename": "c132r",
+      "prediction": "l'alta vervegene beata et dici mo ave Maria sempre sia da nui laudata. Salutialla dalcemente et cur",
+      "reference": "l'alta vervegene beata beata et dici mo ave Maria sempre sia da nui laudata. Salutialla dulcemente et cum",
+      "sample_WER": 16.6667,
+      "sample_CER": 7.619
+    },
+    {
+      "filename": "c030r",
+      "prediction": "fallimento tu sè via de salvamento chiara stella dolente Etella sovra la luna più responde ke neuna in te Cristo virgo pura in carne Dio vivente. O beata ke credesti al messagio ke vedesti lo saluto retinesti colla gratia fervente. Fosti le ska et Cristo l'amo per cui to difiso Adamo perch' Eva prese e 'l canto del freno ke fostalliente. Si digno per noi venire Iesù Cristo",
+      "reference": "fallimento tu sè via de salvamento chiara stella d'oriente. Stella sovra la luna più resplende ke neuna in te Cristo virgo pura incarnòe Dio vivente. O beata ke credesti al messagio ke vedesti lo saluto retinesti colla gratia fervente. Fosti l'eska et Cristo l'amo per cui fo difiso Adamo per k'Eva prese el camo del freno ke fo talliente. Si dignò per noi venire Ihesù Cristo",
+      "sample_WER": 25.7576,
+      "sample_CER": 6.2992
+    },
+    {
+      "filename": "c074v",
+      "prediction": "gustare ki lassa te p'altro intende mento non s'a né può lo cor terre no amare sì gran celestial delc tamento non vede lume Cristo in tuo splendore. Splendor ke doni a tutto 'l mondo luce amor Iesù de li angeli Belleça cielo et terra perte sè con duce et splende in tutte cose tuo forteça ognuor era cura a te sa dice nia solo 'l peccator e 'l vio amor spreça et partise da te",
+      "reference": "gustare ki lassa te per altro intende mento non sa né può lo cor terre no amare sì gran celestial delec tamento non vede lume Cristo in tuo splendore. Splendor ke doni a tutto 'l mondo luce amor Ihesù de li angeli belleça cielo et terra per te se con duce et splende in tutte cose tuo' forteça ognunque cratura a te s'aduce ma solo 'l peccatore 'l tuo amor spreça et partise da te",
+      "sample_WER": 25.3333,
+      "sample_CER": 6.7183
+    },
+    {
+      "filename": "c096r",
+      "prediction": "Einterna e inmare et in oni lato sancto savere et privato lo tuo nome e in vocato sanita d'ogne baldore Danne padre è donamento lo tuo ricordamento ke lo nostro intendimento te seguisca gui datore. O lucerna sole et luce tu ne gonna e né conduce sì sia nostro et face ora sempre et tutte l'ore. Diascun ke fede sente vegna",
+      "reference": "E in terra e in mare et in oni lato sancto saver è' et provato lo tuo nome è invocato sanitad' ogn' e baldore. Danne padre en donamento lo tuo ricordamento ke lo nostro intendemento te seguisca guidatore. O lucerna sole et luce tu ne governa e ne conduce sì sia nostro porto et foce ora sempre et tutte l'ore. Ciascun ke fede sente vegn' a",
+      "sample_WER": 37.8788,
+      "sample_CER": 10.5263
+    },
+    {
+      "filename": "c059v",
+      "prediction": "bemptol s'umò divino a li aposto li fer conto anço non credetter puro decio ognun' era presoso Pensosi fa lor essendo l'aparbel signor verace dire non andate temendo de me k'io non so fallace sempre aviate in fra voi pace etcer cate le kia v'adire ke le mente a viate pire di me ogno sia copioso copioso sì partìo pesce prima sì aggiato home non v'era poi re Dio di convene fo contato sì noi",
+      "reference": "bem fo 'l summo divino a li aposto li fer conto anco non credetter punto de ciò ognun n' era pensoso. Pensosi fa lor essendo l'apparbe 'l Signor verace dixe non andate temendo de me k'io non so' fallace sempre aviate in fra voi pace et cer cate le kiavadure ke le mente a aviate pure di me ogn' om sia copioso. Copioso si partìo pesc' et prima mangiato thome non v'era poi re dio e 'l convente i fo contato s'i' no i",
+      "sample_WER": 47.619,
+      "sample_CER": 14.1148
+    },
+    {
+      "filename": "c053v",
+      "prediction": "Dami conforto Dio et ardore a canta de lega lo mio core ke non misia vetato lo tuo amore in me no possa nulla ria in di grança.",
+      "reference": "Dami conforto Dio et ardore a carita de lega lo mio core ke non mi sia vetato lo tuo amore in me no possa nulla ria indignança.",
+      "sample_WER": 22.2222,
+      "sample_CER": 4.6875
+    },
+    {
+      "filename": "c071v",
+      "prediction": "d'ogne male el filiolo a te vguale mandastalagente isanata Nella vergene d'ascese stecticlino ve messe puracarne di lei prese per noi molto tormentata. Spirito amor iocundo ké riempisti tutto 'l mondo tu ne guarda dal profundo et perdona li peccata. Kite ama trete sempre tutto hono do priente alte forte la divente piu ke rocca ke' fi data O verace trinitude fi qual",
+      "reference": "d'ogne male el Filiolo a te uguale mandast' a la gente insanata. Nella vergene descese stect' e ·llei no ve mese pura carne di lei prese per noi molto tormentata. Spiritu Sancto amor iocundo ke rempisti tutto 'l mondo tu ne guarda dal profundo et perdona li peccata. Ki te ama crede sempre tutto 'l mon do perniente alt' e fort' è la sua mente più ke rocca k' è fidata. O verace Trinitade fa' per la tua",
+      "sample_WER": 51.2821,
+      "sample_CER": 17.9361
+    },
+    {
+      "filename": "c112r",
+      "prediction": "discordia volne perdonare però a la fine non pora campare quel ke de pace non sire volente. Volente sempresendo quel beni gno ché ·nn ciel ne combatte col gram malingno ke nol segui dé millenco fo degno d'aver honor et gla potente. Poitentemente vita ki servire vol l'alto Signore pace sofrire ke dal nemico non lassa laidire et a la fine lo fa stare gaudente",
+      "reference": "discordia volne perdonare però a la fine non porà campare quei ke de pace non sirà volente. Volente sepr' essendo quel beni gno che 'm ciel ne combattè col gran maligno ke no 'l seguì de mille 'n cò fo degno d'aver honor et gloria potente. Potentemente vit' à ki servire vol l'alto Signore 'n pace sofrire ké dal nimico non lassa laidire et a la fine lo fa stare gaudente.",
+      "sample_WER": 35.2113,
+      "sample_CER": 12.3684
+    },
+    {
+      "filename": "c077r",
+      "prediction": "O dor ke trapassi ogn' àilimento Iesù ki ben non n'ama fa' gran torto ch'i non sente el tuo d'ora mento o dillie puçalente olli e morto e fiume vivo del delec tamento ke l'à vi ogni fetore et da ì conforto et fai tornare lo mor to in suo vigore. Vigorosamente li amorosi ano quel la via entata dolceça gustando quelli morselli savorosi ke dona Cristo a quelli kano sua",
+      "reference": "Odor ke trapassi ogn' aulimento Ihesù ki ben non t'ama fa gran torto chi non sente el tu' odora mento od illi è puçulente od illi è morto è' fiume vivo del delec tamento ke lavi ogni fetore et da i conforto et fai tornare lo mor to in suo vigore. Vigorosamente li amorosi ano quel la via en tanta dolceça gustando quelli morselli savorosi ke dona Cristo a quelli k'àno sua",
+      "sample_WER": 31.9444,
+      "sample_CER": 9.4987
+    },
+    {
+      "filename": "c028v",
+      "prediction": "ate voliam dirave per ke tu a la trinitade aparechiasti nova çella. O Maria fresca rosa de te fece Dio sua sposa per ke tu fosti gratiosa dessare pura donçella. O Maria cui annuntione san Gabri ello ke lo mandone Dio de ciel ei comandone te salutar te sua sposella. O Maria cum recevestilo dolçe sa luto c'anesti cum gram paura",
+      "reference": "a te voliam dir ave perké tu a la Trinitade aparechiasti nova cella. O Maria fresca rosa de te fece Dio sua sposa perké tu fosti gratiosa d'essare pura donçella. O Maria cui anuntiòne san Gabri ello ké lo mandòne Dio de' ciel e i comandòne te salutar te sua sposella. O Maria cum recevesti lo dolçe sa luto c'avesti cun gram paura",
+      "sample_WER": 33.3333,
+      "sample_CER": 7.6923
+    },
+    {
+      "filename": "c008v",
+      "prediction": "ke tanto è cortissima. Tomasso questo te ne porta colli apisti ti consorta di k'io so viva no so morta non fui sì baldissia. Ben si move a questo facto per contar tutto lo facto come a re al grand acatto di la piu nobilissima. Madonna santa Maria merçé de noi peccatori fave prego.",
+      "reference": "ké tanto è cortesissima. Tomasso questo te ne porta colli apostoli ti conforta di' k'io so' viva non so' morta non fui mai sì baldissima. Ben si move a questo pacto per contar tutto lo facto come areca 'l grand' acatto di la più nobilissima. Madonna santa Maria merçé de noi peccatori faite prego",
+      "sample_WER": 33.3333,
+      "sample_CER": 9.2715
+    },
+    {
+      "filename": "c077v",
+      "prediction": "conteça ke tanto sono suave e delectosi ki bene la sagia tutto lo mondo despreça e quasi era perde suo sentore. Sentiamoni o figri onegligenti e bastine el tempo cagiamo perdu to oimè lasso quato siamo stato scono sancte c'a 'l più cortese nonna viamo servito cu lui ke et e 'n promette celestiale presente a cui linpromette già no la fal luto e ki lui ama li stane",
+      "reference": "conteça ke tanto sono suave e delectosi ki bene l'asagia, tutto lo mondo despreça e quasi en terra perde suo sentore. Sentiamoni o pigri o negligenti e bastane el tempo c'agiamo perdu to oimè lasso quanto siamo stati sconoscente c'al più cortese non a viamo servito cului ke ce en promette celestiale presente a cui l'inpromette già no l'à fal luto e ki lui ama li stane",
+      "sample_WER": 35.8209,
+      "sample_CER": 7.9787
+    },
+    {
+      "filename": "c051v",
+      "prediction": "per lo cattudaro le sue mane strecto logaro como l'adro voll'anamente Trenta de' nar fo l'omereato ke fece vida et fo pregato mellio li fora rito essar nato k'aver peccato sì duramente. A la colonna fo spolato per tutto 'l corpo flagello ogne perte fon",
+      "reference": "parte lo circundaro le sue mane strecto legaro como ladro villanamente. Trenta denar' fo lo mercato ke fece Iuda et fo pagato mellio li fora non essar nato k'aver peccato sì duramente. A la colonna fo spoliato per tutto 'l corpo flagellato d'ogne parte fo 'n",
+      "sample_WER": 39.1304,
+      "sample_CER": 13.1274
+    },
+    {
+      "filename": "c082r",
+      "prediction": "ta saggia maio non po morire farme questo d'o non perpetuale ki te Iesù possa sentire et per pietança olango donatore. Doname del tuo amore desi de rato d'ogn' altra cosa fame en fastire et sopra ogn' altro cibo ed siderato del tuo dolce amore fannene asagare de' sopra ogne altro cobo e dolicato è tutto 'l mondo vollio degiunare la len gua ke la s'aggia ilopalato lacto",
+      "reference": "t'asaggia maio non pò morire famme questo dono spetiale k'i' te Ihesù possa sentire et per pietança o largo donatore. Doname del tuo amore deside rato d'ogn' altra cosa famme en fastidire et sopra ogn' altro cibo è disiderato del tuo dolce amore famene asagiare de sopra ogne altro cibo è delicato e tutto 'l mondo vollio degiunare la len gua ke l'asaggia in lo palato lacte",
+      "sample_WER": 43.2836,
+      "sample_CER": 11.0818
+    },
+    {
+      "filename": "c023v",
+      "prediction": "perto bene morto chi non è corto. servire mai soglire non porra la legnò Bocca forte sença porte dan socorso che sorte de la morte viende corso. lo sum sal ch'u sorso di savore dal t'amore non me viem mie dolça amaça. Grannigiata candidata pure necta anti nata per beata da dilelecta tu ma specta ch'io re metta ch'io suo malingo ch'io non v'adan per dança. Dolçaudra frescetora riserena la",
+      "reference": "porto ben' è morto chi nonn è acorto servire mai saglire non porrà in alegrança. Rocca forte sença porte da' 'n socorso ché sorte de la morte vien de corso io sum s'alchun sorso di savore dal tu' amore non me viem mie dolça amança. Gran rugiata candidata pur' e necta anti nata per beata da Di' electa tu m'a specta ch'io remetta ch'io su 'nciso mal assiso ch'io non vada 'n perdança. Dolç' aurora fresc' et sora riserena la",
+      "sample_WER": 53.75,
+      "sample_CER": 15.8986
+    },
+    {
+      "filename": "c067r",
+      "prediction": "l'omo ke mo rvinoso. E gioia ke sempre grana l'acar natione humana per la vergine sovana di ke sempre sta gioioso. La dinitade pura prese homo in te natura nostra fede non sì scura per ke sè sì pietoso Aposto non ti sia disdegno perké di se nostro regno danne parte da tuo regno di quel fructo lauda Di quel ci bon Spini di ke sua sa tri nale vivo pane suPlange",
+      "reference": "l'omo k'è mo' ruinoso. È gioia ke sempre grana la 'ncar natione humana per la vergine sovrana di ke sempre sta gioioso. La divinitade pura prese homo in te natura nostra fede non si scura perké sè sì pietoso. Cristo non ti si' a disdegno perké tu sè nostro pegno dà' ·nne parte di tuo regno di quel fructo savoroso di quel cibo spiritale ke sirà sempi ternale vivo pane sustantiale",
+      "sample_WER": 45.0704,
+      "sample_CER": 17.6471
+    },
+    {
+      "filename": "c093r",
+      "prediction": "sua madre colli sancti venaro per te con dolçi canti menartene cum grande honore. Facesti la corte rallegrare dolcissi mi visi cantare davate l'alta ma iestade redendo laude cum amor Sia laudato sancto Iesù Iesù li caparie è crocefco como re",
+      "reference": "sua madre colli sancti venaro per te con dolçi canti menartene cun grande honore. Facesti la corte ralegrare dolcissi mi versi cantare davante l'alta ma iestade reddendo laude cun amore. Sia laudato san Francesco quel li c'aparve en croce fixo como redemptore.",
+      "sample_WER": 35.7143,
+      "sample_CER": 14.5594
+    },
+    {
+      "filename": "c013v",
+      "prediction": "Ave scala per la quale descese la di tade et prese in te u manitade per dare seguança. Ave relucente stella virgine ma dre donçella alor che ti chiamasti ancella fece in te Dio riposança. Ave virgo imperiale madre sè de gina pietade tu sè quella per la qua le noi semo for di dubitança. Ave paradisi porta di la quale lu ce e or t'à kienmile tuo nome sì co forta ben sapre de' abrona amaça",
+      "reference": "Ave scala per la quale descese la dei tade et prese in te umanitade per dare segurança. Ave relucente stella virgene ma dre donçella alor che ti chiamasti ancilla fece in te Dio riposança. Ave virgo imperiale madre sè de gran pietade tu sè quella per la qua le noi semo for di dubitança. Ave paradisi porta di la quale lu ce è orta ki ennil tuo nome si con forta ben s'aprende a buona amança.",
+      "sample_WER": 22.3684,
+      "sample_CER": 6.75
+    },
+    {
+      "filename": "c103r",
+      "prediction": "Ipo lo represe et felli respondo falso pensiero e in te nascoso be' cogno sco et so ke li è kiuso volota di bene ad oparare. Duo debitori non possono ubedi re al creditore ke tiene de loro avere per pietade volse provede a ciascuno volse perdonare. L'un dovea ci quata veramente l'altro ci 'n quecato veramente di mando te per ke sè presente quale piu degno de lui amare",
+      "reference": "Cristo lo represe et feli resposo falso pensiero è in te nascoso bene cogno sco et so ke li è kiuso volontà di bene adoparare. Duo debitori non possono ubedi re al creditore ke tiene de loro avere per pietade volse prevedere a ciascuno volse perdonare. L'un dovea cinquanta veramente l'altro cinquecento veramente di mando te perké sè presente qual è piu degno de lui amare?",
+      "sample_WER": 28.7879,
+      "sample_CER": 8.6842
+    },
+    {
+      "filename": "c009v",
+      "prediction": "Misericordia patre deo de tutto 'l pescato meo è so quel salva sciò reco ke sempre volsì m'al fare Pescatori ab hom inati pensiam li nostri peccati tau pinelli adate al padre mette ven suo iudicare. O tarpinella e dolle gente torna te a Dio omnipotente ke ne' ne fe ce de niente e da lui dove tonare. Te né prego Iesù Cristo allegra lo mio cor ke tristo è sempre da quel ministo k'ebbe",
+      "reference": "Misericordia Patre Deo de tutto 'l peccato meo e' so' quel malva scio reo ke sempre volsi mal fare. Peccatori abhominati pensiam li nostri peccati taupinelli andate al Padre metteteve 'n suo iudicare. O taupinella e folle gente torna te a Dio omnipotente ke ne fe ce de niente ed a lui dovem tornare. Te ne prego Ihesù Cristo allegra lo mio cor k'è tristo e scampane da quel ministro ke Lucifer",
+      "sample_WER": 50.0,
+      "sample_CER": 13.8889
+    },
+    {
+      "filename": "c131v",
+      "prediction": "uolse desperare a Dio non volse tornare per kegle fo traditore E tu aplo Mathia ke d'amor fusti perfecto en quel alta compa gnia in suo c'ambio fusti electo sempre star natel cospecto del fi glolo di don beato te cl'amaro per avocato e nostro defendetore. Etutiam divotamente",
+      "reference": "volse desperare a Dio non volse tornare perké gle fo traditore. E tu apostolo Mathia ke d'amor fusti perfecto en quel'alta compa gnia in suo cambio fusti electo sempre stai 'nnante 'l cospecto del Fi glolo di Deo beato te clamamo per avocato e nostro defendetore. Salutiam divotamente",
+      "sample_WER": 31.25,
+      "sample_CER": 9.4737
+    },
+    {
+      "filename": "c069r",
+      "prediction": "Spirito consilladore d'ogne verita de sè doctore k'i te lauda cum ben core mai non porre perire. Eposti del sancto timore ke converti ci  peccatori tu sè casto e dolçe amo re più ke lingua non po' dire Spiriti de' sapiença de' forteça e desoi ença la tua compagnia ké presença tu la degi mantenere Ei perfei amastrasti et la vergine ob unbrasti tutta la santificasti ché tuo sancto venire",
+      "reference": "Spiritu consilliadore d'ogne verita de sè doctore ki te lauda cun bo n core mai non porreà perire. Spiritu del sancto timore ke converti ei peccatori tu sè casto e dolçe amo re più ke lingua non pò dire. Spiritu de sapiença de forteça e de sci ença la tua compagnia k'è presença tu la degi mantenere. Ei profeti amaistrasti et la vergene ob unbrasti tutta la santificasti ennel tuo sancto venire.",
+      "sample_WER": 33.3333,
+      "sample_CER": 9.0909
+    },
+    {
+      "filename": "c035r",
+      "prediction": "Oricantiam cum gran dilecto de l'amor nostro perfecto ke prechi per nobis Cristo ke sia nra lux et via.",
+      "reference": "Or cantiam cun gram dilecto de l'amor nostro perfecto ke prechi pro nobis Cristo ke sia nostra lux et via.",
+      "sample_WER": 42.1053,
+      "sample_CER": 9.3458
+    },
+    {
+      "filename": "c033v",
+      "prediction": "Potesco nave victoria de la suona le gloria la tua corona imperiale dui Cristo imperadore. Tante sono li tue virtude ki cielo e terra e mare con clude tutti so di gratia signudi kiun que de te sienerrore. Tant' abonda per te gratia ké tuto 'l cielo sene solatia un que de te non sè satiamo l'angeli di far laudire. De quel canto glorioso fanno coro delectoso ciascun re di gaudioso",
+      "reference": "Per te Deo n'ave victoria de la superna le gloria la tua corona imperia cun Cristo imperadore. Tante sono li tue virtude ki cielo e terra e mare conclude tutti so' di gratia ignudi kiunque de te si' en errore. Tant' abunda per te gratia ke tuto 'l cielo se ne solatia unque de te non se satiano l'angeli di far laudare. De quel canto glorioso fanno coro delectoso ciascun rendi gaudioso",
+      "sample_WER": 37.5,
+      "sample_CER": 8.0311
+    },
+    {
+      "filename": "c014v",
+      "prediction": "Ave dicelli tuoi amanti quando ti stanno davati laude cum dalçi bei canti cantan cum gratiança. Ave virga di radice di Iesù dolce nutrice ki le tue la vide dice. dalli de te consolança. Da ciel venne messo novello. cioso l'angel Gabriel Gabriello.",
+      "reference": "Ave dice ·lli tuoi amanti quando ti stanno davanti laude cun dulçi bei canti cantan cun gran iubilança. Ave virga di radice da Ihesù dolce nutrice ki le tue laude dice dalli de te consolança. Da ciel venne messo novello ciò fo l'angel Gabriello.",
+      "sample_WER": 38.6364,
+      "sample_CER": 12.749
+    },
+    {
+      "filename": "c092r",
+      "prediction": "Marino esso fa per desidero tanto mar tificasti adéo nullo male te sape a reo de' patire per lo suo nome Del suo amore stavi lo cundo di s preçavi tutto 'l mondo die nocte andavi adorno per trovare lo tuo segnore. Per le belve di già c'a rendo a d'alta voc via dicendo o sire sì a te mandò k'io et guesco del tuo amore. Del suo amore tanto languisti en cro ell'an lo vedesti c'ulli suoi signi",
+      "reference": "Martirio esso fa' per desiderio tanto mor tificasti a Deo nullo male te sape a reo de patire per lo suo nome. Del suo amore stavi iocundo dis preçavi tutto 'l mondo dì e nocte andavi atorno per trovare lo tuo Segnore. Per le selve el gìa carendo ad alta voce iva dicendo o Sire sì a te m'arendo k'io languesco del tuo amore. Del suo amore tanto languisti en croce ell' ari' lo vedesti culli suoi signi",
+      "sample_WER": 42.3077,
+      "sample_CER": 11.8519
+    },
+    {
+      "filename": "c068v",
+      "prediction": "bonitade per la tua benignitade la tua via ne fa seguire. Spirito de' pietade fl Roma ardente et caritade ben postare in securita de ki a te vole obidire Delto Dio sè donamento font' e viva et ungemento splendore di mento tu né degi mantenere.",
+      "reference": "bonitade per la tua benignitade la tua via ne fa' seguire. Spiritu de pietade flamma ardente et caritade ben pò stare in securita de ki a te vole obidire. De l'alto Dio se' donamento fonte viva et ungemento Spiritu d'entendi mento tu ne degi mantenere.",
+      "sample_WER": 35.5556,
+      "sample_CER": 12.6482
+    },
+    {
+      "filename": "c090v",
+      "prediction": "Laudar vollio per amore lo primen frate minore San Francesco amor dilecto Cristo tare Iesù Cristo fosti fosti",
+      "reference": "Laudar vollio per amore lo primer frate minore. San Francisco amor dilecto Cristo t'à nel suo cospecto peroké fosti",
+      "sample_WER": 42.1053,
+      "sample_CER": 19.6581
+    },
+    {
+      "filename": "c130r",
+      "prediction": "gaudiosa ki avea desiderata l'anima tua glorificata a tuttore sta presente in nanti il suo viso pl'agente a vedere lu suo splendore. San Symone iusto è santo dimenti a Dio glorificato te laudamo cum dolce canto sancto aplo beato tu andasti in omni lato predicando per lo modo li dole c'a ciando a fu do a lor faccedo disinore.",
+      "reference": "gaudiosa ki avea desiderata l'anima tua glorificata a tutt' ore sta presente innanti il suo viso plagente a vedere lu suo splendore. San Simone iusto e santo dinanti a Dio glorificato te laudamo cun dulce canto sancto apostolo beato tu andasti in omni lato predicando per lo mondo l'idole caciando a fundo a lor facendo disinore.",
+      "sample_WER": 33.9286,
+      "sample_CER": 6.9909
+    },
+    {
+      "filename": "c062r",
+      "prediction": "ra la trova ki fara offensione. lo vide abbo rinki doni sirete miel testi moni c'a ciarete le de moni ke dano tempitatone. Li angeli comeciarano a dire ke portano gratia savere a Iesù Cristo nostro sire la vive la sua mascione Toll'arete li serpenti è veneno entra le gente salvi fien li miei credenti ke del peccationpettisciòe 'n Voi de Galilea or guardate in cie",
+      "reference": "rà la prova ki farà offensione. Io vi darabbo rikki doni sirete miei testimoni caciarete le de moni ke danno temptatione. Li angeli comeciarano a dire ke portano gran savere a Ihesù Cristo nostro sire là uv'è la sua mascione Tollarete li serpenti e veneno enfra le gente salvi fien li miei credenti ke del peccat' òn pentiscione. Voi de Galilea or guardate in cie",
+      "sample_WER": 36.9231,
+      "sample_CER": 11.3821
+    },
+    {
+      "filename": "c043r",
+      "prediction": "gran perfundo degno venire per noi sofrire la morte danosa la quel gioiosa era giuda noi prende In belle natel signor beato on ugie pura annutiato prefigura to fa la scriptua mediatoe e redemptore di niete verace re gratia pace k'a ciascun pace kiaveramente Su malingreçça suma forteça xmpenato terra suma forteça per cui sè spocca benign' altra",
+      "reference": "gran profundo degnò venir e per noi sofrire la morte dannosa la qual gioiosa era gravosa noi primeramente. In Bellem nat è 'l Signor beato de virgine pura anuntiato prefigura to fo da la scriptura mediatore e redemptore dirict' e verace re gran pace k'a ciascun pace ki à vera mente. Summ' alegreçça summa forteça Crist' è nato 'n terra summa forteça per cui se speçça ben ongn' altra guerra.",
+      "sample_WER": 57.1429,
+      "sample_CER": 23.1343
+    },
+    {
+      "filename": "c046v",
+      "prediction": "Plangiamo quel crudel basciar ke fe' per noi deo cruciare. Venne vi da traditen basciò li die de gratia dolore la qual facian noi",
+      "reference": "Plangiamo quel crudel basciar ke fe' per noi Deo cruciare. Venne Iuda traditore bascio li die de gran dolore lo qual faciam noi",
+      "sample_WER": 34.7826,
+      "sample_CER": 11.0236
+    },
+    {
+      "filename": "c034v",
+      "prediction": "nostro redemptore Tu sè gloria del paradiso sempre parne diviso tu gloria te sè  riso tu sè rosa cum dolçore. Ave virgo incoronata die di obunbrata ke m ciel sè è 'n coro nata madre d'ogne peccatore. Salve salve virgo pia gema splendida Maria",
+      "reference": "nostro redemptore. Tu sè gloria del paradiso sempre pare 'n te di viso tu sè gloria te sè riso tu sè rosa cun dolçore. Ave virgo incoronata ave Dei obumbrata ke in ciel sè encoro nata madre d'ogne peccatore. Salve salve virgo pia gema splendida Maria.",
+      "sample_WER": 36.9565,
+      "sample_CER": 10.1167
+    },
+    {
+      "filename": "c093v",
+      "prediction": "A Cristo fo confusato de le piaghe fo Signato empcio k'avea por vato scripto meore lu suo amore.",
+      "reference": "A Cristo fo configurato de le piaghe fo signato emperciok' avea por tato scripto in core lu suo amore.",
+      "sample_WER": 36.8421,
+      "sample_CER": 12.7451
+    },
+    {
+      "filename": "c047v",
+      "prediction": "Di lui più vita per fare. Pylato adarode el mandòe perkol ro ed domandòe certo molto e nol trovo e poi lo fe' rapresentare Ben è crudele es pietoso ki non sì mondo gran dolore de la pena del Salvatore che di noi fosti amor",
+      "reference": "per lui più vituper fare. Pilato ad Arode el mandòe perké mol to el domandòe cercò molto e no 'l trovòe poi lo fe' rapresentare. Ben è crudele e spietoso ki non si move a gran dolore de la pena del salvatore che di noi fo sì amoroso.",
+      "sample_WER": 50.0,
+      "sample_CER": 15.7676
+    },
+    {
+      "filename": "c094r",
+      "prediction": "Molti messi avea mandati la di vina maiestade e le gente perdi cate como dicono le scripture entra li quali non fo trovato nullo privilegiato d'arme nove core dato cavalieri a tanto 'nore. A la Verna al monte sancto staval sancto cum gratia pianto lo qual pi anto li torna in canto el serap yn consolatore. Per divino spiramento fallida",
+      "reference": "Molti messi avea mandati la di vina maiestade e le gente predi cate como dicono le scripture. Entra li quali non fo trovato nullo privilegiato d'arme nove coredato cavalieri a tant' onore. A la Verna al monte sancto stava 'l sancto cun gran pianto lo qual pi anto li torna in canto el serap yn consolatore. Per divino spiramento folli da",
+      "sample_WER": 21.3115,
+      "sample_CER": 4.451
+    },
+    {
+      "filename": "c042v",
+      "prediction": "li frati penitenti oniugati contin' e ti stand' al mondo santamente per ser vin al Salvatore. Glorian cielo è pecenterra na t' è 'l nostro salvatore. Nat' è Cristo glorioso l'alto Dio mara",
+      "reference": "li frati penitenti coniugati continenti stand' al mondo santamente per ser vir al salvatore. Gloria 'n cielo e pace in terra na t' è 'l nostro salvatore. Nat' è Cristo glorioso l'alto Dio mara",
+      "sample_WER": 35.2941,
+      "sample_CER": 7.2165
+    },
+    {
+      "filename": "c061v",
+      "prediction": "aura paura a vira salvatone. K'i non credera sì fa' perduto o denna to e battuto mai non averal mi o aiuto è andaran perditione. Del mio nome resuscitate mor ti ci leprosì mundate e 'l infermi sì curate sanando le lorpersone. Kiera non si ravano a cui voi porece manù sempre sire salve esano et avira bon guitardone L'anima fe non sè remova avare te lingua nuova ogn' omo perda",
+      "reference": "et avrà paura avirà salvatione. Ki non crederà sirà perduto condempna to e battuto mai non avirà 'l mi o aiuto e andarà 'n perditione. Nel mio nome resuscitate mor ti e i leprosi mundate e l'infermi sì curate sanando le lor persone. Ki crederà non sirà vano a cui voi porrete manu sempre sirà salvo e sano et avirà bon guidardone. La nostra fe' non se remova avare te lingua nuova ongn' omo perda",
+      "sample_WER": 54.6667,
+      "sample_CER": 18.4275
+    },
+    {
+      "filename": "c075r",
+      "prediction": "te suo creatore. Oreatura humana sc'ognoscente sovr'ogn' altra terrena creatura. commenti puoi partir si pernicie l'alto factor cum tu sè creatura. Ei ke ti chiama cum siamorosa mente che torni a lui ma tu pur li stai dura et non ài cura del tuo Salvatore. Salvatore ke de la vergine na scesti del tuo amor darne non ti sia desdegno ke gran segno",
+      "reference": "te suo creatore. Creatura humana scognoscente sovr'ogn' altra terrena creatura comme ti puoi partir sì per niente dal to factor cui tu sè creatura? Ei ke ti chiama cusì amorosa mente che torni a lui ma tu pur li stai dura et non ài cura del tuo salvatore. Salvatore ke de la vergene na scesti del tuo amor darne non ti sia desdegno ké gran segno",
+      "sample_WER": 25.7576,
+      "sample_CER": 6.5714
+    },
+    {
+      "filename": "c076v",
+      "prediction": "ne cor pensare se no ·lla puato. oimè lasso fanne te sentire ris calda lo mio cor di te celato ke non consumini in tanto fresdore. Fresdi peccatori e 'l grande fuoco nello inferno ve a parechiato se questo breve tempo ke sì peco d'amor lo vostro cor no ne scaldo pociascun sì studiam Glorogo d'amo di Cristo essarabra cato è confortato del suave odore.",
+      "reference": "né cor pensare se no ll'à provato oimè lasso fa' ·mme te sentire ris calda lo mio cor di te gelato ke non consumi in tanto freddore. Freddi peccatori el grande fuoco nello inferno v'è aparechiato se questo breve tempo k'è sì poco d'amor lo vostro cor non è scaldato però ciascun si studi in oni luogo d'amor di Cristo essar abra ciato e confortato del suave odore.",
+      "sample_WER": 47.0588,
+      "sample_CER": 16.0858
+    },
+    {
+      "filename": "c020r",
+      "prediction": "Dami conforto madre de l'amore ci mette fuo et fi aba nel mio co re ki temasse tanto a tutte l'ore kio ne transmortisse spessamente.",
+      "reference": "Dami conforto madre de l'amore et mette fuoco et fiamba nel mio co re k'i' t'amasse tanto a tutte l'ore k'io ne transmortisse spessamente.",
+      "sample_WER": 29.1667,
+      "sample_CER": 7.971
+    },
+    {
+      "filename": "c079v",
+      "prediction": "copagnia spesse fiade per la trop po cura la mente da te sè desvaga e si disvia dolce amare la cre atura m'al creatore più dolce ke mai sia è 'nperciò sè dea temen con gran tremore. remore e gillosa porta la mente ki ben t'ama e 'nperciò ke nostro te dispia cia partese da tutta da tutta l'altra gente e solo te Iesù e suo core abracia on creatu ra appniete è verso la belleça",
+      "reference": "compagnia spesse fiade per la trop po cura la mente da te se desvaga e si disvia dolc' è amare la cre atura ma 'l Creatore più dolc' è ke mai sia emperciò se dea temer cun gran tremore. Tremore e gilosia port' a la mente ki ben t'ama e 'mpercioké non te despiacia partese da tutta da tutta l'altra gente e solo te Ihesù el suo core abracia oni creatu ra à per niete enverso la belleça",
+      "sample_WER": 38.4615,
+      "sample_CER": 13.5204
+    },
+    {
+      "filename": "c051r",
+      "prediction": "do certo a di fel potato et cui duo l'adroni a' vasoro Iesù Iesù nabi et tutti mondo tenebro De la crude 'l morte de Cristo on bon piança amaramente. Quando inderi Cristo riliamo d'ogne",
+      "reference": "d'aceto et di fel potato et cun duo ladroni crucifixo inferno 'l sentì en n abisso e tutto 'l mondo tenebroso. De la crudel morte de Cristo on' hom pianga amaramente. Quando iuderi Cristo pilliaro d'ogne",
+      "sample_WER": 63.8889,
+      "sample_CER": 26.4706
+    },
+    {
+      "filename": "c004v",
+      "prediction": "Fonto sè da qua surgente ma dre de Dio vivente tu sè luce de la gente sovra li angeli exal tata. Tu sè verga tu sè fiore tu buna de splendore voluta avemo e core de' venerate ornata. Tu sè rosa tu sè gillio tu por tasti e 'l dolce filiò però donna sì menastiò de laudar te honoata. A richa sè d'umilitade viso do gne sentade en te venne di tade",
+      "reference": "Fonte sè d'aqqua surgentema dre de Dio vivente tu sè luce de la gente sovra li angeli exal tata. Tu sè verga tu sè fiore tu sè luna de splendore voluntà avemo e core de venir a te ornata. Tu sè rosa tu sè gillio tu por tasti el dolce fillio però donna sì me 'npillio de laudar te honorata. Archa sè d'umilitade vaso d'o gne sanctitade en te venne deitade",
+      "sample_WER": 35.2113,
+      "sample_CER": 10.9589
+    },
+    {
+      "filename": "c018v",
+      "prediction": "tu sì 'l puristi non c'ognoscendo carnal delectança. Fosti radice I cielo per lontata ma d' e nudrice a Dio disposata inna drice tu sè deficata nostra avocata per tua pietança. Fresca rivera ornata di flori tu sè la spera di tutti colori giuda la skiera di noi peccatori sì casavo ri de tua benignança. Ave Maria di gratia tu sè la via c'à vita ci mena di rendria",
+      "reference": "tu sì 'l parturisti non cognoscendo carnal delectança. Fosti radice in cielo plantata ma dr' e nutrice a Dio disponsata impera drice tu sè deficata nostra advocata per tua pietança. Fresca rivera ornata di fiori tu sè la spera di tutti colori guida la skiera di noi peccatori sì c'asavo ri de tua beninança. Ave Maria di gratia plena tu sè la via c'a vita ci mena di tenebria",
+      "sample_WER": 24.6377,
+      "sample_CER": 8.8773
+    },
+    {
+      "filename": "c055r",
+      "prediction": "di Cristo facian gaudio et iubilata. Fuoco et fianba stia nel nostro core rem freske la rosa coll'amore et lo spu sancto parlin noi e 'l padre né comfirmi per pietança. Am Da né homo ad alta voce lau di la verace croce.",
+      "reference": "di Cristo faciam gaudio et iubilança. E fuoco et fianba stia nel nostro core renfreskese la rosa coll'amore et lo Spiritu Sancto parli 'n noi e 'l padre ne confirmi per pietança. Amen. Onne homo ad alta voce lau di la verace croce.",
+      "sample_WER": 34.8837,
+      "sample_CER": 12.0172
+    },
+    {
+      "filename": "c076r",
+      "prediction": "et trictamente tami conardore. Arore ke consumini ogni fresdu ra purghi et illumini la mente ogn' altra cosa fai parer obscu ra la qual nostro vede te presente te et giamai teco amar non cu ra per noi cessar l'amor date ni ente et no rateparallò al tuo dalore. Dolor sì fai l'anima la guitata et strugere lo cor di te inflarnato ke né lingua ke 'l potesse dire",
+      "reference": "et trictamente t'ami con ardore. Ardore ke consumi ogni freddu ra purghi et illumini la mente ogn' altra cosa fai parer obscu ra la qual non vede te presentemen te et giamai teco amar non cu ra per non cessar l'amor da te ni ente et non ratemparà' ·llo dal tuo calore. Calor sì fai l'anima languire et struggere lo cor di te inflammato ke non è lingua ke ·l potesse dire",
+      "sample_WER": 33.3333,
+      "sample_CER": 11.4667
+    },
+    {
+      "filename": "c066r",
+      "prediction": "Tu speri paraclino tu nida pace et habito ciò ke ti sia placito al tu o regno spatioso. Già null' omo stia turbato Iesù Cristo sia laudato sempre sia glori ficato ke mè dolçe et amoroso Delumanità del servo tu' precedesti carne è nervò con m'alafontan 'l nal cervo venisti desideroso. Oi nui ti proveda pietade tu Signor duilitade per la tua benignita de sempre se di noi geloso.",
+      "reference": "Tu Spiritu paraclito tu ni da' pace et habito ciò ke ti si' a placito al tu o regno spatioso Già null' omo stia turbato Ihesù Cristo sia laudato sempre sia glori ficato ké m'è dolçe et amoroso. De l'umanità del servo tu prendesti carne e nervo comm' a la fontan 'l cervo venisti desideroso. Di nui ti prenda pietade tu Signor d'umilitade per la tua benignita de sempre sè di noi geloso.",
+      "sample_WER": 35.6164,
+      "sample_CER": 10.4061
+    },
+    {
+      "filename": "c021r",
+      "prediction": "Vergine bella fior sovr'ogni rosa sença carnal amore sè dilectosa amata fosti et sè sovr'ogni cosa nel para diso sè la più piacente. Per voi ne piango molti sospira do kiedendo lo tuo amore va Cri dando le va li occhi in alto ami rando o ti ci dona gaudio dolagere Conticimento fosti madre bella dal stancasta virgene donçella puoi fiersei 'l mondo et novella reina sovra li angeli respondente.",
+      "reference": "Vergine bella fior sovr'ogni rosa sença carnal amore sè dilectosa amata fosti et se' sovr'ogni cosa nel para diso sè la più piacente. Per voi ne piangon molti sospiran do kiedendo lo tuo amore van gri dando levan li occhii in alto ami rando or ti ci dona gaudio de la gente. Cominciamento fosti madre bella di stari casta virgene donçella per voi fioresc' il mondo et rinovella reina sovra li angeli resplendente.",
+      "sample_WER": 30.137,
+      "sample_CER": 9.0909
+    },
+    {
+      "filename": "c031r",
+      "prediction": "con fiction quardo tutto 'l sange li era sperto de la gratia piaga repente. Que 'l dolor participasti giamai no l'abonasti nostra fede o fin marti per ke non fosse perdente Le la gnme del tuo pianto turban lo mondo tutto quato tenebre fu or facto in tanto ke le luce fuorospente Terra etaer comosse tutta la cqua sì riscose per temo de le scoske ke sofrio il Signor potente. O Maria virgo pura molto fosti",
+      "reference": "conficto 'n quarto tutto 'l sangue li era sparto de la gran piaga repente. Quel dolor participasti giamai no l'abandonasti nostra fede confir masti perké non fosse perdente. Le lagrime del tuo pianto turbar lo mondo tutto quanto tenebre fu or facte intanto ké le luce fuoro spente. Terra et aer commosse tutta l'acqua si riscosse per temo de le percosse ke sofrio il Signor potente. O Maria virgo pura molto fosti",
+      "sample_WER": 45.8333,
+      "sample_CER": 10.8434
+    }
+  ]
+}

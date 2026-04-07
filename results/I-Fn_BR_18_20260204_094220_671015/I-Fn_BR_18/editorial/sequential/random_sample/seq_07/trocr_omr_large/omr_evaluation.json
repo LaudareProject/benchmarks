@@ -1,0 +1,319 @@
+{
+  "metrics": {
+    "NER": 84.0505,
+    "CER": 39.6163,
+    "p-CER": 20.6614,
+    "num_samples": 44,
+    "matched_files": 44
+  },
+  "sample_details": [
+    {
+      "filename": "BR 18-018v",
+      "prediction": "KF2 (B3) (A3 G3 F3) (G3) (A3) (B3) (C4 B3 A3 G3) (F3) (G3) (A3) (B3) C4 KC3 (A3 B3) (C4 B3) (C4) (C4) / (F4) (G3 A3) (B3 C4) (B3) (A3) (G3) (A3) (B3) C4 KC3 (F4) (E4 D4 C4 B3) (C4) (C4) / (F4 B3) (C4) (C4) (B3 A3 G3 F3) (A3 B3) (C4 B3 A3 G3) (F3) (A3 B3) (C4) / F4",
+      "reference": "KC3 (E4) (D4 C4) (D4) (D4) (E4) (F4 E4 D4) (C4) (D4) (E4) (E4) E4 / KC2 (E4 G4 F4 E4 D4) (E4 D4) (C4) (A3) (C4 G3) KC3 (G3 F3 E3) (F3) (C4 B3 A3) (B3 G3) (A3) (B3) (C4) / C4 KC3 (C4) (F3) (G3 F3 G3) (A3 G3 F3) (G3 A3 G3 F3) (F4 E4 D4) (E4 C4) (A3) (C4 B3 A3 G3 F3) (G3 A3 G3) (F3) //",
+      "sample_NER": 87.5,
+      "sample_CER": 48.7633
+    },
+    {
+      "filename": "BR 18-007r",
+      "prediction": "KF2 (F3) (G3) (A3) (B3) (A3 G3) (A3) (B3) (C4 B3 A3 G3) (F3) / F4 KF2 (C4) (B3 C4 B3 A3 G3) (F3) (G3) (A3) (B3) (A3) (G3) (A3) (B3) C4 KF2 (C4) / (F3) (G3) (A3) (B3) (B3) (A3) (G3) (A3) (B3) C4 KF2 (F3) / (F3) (F3) (G3) (A3) (B3) (B3) (C4 B3 A3 G3) (F3) (G3) A3 KF2 (F3) (G3) (F3) (G3) (A3) (B3) (B3) (B3) (C4) (B3) (A3 G3) F3",
+      "reference": "KF2 (G3) (G3) (B3) (A3) (G3 F3) / (G3 A3) (B3) (A3 G3 F3) (G3) (A3) A3 KF2 (A3) (A3 G3 F3) / (E3) (E3) (F3) (G3) (F3) (E3 D3) (E3) (E3) // A3 KF2 (A3) (A3) (A3) (A3) (G3) (A3) / (D3 C3) (G3) (G3) (G3) F3 KF2 (F3) (G3) (A3) (A3) / (A3) (C4) (C4) (D4) (C4 B3) (A3 G3 F3) (G3) (A3) (A3) A3 / KF2 (A3) (A3) (A3) (A3) (G3) (F3) (G3) (A3) (A3) / (D3) (A3) A3",
+      "sample_NER": 78.0488,
+      "sample_CER": 31.5341
+    },
+    {
+      "filename": "BR 18-119v",
+      "prediction": "KC3 (F3) (G3) (A3) (B3) (B3) (C4) (B3) (B3) (B3) (C4 B3 A3 G3) A3 KF2 (F3 E3) (F3 E3) (F3 G3 F3) (G3) (A3) (B3) (C4 B3 C4) / (F3 G3) (A3) (B3) C4 KF2 (C4) (B3) (A3) (G3) (F3 E3) (F3) (G3) (F3 E3) (F3) (F3) (F3) // F4 KF2 (C4) (B3) (A3 G3 F3) (G3) (A3) (A3) / (B3) (C4) (B3) C4 KF2 (F3) (G3) (A3 G3) (F3) (G3) (F3 E3) (D3 C3) (B2 C3) (B2) (C3) //",
+      "reference": "KF3 (E3 D3) (E3 F3) (E3 D3) (C3) (C3) / (E3 F3) (G3) (E3) (F3 E3) (E3 D3) D3 KF3 (D3 B2) (C3) // (C3) (E3 F3) (G3) (G3) (A3 G3 F3) (A3) (G3) (G3) / D4 KF2 (C4) (B3 A3) (G3) (G3) (E3 D3) (E3 F3) (E3 D3) KF3 (C3) (C3) / (C3) E3 KF3 (E3 F3) (G3) (G3) (A3 G3 F3) (F3) (F3) (F3) (A3) (G3) (G3) / KF2 (F3) E3 KF3 (E3 D3) (E3) (F3 E3) (E3) (D3 C3) (D3 E3) (C3) (C3) (C3) //",
+      "sample_NER": 84.0909,
+      "sample_CER": 36.612
+    },
+    {
+      "filename": "BR 18-126v",
+      "prediction": "KC3 (G3) (F3) (E3) (F3) // KF2 (F3) (F3 G3) (A3) (B3) (C4 B3 A3 G3) A3 KF2 (F3 E3) / (F3 G3) (A3) (B3 C4) (B3) (A3 G3) (F3) (F3) (G3) F3 KF2 (F3) (F3 G3) (A3) (B3) (A3 G3) (A3) (B3) (A3) (G3) F3 KC3 (C4 B3) (C4) (B3) (A3) (G3 F3 E3) (F3) (F3) (G3 A3) (B3) (C4 B3 A3 G3 F3) / E4",
+      "reference": "KC3 (B3) (G3) (F3) // KF2 (F3) (F3) (E3) (F3) (G3 F3 E3) (F3 G3) B3 KF2 (B3 A3 G3) (F3) (A3 B3) (C4) (C4) (D4 B3) (C4) / (F3) (E3) (F3) G3 KF2 (G3) (A3) (B3) (A3) (G3 F3) (G3) (A3) (F3) (F3) // KC3 (F4 E4 C4) (D4) (C4) (B3) (A3) (G3) (F3) (G3) (C4 D4) (C4 B3 A3 G3 F3 E3) F3",
+      "sample_NER": 76.9231,
+      "sample_CER": 33.9416
+    },
+    {
+      "filename": "BR 18-117v",
+      "prediction": "KF2 (C4) (B3) (A3 G3 F3) (A3) (B3) (B3 A3 G3) (F3 G3) A3 KF2 (F3 E3) (F3 G3) (A3) (B3) (C4 B3 A3 G3) (A3) (B3 C4 B3 A3 G3) (F3) / F4 KC3 (F3) / (F4) (G3) (A3) (B3) (C4) (B3) (B3) (B3) (C4) (B3 A3 G3 F3 E3) (F3 G3 F3 G3 A3 G3) F3",
+      "reference": "KF2 (F3) (G3 A3) (F3) (G3 A3 F3 E3) (G3 A3 F3 E3) F3 KF2 (F3) (F3) (G3) (A3) (B3) (A3 G3 F3) (G3) (A3) (A3 G3 F3) (G3) / A3 KC3 (A3) (B3) (C4 D4 B3) (C4) (D4) (F4) (E4) (C4) (D4 C4 B3 A3) (C4 B3 A3 G3 F3) / F3",
+      "sample_NER": 88.6792,
+      "sample_CER": 40.1914
+    },
+    {
+      "filename": "BR 18-085r",
+      "prediction": "KC3 (F3) (F3) (G3 A3) (B3) (B3) (B3 A3 G3 F3) (B3) (C4 B3 C4) (B3 A3 G3) / F4 KC3 (F4) (E4 D4 C4 B3) (C4) (C4) (B3) (A3) (B3) (C4) (B3 A3 G3 F3) (A3 B3) (C4) / F4 KC3 (B3) (C4) (C4) (B3) (A3) (G3) (A3) (B3) (C4) (B3) (B3) (B3) C4 KC3 (C4) (B3) (A3) (G3) (F3) (F3) (G3) (A3) (B3) (B3) //",
+      "reference": "KC2 (G3) (G3) (B3) (C4) (D4 C4 D4 C4 B3 A3) (B3) (D4) (E4 D4 C4) (D4) (E4) F4 KC2 (F4) (G4 F4 E4 D4) (E4 C4) (D4) / (E4) (F4) (E4) (D4 C4 D4) (E4) (D4) C4 KC2 (C4) (D4) (E4) (C4) (D4) (D4) / (C4 D4) (E4) (D4) (D4) (B3 C4 B3 A3 G3) A3 KC2 (A3) (D4) (C4) (A3) (G3) (A3 B3 A3) (G3) //",
+      "sample_NER": 91.1765,
+      "sample_CER": 44.1281
+    },
+    {
+      "filename": "BR 18-052r",
+      "prediction": "KF2 (F3) (G3 F3 E3) (F3 G3 A3) (B3) (B3) (B3 C4) (B3 A3 G3 F3 E3) (F3 G3 A3 G3) A3 KF2 (C4) (B3) (A3) (G3) (F3) (G3) (A3) (B3) (B3) C4",
+      "reference": "KF2 (F3) (D3 F3 E3 D3) (C3) / (C3) (F3) (G3) (G3) (F3) (G3) (A3 G3 F3) (G3) G3 KF2 (G3) (F3) (E3) (F3) (F3) // (F3) (F3)",
+      "sample_NER": 96.4286,
+      "sample_CER": 41.6667
+    },
+    {
+      "filename": "BR 18-036r",
+      "prediction": "KC3 (F4) (E4 D4 C4 B3) (C4) (B3 C4) (B3 A3 G3) (F3) (A3) (B3 C4 B3 C4) / (F3) (G3) (F3 E3) (F3 G3) A3 KC3 (C4 B3) (C4) (B3) (C4) (C4) / (F4) (F4 E4 D4 C4) (C4) (D4 C4 B3) (C4) (B3) C4 KF2 (C4) (B3) (A3 G3 F3) (E3) (F3) (G3) (A3) //",
+      "reference": "KC2 (F4) (G4) (F4 E4 D4 C4 B3 A3) (B3) / (A3) (C4) (C4) (C4 B3 A3 G3) (A3) (G3 F3) A3 KF3 (F3) / (A3) (G3) (F3) (G3) (G3 F3 E3 D3) (E3) (D3 C3) (D3 C3 D3) / (F3) G3 KF2 (G3 A3) (B3) (A3 G3 A3) (F3) (F3 E3) (F3) //",
+      "sample_NER": 92.5926,
+      "sample_CER": 44.1315
+    },
+    {
+      "filename": "BR 18-035v",
+      "prediction": "KF2 (C4) (B3) (A3 G3 F3) (G3 A3) (B3) (A3 B3) (C4 B3 A3 G3) (A3) / F4 KF2 (F3) / (F3) (G3) (A3) (B3) (B3) (A3 G3) (F3) (A3) (B3) C4 KF2 (B3 A3 G3 F3) (G3) (A3 B3) (C4 B3 A3 G3) (A3) (B3 C4 B3) (C4) (B3 A3 G3 F3) (G3) (A3) (A3 B3) (C4) / F4 KC3 (F3) (G3 A3) (B3) (C4) (B3) (B3) (B3) (C4) (B3 A3 G3 F3) (G3 A3 G3) A3 KC3 (F4 E4 D4) (C4 B3) (C4) (C4) (B3) (A3) (G3 F3) (A3) (B3) (C4 B3 A3 G3) / F4",
+      "reference": "KF3 (A3) (A3 G3 F3) (G3) (A3) (G3 F3) (E3 D3 C3) (D3) / F3 KF2 (F3) (G3 A3) (B3) (A3 G3 A3) (F3) (F3) (F3 E3) (F3) / (A3) (C4) (C4) C4 KF2 (C4 B3 A3 G3) (G3) (G3 F3 E3 D3) (F3 E3 D3) (C3) / (F3) (G3 A3) (B3) (A3 G3 A3) (F3) (F3 E3) F3 KC3 (F3) // KC2 (F4) (F4) (C4) (F4) (G4) (F4 E4 D4 C4 B3 A3) (A3 G3 B3) / (A3) C4 KC3 (C4) (C4 B3 A3 G3) (A3) (A3) (F3 E3) (F3) / KC2 (F4) (F4) (E4 D4 C4) F4",
+      "sample_NER": 86.8687,
+      "sample_CER": 42.3469
+    },
+    {
+      "filename": "BR 18-124v",
+      "prediction": "KF2 (F3) (G3) A3) (B3) (B3) (A3) G3",
+      "reference": "KF2 (F3) (F3 G3) (A3) (A3) (A3) (B3) A3",
+      "sample_NER": 66.6667,
+      "sample_CER": 20.5128
+    },
+    {
+      "filename": "BR 18-082r",
+      "prediction": "KF2 (B3) (A3 G3 F3) (F3 E3) (F3) (G3 F3 E3 D3 C3) (B3 C4) (B3) (B3) (C4) / F4 KF2 (F3) (G3) (F3) (G3) (A3) (B3) (B3) (B3) (B3) (C4 B3 A3 G3) F3 KF2 (C4) (B3) (A3 G3) (F3 E3) (F3) (F3) (G3) (A3) (B3) (A3 G3) F3",
+      "reference": "KF2 (E3) / (F3) (E3) (F3) (D3 C3) (D3 E3) (F3) (E3 F3) (G3) / (G3 F3 E3 D3) G3 KF3 (G3) (G3) (G3) (G3) (F3 E3 D3) (E3 G3) (G3) (G3) / (A3) (B3) D4 KF3 (D4) (A3) (G3) (F3 E3) (D3 C3) (D3) (C3) // (C3 B2) (D3) (E3)",
+      "sample_NER": 90.1961,
+      "sample_CER": 41.0377
+    },
+    {
+      "filename": "BR 18-042r",
+      "prediction": "KF3 (C3) (G3 A3) (B3) (B3) (A3 G3 F3 E3) (F3) (F3 G3) (A3) (B3) A3 KC3 (G3) (F3) (E3) (F3) (G3) (F3) (B3) (A3 G3) (F3) (G3) (F3 E3) (F3 G3 A3 G3) A3 KC3 (F3) / (F3) (G3) (A3) (B3) (C4) (B3) (B3) (B3) (B3) (B3) G3 KC3 (F3) / (F4) (F4) (G3) (A3) (B3) (B3) (C4) (B3) (B3) (C4) (B3 A3 G3 F3) / KC3 (C4) / (F4) (G4) (A3) (B3) (C4) (B3) (B3) (B3) (C4) (B3 A3 G3 F3 E3) (F3) / F3",
+      "reference": "KC3 (D4) (D4) (C4 B3) (A3 G3 A3) (B3) (E4) (D4 C4) (C4) D4 KC3 (D4) (C4 B3) / (A3 G3) (A3) (B3) (C4) (D4) (C4) (B3 G3 F3) (G3) (A3) // C4 KC2 (C4) (D4) (E4) (F4) (F4) (F4) (D4) (C4) (D4) (C4 B3 A3 G3) (A3) / KC2 (C4) (D4) (E4) (F4) (F4) (F4 E4) (E4 D4) (D4 C4) (D4) (C4 B3 A3 G3) (A3) / (C4) KC2 (D4) (E4) (F4) (F4) (F4) (D4) (C4) (D4) (C4 B3 A3 G3) (A3) / (A3 B3)",
+      "sample_NER": 91.8605,
+      "sample_CER": 45.0549
+    },
+    {
+      "filename": "BR 18-091v",
+      "prediction": "KC3 (A3) (B3) (C4) (G3) (A3) (B3) (A3) (G3) (A3) (B3) (B3) C4 KC3 (F4) (C4) (C4 B3) (C4) (C4) / (F4) (F4) (E4 D4) (C4) (B3) (A3) G3 KC3 (F3) / (F3) (G3) (A3) (B3) (B3) (B3) (A3) (G3) F3 KC3 (F3) / (F3) (F3) (G3) (A3) (B3) (B3) (B3) (B3) (C4) (B3) C4 KC3 (G3) (A3) (B3) (C4) (B3) (A3) (G3) (F3 E3) (F3) (F3) (G3) (A3) (B3) C4",
+      "reference": "KC2 (E4) (F4) (E4 D4) (C4) (D4) (D4) / (D4) (E4) (C4) (D4 E4) (F4) F4 KC3 (F4) (D4) (C4) (D4) (E4 D4) (C4) / (F3) (G3) (A3) (G3) G3 KC3 (G3) (F3) (B3) (A3) (G3) (F3) (F3) / (F3) (A3) A3 KC3 (A3) (B3) (C4) (C4) (D4) (E4) (D4) (C4) (C4) (C4) / (F4) E4 KC3 (E4) (D4) (C4) (B3) (A3 F3) (G3) / (A3) (C4) (D4) (E4) D4",
+      "sample_NER": 84.2857,
+      "sample_CER": 37.299
+    },
+    {
+      "filename": "BR 18-074r",
+      "prediction": "KC3 (F4) (E4 D4 C4 B3) (C4) (C4) (B3) (A3) (G3) (A3) (B3) (C4) / F4 KC3 (C4) (D4 C4 B3) (C4) (C4) (C4) (B3) (A3) (G3) (A3) (B3) (C4 B3) (C4) / F4 KC3 (F3) (G3 F3) (A3) (B3) (B3) (C4 B3 A3 G3) (F3) (G3) (A3) (B3) C4 KC3 (G3 A3 B3) (C4) (B3) (C4) (B3) (A3) (B3) (B3) (C4 B3 A3 G3) (A3 B3) (C4 B3 A3 G3) F3 KC3 (F4) (E4 D4 C4 B3) (B3) (C4) (B3) (A3) (G3 A3) (B3) (C4 B3 C4) (C4 B3 A3 G3 F3) / G3",
+      "reference": "KC3 (D4) (C4 B3 A3) (G3) / (C4) (D4) (E4) (C4) (D4) (B3 A3) (G3) A3 KC3 (A3) (C4 B3) (D4 C4 B3) (C4 G3) (A3 F3 E3) (G3 A3) (G3 F3) / (C4) (D4) (E4) C4 KC3 (C4) (B3) (A3 G3 F3) (G3) (C4) (C4 B3 A3) (C4) (C4) (C4) / (F4) E4 KC3 (E4 D4 C4) (A3 B3) (C4) (G3) (A3 G3) (F3) (A3) (C4 B3) (D4 C4 B3) (C4) G3 KC3 (G3) (A3 F3 E3) (G3 A3) (G3 F3) / (F3) (G3) (A3) (F3 D3 C3) (G3 F3 E3) (F3) F3",
+      "sample_NER": 90.4255,
+      "sample_CER": 43.4555
+    },
+    {
+      "filename": "BR 18-048v",
+      "prediction": "KF2 (F3) (F3 G3) A3 KF2 (A3) (A3) // F4 KF2 (C4) (B3 C4 B3 A3) (G3) A3 KF2 (F3) (G3 A3) (B3) (A3 G3 F3 E3) (F3) (C4 B3 A3 G3) (A3 G3) (F3 E3) / (F3) (F3 G3) A3 KF2 (G3) (A3) (B3) (C4 B3 A3 G3) (F3) (A3) (B3 C4 B3 A3 G3) (A3) / (C4 B3) (C4) (B3) C4",
+      "reference": "KF2 (D3) (A3) (A3 G3) A3 KF2 (A3) (D4) C4 KF1 (C4 B3 A3) (G3) (A3) / D3 KF2 (D3) (A3) (G3) (F3 E3 D3) (E3 C3) (D3 E3) (F3 E3 D3) (D3 C3 B2) (C3 D3) // F3 KF2 (F3) (F3 E3) (E3 D3) (D3 C3 D3) (F3 E3 D3) (D3 C3) (C3 D3 C3) (D3) (E3) / (F3) (F3 G3) (A3) A3",
+      "sample_NER": 87.5,
+      "sample_CER": 43.254
+    },
+    {
+      "filename": "BR 18-114v",
+      "prediction": "KF2 (F3) (F3) (G3) A3 KF2 (F3 E3) (F3 E3 C3) (D3) / (F3) (F3) (G3) (A3) (B3) (C4 B3 A3 G3) (F3) (G3 A3 G3 F3 E3) (F3 G3 A3 G3 G3) A3",
+      "reference": "KF2 (F3) (F3 G3) (A3) (A3) A3 KF2 (A3) (A3 G3) (A3 B3 A3 G3) (A3) (G3 F3) / (G3) (G3) (G3 F3) (E3 D3) (E3) (F3 G3) (F3 E3 D3 C3) (D3) // D3",
+      "sample_NER": 91.4286,
+      "sample_CER": 43.8849
+    },
+    {
+      "filename": "BR 18-129r",
+      "prediction": "KC3 (F3) / (F3) (F3) (G3) (A3) (B3) (B3) (C4) (B3) (A3) (G3) F3",
+      "reference": "KC3 (G3 A3) (A3) (F3) (G3) (B3) (D4 C4) // (F3) (F3) (G3) (F3 E3)",
+      "sample_NER": 73.3333,
+      "sample_CER": 35.3846
+    },
+    {
+      "filename": "BR 18-053r",
+      "prediction": "KF2 (F3) (G3) (F3 E3) (F3 E3) (D3 C3) (B2) (A3) (G3 F3 E3) (F3 G3) A3 KC3 (F3) (F3 G3) (A3) (B3) (C4 B3 A3 G3) (A3) (B3) (C4 B3) (C4) / F4 KC3 (B3 A3 B3) (C4) / (C4) (C4) (C4) (B3) (C4) (B3 A3 G3 F3) (A3 B3) (C4 B3 A3 G3) F3 KC3 (G3 A3) (B3) (B3) (C4) (C4) / (F4) (C4) (B3 A3 G3) (A3 B3) (C4 B3 A3 G3) F3 KC3 (F3) (G3 A3) (B3) (B3) (C4 B3 A3 G3) (A3) (B3) (C4 B3 C4) (C4) / (C4 B3 A3 G3 F3) (G3) A3",
+      "reference": "KC3 (B3) (C4 B3) (C4 B3 C4) (B3) / (F3 G3) (A3) (B3) (B3) (B3) (D4) D4 KC3 (D4 C4) (A3) (A3 G3 A3) (B3 A3 G3 F3 E3) (F3) / (F4) (F4 E4) (D4 C4) A3 KC3 (A3 G3 F3) (A3 B3) (C4) (C4) (C4) (C4) / (C4 B3 C4) (D4 C4 B3 A3) (B3) (C4) / (F3 G3) A3 KC3 (A3) (B3) (B3) (B3) (C4 B3 C4) (D4 E4) (F4 E4 C4) (D4 E4) (D4 C4) A3 KC3 (A3) (A3 G3) (A3) (B3 A3 G3 F3 E3) (F3) // (F4) (F4 E4) (D4 C4) (A3 G3 F3) (A3 B3) C4",
+      "sample_NER": 88.2353,
+      "sample_CER": 43.0348
+    },
+    {
+      "filename": "BR 18-017v",
+      "prediction": "KF2 (G3 A3) (B3) (B3) (A3 G3 F3) (A3) (B3) (B3 A3 G3 F3 E3) (F3) (F3 G3 A3 G3) / A3 KF2 (C4) (B3) (A3) (G3) (F3) (G3) (A3) (B3) C4 KF2 (G3 A3) (B3) (B3) (C4) (C4) / (F4 E4 D4 C4) (D4) (C4) (B3 A3 G3 F3 E3) (F3) (F3) E3 KF2 (F3 E3) (F3 G3 F3 G3) (A3) (B3) (A3 G3) (A3 B3) / (B3) (C4) (B3 A3 G3 F3) (G3) A3 KF2 (F3 E3 F3) (G3 A3 G3 F3) (B3) (A3 G3 F3 E3 D3) (C4 B3 A3 G3) (F3 E3) (F3) / (F3 G3) (F3 G3) A3",
+      "reference": "KF2 (A3) (A3) (G3) (F3) (G3 A3) (B3 A3 G3) / (A3) (B3 A3 G3 F3) (G3 A3) C4 KF2 (C4) (C4) (C4) (C4) (C4) / (A3) (C4) (F3) (G3) A3 KF2 (A3 G3) (F3) (F3) // KC2 (E4 G4 F4 E4 D4) (E4 D4) (C4) (A3) (C4) G3 KF1 (G3) (A3 G3 F3 E3) (F3) (C4) (B3 A3) (B3 G3) (A3 B3) (D4 C4) / (C4) (F3) (G3 F3 G3) A3 KF1 (A3 G3 F3) (G3 A3 G3 F3) (F4 E4 D4) (E4 C4) (A3) (C4 B3 A3 G3 F3) (G3 A3 G3) (F3) (F3) / E4",
+      "sample_NER": 81.6327,
+      "sample_CER": 41.0853
+    },
+    {
+      "filename": "BR 18-045r",
+      "prediction": "KF2 (G3 A3) (B3) (B3) (A3 G3 F3) (A3) / (F3) (G3) (A3) (B3 A3 G3 F3) (G3) F3 / KF2 (C4) / (F4) (G3 A3) (B3) (B3) (B3) (B3) (A3 G3 F3 E3) (F3) (F3 E3) (F3 G3) A3 / KF2 (F3 E3) (F3 E3) (F3 G3 A3) (B3) (A3 G3 F3 E3 D3 E3) (F3) / (F3 G3) (F3 G3) A3 KF2 (F3) (G3) (A3) (B3) (B3) (A3 G3) (F3) (G3) (A3 B3) (C4 B3 A3 G3) F3 KF2 (F3) (F3 E3) (F3 E3) (F3 G3) (A3) (B3) (B3) (C4) (B3) C4",
+      "reference": "KF2 (G3 F3 G3) (A3) (A3) / (D3 C3) (D3) (F3) (G3) (F3) (F3) (E3 D3 E3) (C3) (D3) D3 KF2 (D3) // KC3 (A3) (C4) (D4) (C4) (A3 B3 A3 G3 F3) (G3 F3 G3) (A3) (A3) (A3) / A3 KF2 (A3) (C4) (C4) (D4) (C4) (A3 B3 A3 G3 F3) (G3 F3 G3) (A3) (A3) / (A3) (G3) F3 KF2 (F3) (E3) (D3) (E3) (F3) (G3 F3 G3) (A3) (A3) / (D3 C3) (D3) E3 KF2 (E3) (G3 F3) (E3) KF3 (E3 D3 E3) (C3) (D3) (D3) // KF2 (A3) (C4) C4",
+      "sample_NER": 88.2979,
+      "sample_CER": 38.5604
+    },
+    {
+      "filename": "BR 18-051r",
+      "prediction": "KC3 (C4) (B3) (C4) (B3) (A3) (B3) (C4) (C4 B3 A3 G3) (F3) / A3 KF2 (F3) / (F3) (G3) (A3) (B3) (C4 B3 A3 G3) (F3) (F3 E3) (F3) (F3) G3 KF2 (A3) / (F3) (G3) (A3) (B3) (A3) (G3) (F3) (G3) A3 KF2 (F3) (F3) (G3) (A3) (B3) (B3) (A3 G3) (F3) (G3) A3",
+      "reference": "KC3 (C4) (C4) (D4) (C4) (B3 A3) (G3 B3 A3 G3) (F3 E3) / F3 KF2 (F3) (G3) (A3) (G3) (F3) (D3 F3 E3 D3) (C3) / (C3) (F3) G3 KF2 (G3) (A3 B3) (C4) (B3 A3) (G3) (F3) (E3) (F3) F3 KF2 (F3) // (F3) (F3) (G3) (A3 G3 A3) (B3) (C4 B3) C4",
+      "sample_NER": 72.7273,
+      "sample_CER": 32.8947
+    },
+    {
+      "filename": "BR 18-055v",
+      "prediction": "KF2 (F3) (G3) (F3) (G3) (A3) (B3) (B3) (B3) (B3) (C4) (B3) A3 KF2 (G3) (F3 E3) (F3 E3 D3) (C3) (D3 C3) (B2 C3) (D3 C3) // (F3 G3) (A3 G3) (A3 G3) A3 KF2 (C4) (D4) (C4 B3 A3 G3) (A3) (B3 A3 G3 F3 E3) (F3) (F3) / (C4 B3 A3 G3 F3) (G3) (A3 B3) (A3 G3) F3 KF2 (D3) (D3) // (F3) (G3) (A3) (B3) C4 KF2 (C4) (B3) (A3 G3 F3) (G3) (A3) (B3) (B3) (B3) (B3) (A3 G3) (F3) / F4",
+      "reference": "KF2 (E3) (D3) / (D3) (C3) (D3) (E3) (F3) (D3 E3) (E3) / (E3) G3 KF2 (G3) (F3) (F3) (E3) (D3 C3 D3) (E3 D3 C3) (D3) / (D3) (C4 B3 A3) (D4) (C4) C4 KF2 (C4) (B3) (A3 G3 A3 B3) (A3 G3 F3) (E3 F3) (G3 F3 G3 A3) (F3 E3 D3) (D3 C3) (D3) // KF2 (F3) (F3) (F3) (G3) (A3) (G3) F3 KF2 (F3) (E3) (D3) (C3) (D3 E3) (F3 G3) (F3) / (F3) (F3) (A3) (B3) C4",
+      "sample_NER": 93.9024,
+      "sample_CER": 39.7059
+    },
+    {
+      "filename": "BR 18-098r",
+      "prediction": "KF2 (D3) (C4) (C4) (B3) (A3) (G3) F3 KC3 (F3 E3) (F3) / (F3) (G3) (A3) (B3) (B3) (B3) (C4) (B3) C4 KF2 (F3) / (F3) (F3) (G3) (A3) (B3) (B3) (A3) (G3) (F3) (G3) F3 KC3 (F4) (C4 B3) (C4) (C4) / (F4) (E4 D4 C4) (D4 C4 B3) (C4) (B3) (A3) (G3 F3 E3) (F3) (F3) / F3 KC3 (F3) (G3 F3 E3) (F3) (G3 A3) (B3) (B3 C4 B3) (C4) (B3 A3 G3 F3) (A3 B3) (C4) /",
+      "reference": "KF2 (F3) (G3) (A3) (G3) (F3) (G3) F3 KC3 (C4 A3 B3) / (F3) (B3) (G3) (A3) (B3) (C4 B3) (C4) / (F4) KC3 (E4 D4) (C4) (B3) (B3) (A3) (A3) (A3) (F3) (E3) (F3) (F3) // KC3 (F4) (C4) (F4) (E4 D4 C4) (D4 C4 B3) (C4) (B3) (A3) (G3 F3) (A3 B3) (C4) / (F3) (G3 F3) KC3 (E3 F3) (G3 A3) (B3 C4 B3 A3 G3) (F3) / (F4) (C4) (F4) (E4 D4 C4) (D4 C4 B3) (C4) (B3)",
+      "sample_NER": 64.6341,
+      "sample_CER": 33.237
+    },
+    {
+      "filename": "BR 18-026r",
+      "prediction": "KF2 (F3) / (F3 G3) (A3) (B3) (C4 B3 A3 G3) (A3) (B3) (C4 B3 A3 G3) A3 KF2 (F3) / (F3) (G3) (A3) (B3) (C4) (B3) (A3) (G3) (F3 E3) (F3 G3) F3 / KF2 (F3) / (F3) (G3) (A3) (B3) (B3) (A3) (G3) (F3 E3) (F3) F3",
+      "reference": "KF2 (E3) (F3 G3) (A3 B3 A3) (G3) (A3 G3 F3) (G3) / (A3) (B3) (A3) G3 KF2 (G3) (G3) (C4) (C4 B3) (G3) (A3) (B3) (A3) / (D3) (D3) (A3) (G3 F3) E3 KF2 (E3) (E3) (G3) (G3) (F3 E3) (D3) (E3) (D3) // (D3) (D3)",
+      "sample_NER": 87.234,
+      "sample_CER": 35.9606
+    },
+    {
+      "filename": "BR 18-027r",
+      "prediction": "KF2 (C4) (B3) (A3 G3 F3) (E3) (F3 E3 D3 C3) (D3) // (C4) (D4) C4 KF2 (F3) (F3 E3) (F3 G3 F3) (E3 D3) (C3 B2) (C3 D3 E3) (F3) / (C3) (C3) (C3) D3 KF2 (F3 E3) / (F3 G3) (A3) (B3) (B3) (B3) (A3 G3 F3 E3) (F3) (F3 G3) (A3 B3 A3 G3) F3 KF2 (F3) / (F3) (G3) (A3) (B3) (A3 G3) (F3) (A3) (B3) (B3) (C4 B3 A3 G3 F3) / E3 KF2 (F3 E3) (F3 E3 D3) (E3) (F3 E3) (F3 E3 D3 C3) (D3) (E3) F3",
+      "reference": "KF2 (G3 A3) (B3) (A3 G3 F3 E3) (D3) (E3) (E3) // (A3) (C4) (D4) C4 KF2 (C4) (B3) (G3) (A3 G3 A3) (G3) (E3) (F3 E3 D3) (E3) / (E3 F3) (G3 A3) (G3) (E3) D3 KF3 (D3 C3 D3) (E3) (E3) (F3) (A3 G3) (E3) (E3) (E3) (F3 E3 D3) (E3 D3 C3) D3 KF2 (D3) / (A3) (A3) (B3) (C4) (B3) (A3) (G3) (A3 G3 A3) (G3) (E3 F3 E3 D3) E3 KF3 (E3) / (E3 F3) (G3 A3) (G3) (E3) (D3 C3 D3) (E3) (E3) (F3) (F3) (A3 G3) E3",
+      "sample_NER": 85.1064,
+      "sample_CER": 36.7609
+    },
+    {
+      "filename": "BR 18-011r",
+      "prediction": "KF2 (F3) / (F3 G3) (A3) (B3) (C4 B3 A3 G3) (F3) (F3) (G3) (A3) (B3) C4 KF2 (F3 E3 F3) (G3 A3 G3 F3) (B3) (A3 G3 F3) (A3 G3) (A3 B3) (C4) / (C4) (B3 C4) (C4) D4 KF2 (C4 B3 G3 F3) (G3 A3) (B3) (B3) (B3) (A3 B3) (C4 B3 A3 G3) (A3 B3) (C4) / (F3 E3) (F3) (F3 G3) F3 / E3 KF2 (F3 E3 F3) (G3 F3 E3) (F3 E3) (F3) // (F3 G3 A3) (B3 C4 B3) (C4) (B3 A3 G3 F3) /",
+      "reference": "KF2 (G3) (A3) / (A3) (C4) (D4) (C4 B3 A3) (G3) (F3) (G3) (A3 G3) F3 KF2 (F3 E3 D3 C3) (D3 E3 D3) (C3) / (F3 E3 F3) (G3) (E3 D3 E3) (F3) (G3 A3) (B3 A3) (G3) / (A3 B3) (C4) (G3 A3) B3 KF3 (B3 A3 G3) (A3 G3) (F3) (C3) (F3 E3 F3) (G3) (B3) (B3) (A3 G3 F3) (G3 F3 E3 D3 C3) / (F3 E3) (D3 E3) (C3 B2) C3 KF3 (C3) (D3 C3 B2) (C3) (D3 C3) // (G3) (F3) (G3) (A3 B3 A3 G3 F3) (G3)",
+      "sample_NER": 84.0426,
+      "sample_CER": 42.5876
+    },
+    {
+      "filename": "BR 18-067r",
+      "prediction": "KF2 (F3 E3 D3) (C3) (D3) // A3 KF3 (F3) (G3 A3) (F3 E3) (F3) (G3 A3) (B3) (B3) (B3 C4 B3 C4) (B3 A3 G3) F3 KF2 (G3 A3) (B3) (B3 C4 B3 G3 A3) (B3) (B3 C4 B3 A3 G3) (A3) (B3) (B3) (C4) (B3 A3 G3) (A3) (B3) C4",
+      "reference": "KF3 (D3 F3 E3 D3) (D3 C3) (D3) (D3) F3 KF3 (F3) (G3) (F3 E3 D3 C3) (D3) / (A3) (F3) (G3) (D3 C3 B2) (C3) D3 KF3 (D3 C3) (D3 E3) (F3) (G3 F3 E3 D3 C3) (D3) // (D3 F3 E3 D3) (D3 C3) (D3) (D3) (F3) G3",
+      "sample_NER": 96.0,
+      "sample_CER": 43.6548
+    },
+    {
+      "filename": "BR 18-112r",
+      "prediction": "KC3 (F4) (E4) (F4) (E4 D4 C4) (B3) (A3) (F3) (G3) (A3) (B3) (C4) / F4 KF2 (F3) / (F3) (G3) (A3) (B3) (B3) (B3) (A3 G3) (F3) (G3) (F3 E3) (F3 G3) F3 /",
+      "reference": "KF3 (B3) (B3) (E3) (D3 C3) (D3) (C3) // (C3 B2) (D3) (E3) C3 KF3 (C3) (C3) (D3) (F3 E3) (D3) / (C3) (G3 A3 G3) (F3) (E3) (C3 B2) (D3 E3 F3) D3",
+      "sample_NER": 97.0588,
+      "sample_CER": 40.1408
+    },
+    {
+      "filename": "BR 18-023v",
+      "prediction": "KF2 (F3 E3) (F3 G3 F3) (G3) (A3) (B3) (B3) (C4 B3 A3 G3) (F3) / F4",
+      "reference": "KF2 (F3) (F3 G3) (A3) (A3) (A3 B3 C4) (G3 A3) (B3 A3 G3 F3) (G3) (A3) / F3",
+      "sample_NER": 84.2105,
+      "sample_CER": 36.4865
+    },
+    {
+      "filename": "BR 18-079v",
+      "prediction": "KC3 (F3) (G3) (F3) (F3) (G3) (A3) (B3) (B3) (B3) C4 KC3 (C4) (C4 B3) (C4) / (F4) (G3) (A3) (B3) (B3) (B3) (C4) (B3 A3 G3 F3 E3) (F3) / G3 KC3 (G3) (F3) (G3) (F3) (G3) (A3) (B3) (B3) (B3) (B3) (A3 G3) F4 KC3 (C4) (B3) (A3) (G3) (F3) (A3) (B3) (C4) (B3) (A3) (G3 F3) (F3) G3 KC3 (G3) (A3) (B3) (C4) (C4) / (F4) (G3) (A3) (B3) (C4) (B3) (A3) (B3) C4",
+      "reference": "KC3 (G3) (F3) / (F3) (A3) (G3) (C4) (D4) (D4 C4 B3 A3) (C4) D4 KC3 (D4) (C4) (C4) / (F4) (E4) (C4) (C4 B3) (G3 F3 E3) (F3) G3 KC3 (G3) (A3) (G3) (F3) / (F3) (G3) (E3) (F3) (G3 B3 G3) (A3) (C4) C4 KC3 (C4) (A3) (A3) (F3) (B3) (C4) / (F4) (E4) (C4) (C4 B3) G3 KC3 (G3) (E3) (B3) (B3) (C4 B3) (C4 D4 C4) (D4 B3) (C4) / (F3) (G3) (A3) (B3) C4",
+      "sample_NER": 68.3544,
+      "sample_CER": 33.7278
+    },
+    {
+      "filename": "BR 18-005r",
+      "prediction": "KC3 (B3) (C4 B3 A3 G3) (A3) (B3 C4 B3) (C4) (B3 A3 G3) (A3) (B3) (C4 B3 C4) / F4",
+      "reference": "KC3 (D4) (C4 B3 A3 G3) (A3) // (E4) (D4 C4 B3) (C4) (F4) (E4 D4 C4) (D4) (E4) (E4) /",
+      "sample_NER": 61.9048,
+      "sample_CER": 41.6667
+    },
+    {
+      "filename": "BR 18-100r",
+      "prediction": "KC3 (G3 A3) (B3) (B3) (B3 C4 B3 A3 G3) (F3) (F3) (G3) (A3) (B3 A3 G3 F3) / F4 KC3 (C4) (C4 B3) (C4) (C4) (C4) / (F4 E4 D4 C4) (C4) (B3 A3 G3 F3 E3) (F3) (F3) (F3) (G3 A3 G3 F3) (B3) / A3 KC3 (F3) / (F3) (G3) (A3) (B3) (B3) (C4 B3 C4) (C4) (C4) (B3 A3 G3 F3 E4) (F3) (F3) / F4 KC3 (F4 E4 D4) (C4 B3) (C4) (B3) (A3) (G3) (F3) (A3) (B3) (B3) (A3) (G3 F3 E3) (F3) / F3 KF2 (F3 E3) (F3 E3 D3 C3) (D3 E3) // (F3) (F3 G3) (A3 G3) (A3 B3) (C4) (B3) C4",
+      "reference": "KC3 (G3 A3) (C4) (C4) (C4 B3 A3) (G3) (F3) (F3) / (A3) (C4) (D4 C4 B3 A3) D4 KC3 (D4) (E4) (F4) / (C4 B3 A3 G3) (A3 G3 F3) / (G3 A3 G3 A3 G3 F3) (A3 G3 F3 E3) (F3 G3) (A3 G3) (C4) (B3 A3 G3) (A3 G3) F3 KC3 (F3) (F3) / (F3) (E3) (G3 A3 G3) (F3) (F3) (C4 D4 C4 B3 G3) (A3 B3 A3) (G3) (G3) / F4 KC3 (F4) (E4 D4 C4) (D4) (C4) (C4 B3 A3) (G3) (A3 G3) (F3) (F3) / (F3) (E3) (G3 A3 G3) F3 KF2 (F3) (F3 E3 F3) (G3 F3 E3 D3 C3) (D3 E3) (F3) / (A3) (C4) (D4 C4 D4 E4) (F4 E4) (E4 C4) (B3) B3",
+      "sample_NER": 75.8065,
+      "sample_CER": 38.0457
+    },
+    {
+      "filename": "BR 18-076v",
+      "prediction": "KF2 (C4) (B3) (A3) (G3) (F3 E3) (F3) (G3) (A3) (B3) (C4) (B3) C4 KC3 (B3 A3 G3) (F3) (B3 C4) (B3) (B3) (B3) (A3) (G3) (A3) (B3) (B3) C4 KC3 (F3) (E3) / (F3) (G3) (A3) (B3) (B3) (C4) (B3) (B3) (B3) A3 KC3 (G3) (A3) (B3) (B3) (B3) (C4) (B3) (A3) (G3) (A3) (B3) (B3) C4 KC3 (F3) / (F3) (G3) (A3) (B3) (C4) (B3) (B3) (C4) (B3) G3",
+      "reference": "KF2 (D4) (B3) (A3 G3) (F3) (G3) (A3) / (G3) (G3 A3) (B3) B3 KC3 (B3 C4 B3 A3 G3) (B3) (G3) (A3 G3) (A3) (B3) (A3) (G3) (G3) / C4 KC3 (C4) (A3 G3) (A3 G3 A3) (B3) (B3) (D4) (D4) (B3 A3) (G3) (A3) C4 KC3 (C4) (C4) / (G3) (A3) (B3 C4 B3 A3) (B3) (G3) (A3 G3) (A3) B3 KC3 (B3) (A3) (G3) (G3) / (C4) (B3) (G3) (A3) (B3 A3 G3) (F3) F3",
+      "sample_NER": 73.0769,
+      "sample_CER": 32.3171
+    },
+    {
+      "filename": "BR 18-097v",
+      "prediction": "KF2 (C4) (B3) (A3 G3 F3) (F3 E3) (F3) (F3) (G3) (A3 G3) (A3 B3) (C4) / (G3) A3 KC3 (A3) (B3) (C4) (C4) (C4) (B3) (C4) (C4) (C4) (B3 A3 G3 F3) (A3 B3) (C4 B3 A3 G3 F3 G3) F3 KF2 (F3 E3) (F3 G3) (A3) (B3) (C4 B3 A3 G3) (A3) / (F3) G3 KF2 (F3) / (F3) (F3) (G3) (A3) (B3) (C4 B3 A3 G3) (F3) (A3) (B3) C4 KC3 (F3) / (F3) (F3) (F3) (G3) (A3) (B3) (C4 B3 A3 G3) (F3) (C4 B3 A3 G3) (F3) / F3",
+      "reference": "KC3 (E4) (F4) (E4 D4 C4) (B3) (A3) / (G3 F3 E3) (F3 G3) (A3 G3 F3) (G3 A3) (B3) (C4) C4 KC3 (C4) (D4) (E4) (D4) (C4) (D4) (C4 D4 A3 C4) (A3 C4 B3 A3 G3 F3) G3 KF2 (G3 A3 G3) (F3) / (F3) (G3) (A3 G3 F3) (B3) (A3) (G3) F3 KC3 (F3) / (F3) (G3) (A3) (B3) (C4 D4) (E4 F4 E4 D4) (C4) / (F4) (E4) (D4) C4 KC3 (C4) (A3 F3) (G3 A3) (C4) (D4 E4 D4) (C4) (A3 C4 B3 A3 G3 F3) (G3 A3 G3) (F3) //",
+      "sample_NER": 81.25,
+      "sample_CER": 39.267
+    },
+    {
+      "filename": "BR 18-083r",
+      "prediction": "KF2 (C4) (B3 A3 G3 F3) (G3) (A3) (B3 C4 B3 A3 G3) (F3) / (G3) (A3) (A3) (B3) C4 KF2 (C4 B3 A3 G3 F3) (G3) (A3) (B3) (A3) (B3) (C4 B3 A3 G3) (A3) / F3 KF2 (F3 E3 D3) (C3 B2 C3) (D3 C3) / (F3) (F3) (G3) (A3) (B3 A3 G3 F3) (G3) A3 KF2 (G3 A3) (B3) (B3) (A3 G3 F3 E3) (F3 E3 D3 C3) (D3) (E3 F3) (G3 A3) (B3 C4 B3 A3 G3 F3) / E3 KF2 (F3 E3) (F3 E3) (F3) / (F3) (G3) (A3) (B3) (B3) (B3) (B3) C4",
+      "reference": "KF2 (A3) (B3 A3 G3) (F3) (G3) (A3) (G3 F3 D3) (E3) (C3) (D3) (D3) / C4 KF2 (C4) (D4 C4 B3 A3) (C4 B3) (G3 F3) (G3) (A3) (B3) (B3) (C4 B3 A3) (G3) (A3) F3 KF2 (F3 E3 D3) / (C3) (D3 C3 D3) (E3 F3) (E3) (G3) (A3) (F3 E3 D3) (C3) (C3) D3 KF2 (D3) (D3) / (E3) (F3 E3 D3 C3) (D3 C3 D3) (E3 F3) (E3) (G3) (A3) (F3 E3 D3) C3 KF2 (C3) (D3 E3) (D3) / (D3) (A3) (G3) (A3 B3) (A3) (A3) (B3) C4",
+      "sample_NER": 73.1183,
+      "sample_CER": 31.2336
+    },
+    {
+      "filename": "BR 18-075v",
+      "prediction": "KF2 (B3) (A3 G3 F3) (G3) (A3) (A3) / (C4 B3) (C4) (B3 A3 G3) F3 KF2 (F3) / (F3) (G3) (A3) (B3) (B3) (A3 G3) (F3) (A3) (B3) (C4 B3 A3 G3) / F4 KF2 (F3) (G3) (F3 E3) (F3) (G3) (A3) (B3) (B3) (A3) (G3) F3",
+      "reference": "KF2 (G3) (F3 E3 D3) (D3) / (F3) (G3 A3) (B3 A3) (G3) (B3) (A3 G3) (F3) F3 KF2 (F3) (F3) / (B3 C4) (D4 C4 B3) (A3) (A3) (A3) (A3) / (A3 G3 A3 G3) (F3 E3) (G3) (B3 A3 G3) A3 KF2 (A3) (A3) (A3 G3 A3) (G3 F3) / (E3) (F3) (G3) (A3) (G3) (F3) (E3) (E3) //",
+      "sample_NER": 78.6885,
+      "sample_CER": 36.5462
+    },
+    {
+      "filename": "BR 18-028r",
+      "prediction": "KF2 (C4) (B3) (A3) (G3) (F3) (G3 A3) (B3 C4 B3) (B3 A3 G3 F3) / KC3 (F3) / (F3) (G3) (A3) (B3) (B3) (B3) (A3 G3) (F3) (G3) A3 KF2 (F3) (F3) (G3) (A3) (B3) (B3) (A3 G3) (F3) (G3 A3) (B3 C4 B3 A3 G3) / F3",
+      "reference": "KF2 (C4 A3) (G3) (F3) (F3) (F3) (F3 E3 D3) C3 KF2 (C3) (D3) (D3) / (E3 F3) (G3) (D3 C3) (C3 D3) (D3 E3) (F3) (D3) D3 KF2 (D3) / (C3) (D3 E3) (F3) (G3) (A3) (B3) (A3) (A3 G3 F3) G3",
+      "sample_NER": 97.6744,
+      "sample_CER": 40.2235
+    },
+    {
+      "filename": "BR 18-025r",
+      "prediction": "KF2 (F3) (G3) (A3) (B3) (A3 G3 F3) (G3) (A3 B3) (C4 B3 A3 G3) F3 KF2 (F3 E3) (F3 G3) (A3) (B3) (B3) (A3 G3) (A3 G3) (F3 E3) (F3) (F3 G3) A3 KF2 (C4) (B3) (A3) (G3) (F3) (G3) (A3) (B3) (B3) (B3) (C4) / F4 KF2 (F3) (G3) (A3) (B3 C4 B3 C4) (B3) (A3) / (B3) (C4) (B3) C4 KC3 (B3) (C4) (C4) / (F4) (G3) (A3) (B3) (B3) (B3) (B3) (C4) (B3 A3 G3 F3) (F3 E3) (F3) (F3) / F3",
+      "reference": "KF2 (A3) (A3) (A3 G3 F3) (G3) (A3) (B3) (A3 G3 F3) G3 KF2 (G3 A3 G3 F3) (F3 E3) / (F3) (G3) (A3) (G3) (C4 D4 C4) (A3 G3) (A3) (A3) // D4 KF2 (D4) (C4) (A3) (D3) (F3) (E3) (D3) (C3) / (F3) (G3) G3 KF2 (G3) (A3) (A3 G3 F3) (G3) (A3) (A3) / KC3 (D4) (E4) (D4) C4 KC3 (C4) (C4 B3) (C4) (D4 E4 D4 C4) (B3 A3) / (A3) (G3) (A3) (A3) (C4 D4 C4) (A3 G3) (A3) (A3) //",
+      "sample_NER": 80.2326,
+      "sample_CER": 38.0952
+    },
+    {
+      "filename": "BR 18-032v",
+      "prediction": "KC3 (C4 B3) (C4) (D4) (C4) (C4) (B3 A3 G3) (A3) (B3) //",
+      "reference": "KF3 (F3 E3 F3) (E3) (E3) (D3 C3 D3 E3) (C3 B2) (C3) (C3) //",
+      "sample_NER": 93.3333,
+      "sample_CER": 47.4576
+    },
+    {
+      "filename": "BR 18-049r",
+      "prediction": "KF2 (B3) (A3 G3) (F3) (G3) (A3) (B3) (C4 B3 A3 G3) (A3) (B3) C4 KF2 (F3) (F3 G3) (A3) (B3) (A3 G3) (A3 B3) (C4 B3 A3 G3 F3) (G3) (A3) (B3 A3 G3 F3 E3) / (F3 G3 F3 E3) (F3 G3 A3 G3 KF2 (C4) (B3 C4 B3 A3 G3) (F3 E3) (F3) (F3) // (F3) (F3) (G3) (A3 B3) (C4 B3 A3 G3 F3) G3",
+      "reference": "KF2 (A3) (B3 A3 G3 F3) (G3 A3) (B3) (B3) / (C4) (B3 A3 G3 F3) (G3) (A3) A3 KF2 (A3 B3 A3 G3) (A3 F3 E3) (F3 G3) (G3 A3 F3 G3) (A3 D3) / (A3) (B3 A3 G3) (A3 F3) (G3) (F3 E3 D3) (E3 C3) D3 KF3 (D3 E3) (F3 E3 D3) (D3 C3 B2) (C3 D3) // (F3) (F3 E3) (E3 D3) (D3 C3 D3) F3",
+      "sample_NER": 90.0,
+      "sample_CER": 38.7218
+    },
+    {
+      "filename": "BR 18-073r",
+      "prediction": "KF2 (B3) (A3 G3 F3) (G3) (A3) (B3) (C4 B3 A3 G3) (F3 E3 D4 C4) / F4 KF2 (A3) (B3 G3 F3) (G3) (A3) (B3 C4 B3 A3 G3) / (F3) (G3) (A3) (B3 C4) (B3 A3 G3 F3) / (A3) G3",
+      "reference": "KF2 (F3) (G3) (A3) (F3) (D3 C3) (G3 F3 E3) (F3) / B3 KF2 (B3) (G3 F3) (G3) (A3) (B3 A3 G3) (A3) (A3) / (C4) (A3 G3 A3) C4",
+      "sample_NER": 100.0,
+      "sample_CER": 51.2397
+    },
+    {
+      "filename": "BR 18-077r",
+      "prediction": "KF2 (F3) (G3 A3) (B3) (A3 G3 F3 E3) (F3) (G3) (A3) (B3 A3 G3 F3) / (C4 B3 A3 G3) A3 KF2 (F3) (G3) (A3 B3) (C4) (B3 A3 G3) (A3) (B3) (C4 B3 C4) / (C4) (B3 A3 G3 F3) (G3) A3",
+      "reference": "KF2 (F3) (F3) (A3 G3 F3) (G3) (G3) / (G3 A3) (B3) (A3) (C4) (B3 A3 G3) (A3 B3) C4 KF2 (C4 B3 A3) (B3) (B3 A3 B3 G3) (A3 G3 F3) (G3) (A3 B3 A3) (G3) (G3) // (C4) (A3 G3) A3",
+      "sample_NER": 83.7209,
+      "sample_CER": 44.4444
+    },
+    {
+      "filename": "BR 18-131r",
+      "prediction": "KC3 (A3 G3 A3 B3) (C4) (C4) (B3) (A3) (G3 F3) (A3) (B3) (B3) (C4) (B3 A3 G3) A3 / KC3 (B3) / (F4) (G3) (A3) (B3) (B3) (B3) (B3) (C4) (B3 A3 G3 F3) (G3 A3 G3 F3) / E3 KF2 (F3 E3 D3) (E3) (F3) / (F3) (G3) (A3) (B3 C4 B3) (C4) (B3 A3 G3 F3 E3) (F3 G3) F3 / E3 KF2 (F3 E3) (F3 G3) (A3 G3 F3 E3 D3) (E3) (F3) (G3 A3) (B3 C4 B3 A3 G3 F3) (G3) / A3 KF2 (F3) / (F3 G3) (A3) (B3) (B3 C4 B3 A3 G3) (F3) (F3 E3) (F3) (F3) (F3 G3) A3",
+      "reference": "KC2 (F4 E4 D4) (E4 D4 E4) (F4) (C4 B3) (G3) (C4) (D4) (E4) (F4) (E4 D4) (E4) F4 // KC2 (F4 E4 F4 C4) (D4) (E4) (F4) (F4 E4 F4 D4) (C4) (C4) / (F4 E4 F4 E4 D4 C4) D4 KF2 (D4 C4 B3 A3 G3) (F3) (G3) (A3) (B3) (C4) / (D4 C4 B3) (C4 G3) (A3 G3 F3 E3) (F3 G3) E3 KF2 (E3) (F3) (G3) (F3) / KF1 (F4 E4 F4 E4 C4) (D4) (E4) (F4) (G4 F4 E4) (F4 D4) C4 KF1 (C4) (C4) / (F4 E4) (F4 E4 D4 C4) (D4 G3) (F3 G3) (A3) (B3) C4",
+      "sample_NER": 92.3077,
+      "sample_CER": 53.317
+    },
+    {
+      "filename": "BR 18-073v",
+      "prediction": "KF2 (G3 A3) (B3) (B3) (A3 G3 F3) (A3) / (C4 B3) (C4) (B3 A3 G3 F3 E3) (F3) (F3 G3 A3 G3) A3 KF2 (F3 E3 D3 C3 B2) (C4) (C4) (B3 A3 G3 F3) (G3) (A3) (A3 B3) (C4) / F4 KC3 (G3 A3) (B3) (B3) (C4) (B3 A3 G3 F3) (A3) (B3) (C4 B3 C4) (B3 A3 G3 F3) / F3 KC3 (G3) (A3) (B3) (C4) (B3) (A3) (G3) (A3) (B3) (C4 B3 A3 G3) (F3) / F4 KC3 (C4) / (C4) (C4) (C4) (B3) (A3) (G3) (F3 E3) (F3) (F3) (G3) A3",
+      "reference": "KF2 (A3 G3 A3) (A3) (G3 F3) (A3 G3 F3) (E3) (F3) (G3 A3) (B3) (A3 G3 E3) (G3 F3 E3 D3 C3) F3 KF2 (F3 G3) (A3 G3 F3) (B3 A3 F3) (G3) (F3) // KF1 (C4) (D4) (E4) (D4) (B3) A3 KC3 (A3 G3 F3) (G3) (C4) (C4 B3 A3) (B3) (C4) (C4) / (F4) (E4 D4 C4) (C4) A3 KC3 (A3 B3) (C4) (G3) (A3 G3) (F3) (F3) (A3) (C4 B3) (D4 C4 B3) (C4 A3) (A3 F3 E3) (G3 A3 G3) F3 KC3 (F3) / (C4) (D4) (E4) (E4) (C4) (B3) (A3 G3) (F3) (G3) (B3) C4",
+      "sample_NER": 81.1881,
+      "sample_CER": 38.3495
+    }
+  ]
+}

@@ -14,10 +14,18 @@ DATA_DIR=""
 TRAIN_DIR=""
 TEST_DIR=""
 SEQUENTIAL_STRATEGY=""
+ENABLE_PRETRAIN=false
 N_FOLD_MODE=false
 SEQUENTIAL_MODE=false
+OCR_PRETRAIN_SAMPLES=5000
+OMR_PRETRAIN_SAMPLES=5000
+FONT_DIR="./fonts"
+CAPITALS_DIR="./fonts/capitals"
+PRETRAIN_DIR=""
 AUGMENT="true"
-MODEL_NAME=""
+LATEX_JOBS=8
+FOLD_NUM=0
+MODEL_NAME="default"
 while [[ $# -gt 0 ]]; do
   case $1 in
   --help)
@@ -35,14 +43,6 @@ while [[ $# -gt 0 ]]; do
     ;;
   --framework)
     FRAMEWORK="$2"
-    case $FRAMEWORK in
-    trocr | yolo) ;;
-    *)
-      echo "Invalid --framework option: $FRAMEWORK"
-      echo "Valid options: trocr, yolo"
-      exit 1
-      ;;
-    esac
     shift
     shift
     ;;
@@ -87,13 +87,48 @@ while [[ $# -gt 0 ]]; do
   --task)
     TASK="$2"
     case $TASK in
-    annotations | ocr | omr | layout) ;;
+    annotations | ocr | omr | layout | synthesis) ;;
     *)
       echo "Invalid --task option: $TASK"
-      echo "Valid options: annotations, ocr, omr, layout"
+      echo "Valid options: annotations, ocr, omr, layout, ocmr"
       exit 1
       ;;
     esac
+    shift
+    shift
+    ;;
+  --enable-pretrain)
+    ENABLE_PRETRAIN=true
+    shift
+    ;;
+  --pretrain-samples)
+    OMR_PRETRAIN_SAMPLES="$(($2 / 20))"
+    OCR_PRETRAIN_SAMPLES="$2"
+    shift
+    shift
+    ;;
+  --font-dir)
+    FONT_DIR="$2"
+    shift
+    shift
+    ;;
+  --capitals-dir)
+    CAPITALS_DIR="$2"
+    shift
+    shift
+    ;;
+  --pretrain-dir)
+    PRETRAIN_DIR="$2"
+    shift
+    shift
+    ;;
+  --latex-jobs)
+    LATEX_JOBS="$2"
+    shift
+    shift
+    ;;
+  --fold)
+    FOLD_NUM="$2"
     shift
     shift
     ;;
@@ -131,17 +166,8 @@ if [ -z "$TASK" ]; then
   missing_params+=("--task")
 fi
 
-if [ "$TASK" = "annotations" ]; then
-  if [ -z "$EDITION" ]; then
-    missing_params+=("--edition")
-  fi
-  if [ -z "$DATA_DIR" ]; then
-    missing_params+=("--data-dir")
-  fi
-fi
-
-# if task is not annotations
-if [[ "$TASK" != "annotations" ]]; then
+# if task is not annotations nor synthesis
+if [[ "$TASK" != "annotations" && "$TASK" != "synthesis" ]]; then
   if [ -z "$FRAMEWORK" ]; then
     missing_params+=("--framework")
   fi
@@ -203,6 +229,9 @@ fi
 if [ "$SEQUENTIAL_MODE" = true ]; then
   echo "🔁 Sequential Mode Enabled (Strategy: ${SEQUENTIAL_STRATEGY})"
 fi
+if [ "$ENABLE_PRETRAIN" = true ]; then
+  echo "📚 Pre-training enabled!"
+fi
 echo ""
 
 # --- 1. Data Preparation ---
@@ -250,6 +279,42 @@ if [ "$TASK" = "annotations" ]; then
   echo ""
 fi
 
+# Generate pre-training data if the task is "synthesis"
+if [ "$TASK" == "synthesis" ]; then
+  echo "📚 STEP 1.5: Generating Pre-training Data"
+  echo "─────────────────────────────────────────"
+
+  PRETRAIN_DATA_DIR="${PROJECT_ROOT}/data/pretrain_data"
+  mkdir -p "${PRETRAIN_DATA_DIR}"
+
+  # Generate OMR synthetic data
+  echo "🎵 Generating OMR synthetic data..."
+  OMR_ARGS=(--task omr --output-dir "${PRETRAIN_DATA_DIR}/omr" --num-samples "$OMR_PRETRAIN_SAMPLES" --latex-jobs "$LATEX_JOBS")
+  if [ "$DEBUG_MODE" = true ]; then
+    OMR_ARGS+=(--debug)
+  fi
+  uv run python -m "${BENCHMARKING_DIR}.generate_pretrain_data" "${OMR_ARGS[@]}"
+
+  echo "✅ Pre-training data generation complete"
+  echo ""
+
+  # Generate OCR synthetic data
+  if [ -n "$FONT_DIR" ]; then
+    echo "📝 Generating OCR synthetic data..."
+    OCR_ARGS=(--task ocr --output-dir "${PRETRAIN_DATA_DIR}/ocr" --num-samples "$OCR_PRETRAIN_SAMPLES")
+    if [ "$DEBUG_MODE" = true ]; then
+      OCR_ARGS+=(--debug)
+    fi
+    OCR_ARGS+=(--font-dir "$FONT_DIR")
+    if [ -n "$CAPITALS_DIR" ]; then
+      OCR_ARGS+=(--capitals-dir "$CAPITALS_DIR")
+    fi
+    uv run python -m "${BENCHMARKING_DIR}.generate_pretrain_data" "${OCR_ARGS[@]}"
+  else
+    echo "⚠️  Skipping OCR synthetic data generation - no --font-dir provided"
+  fi
+fi
+
 # Function to run benchmark for a specific fold
 run_benchmarks_for_fold() {
   local fold_to_run=$1
@@ -257,31 +322,35 @@ run_benchmarks_for_fold() {
   shift 2
   local base_args=("$@")
 
+  local -A python_exec_map=(
+    ["kraken"]="-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
+    ["calamari"]="-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
+  )
+
   echo "🚀 Launching benchmark for ${FRAMEWORK}/${TASK} with model name ${model_name_to_run}..."
   local run_args=("${base_args[@]}" --fold "$fold_to_run" --framework "$FRAMEWORK" --task "$TASK" --model-name "$model_name_to_run")
 
-  command="uv run python -m ${BENCHMARKING_DIR}.run_single_fold_benchmark ${run_args[@]}"
+  local exec_args=${python_exec_map[$FRAMEWORK]}
+  command="uv run $exec_args python -m ${BENCHMARKING_DIR}.run_single_fold_benchmark ${run_args[@]}"
   echo "Running command: $command"
   $command
 }
 
 # --- 2. Run Benchmarks ---
-if [[ "$TASK" =~ ^(ocr|omr|layout)$ ]]; then
+if [[ "$TASK" =~ ^(ocr|omr|layout|ocmr)$ ]]; then
   # Build base arguments for run_single_fold_benchmark.py
   benchmark_args=(--edition "${EDITION}")
   if [ "$AUGMENT" = "true" ]; then benchmark_args+=(--augment); fi
   if [ "$DEBUG_MODE" = true ]; then benchmark_args+=(--debug); fi
   if [ -n "$TASK" ]; then benchmark_args+=(--task "$TASK"); fi
+  if [ "$ENABLE_PRETRAIN" = true ]; then benchmark_args+=(--enable-pretrain); fi
+  if [ -n "$PRETRAIN_DIR" ]; then benchmark_args+=(--pretrain-dir "$PRETRAIN_DIR"); fi
 
   if [ -n "$DATA_DIR" ]; then
     benchmark_args+=(--data-dir "$DATA_DIR")
   fi
 
   if [ "$N_FOLD_MODE" = true ]; then
-    if [ -z "$DATA_DIR" ]; then
-      echo "Error: --data-dir is mandatory when using --n-fold"
-      exit 1
-    fi
     # N-FOLD CROSS-VALIDATION MODE
     echo "🚀 Running N-Fold Benchmark"
     echo "──────────────────────────────────"
@@ -324,10 +393,6 @@ if [[ "$TASK" =~ ^(ocr|omr|layout)$ ]]; then
 
   # SEQUENTIAL LEARNING MODE
   if [ "$SEQUENTIAL_MODE" = true ]; then
-    if [ -z "$DATA_DIR" ]; then
-      echo "Error: --data-dir is mandatory when using --strategy"
-      exit 1
-    fi
     echo "🚀 Running Sequential Benchmark"
     echo "─────────────────────────────────────"
 
@@ -351,13 +416,19 @@ if [[ "$TASK" =~ ^(ocr|omr|layout)$ ]]; then
     for i in $(seq 0 $((NUM_STEPS - 1))); do
       echo "    --- Running Sequential Step $((i + 1))/$NUM_STEPS for ${current_strategy} ---"
 
+      declare -A python_exec_map=(
+        ["kraken"]="-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
+        ["calamari"]="-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
+      )
+
       # Use the specified model name for sequential mode
       seq_model_name="$MODEL_NAME"
       echo "    🚀 Launching benchmark for ${FRAMEWORK}/${TASK} with model name ${seq_model_name}..."
       seq_run_args=("${benchmark_args[@]}" "--framework" "$FRAMEWORK" --task "$TASK" "--sequential-step" "$i" "--sequential-strategy" "$current_strategy")
       seq_run_args+=("--model-name" "$seq_model_name")
 
-      uv run python -m "${BENCHMARKING_DIR}.run_single_fold_benchmark" "${seq_run_args[@]}"
+      exec_args=${python_exec_map[$FRAMEWORK]}
+      uv run $exec_args python -m "${BENCHMARKING_DIR}.run_single_fold_benchmark" "${seq_run_args[@]}"
 
     done
 
@@ -373,11 +444,18 @@ if [[ "$TASK" =~ ^(ocr|omr|layout)$ ]]; then
       echo "📂 Training on: ${TRAIN_DIR}"
       echo "🧪 Testing on: ${TEST_DIR}"
 
+      declare -A python_exec_map=(
+        ["kraken"]="-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
+        ["calamari"]="-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
+      )
       train_test_args=("${benchmark_args[@]}" --framework "$FRAMEWORK" --task "$TASK" --model-name "$MODEL_NAME" --train-dir "$TRAIN_DIR" --test-dir "$TEST_DIR")
-      uv run python -m "${BENCHMARKING_DIR}.run_single_fold_benchmark" "${train_test_args[@]}"
+      exec_args=${python_exec_map[$FRAMEWORK]}
+      uv run $exec_args python -m "${BENCHMARKING_DIR}.run_single_fold_benchmark" "${train_test_args[@]}"
     else
-      echo "Error: Choose one mode: --n-fold, --strategy, or --train-dir/--test-dir"
-      exit 1
+      # SINGLE FOLD MODE
+      echo "🚀 Running Benchmark for Single Fold ${FOLD_NUM}"
+      echo "─────────────────────────────────────────────────"
+      run_benchmarks_for_fold "$FOLD_NUM" "$MODEL_NAME" "${benchmark_args[@]}"
     fi
   fi
 fi

@@ -1,0 +1,40 @@
+% 1 in is 2.54 cm
+% 1 pt is 1/72 in
+% 1 px is 1 in at 1 dpi
+% set dpi to D
+% X px is our input
+% it is X/D in
+% X/D is 72X/D pt
+
+\documentclass{article}
+
+\usepackage{geometry}
+\geometry{paperheight=\VAR{height / dpi}in,paperwidth=\VAR{width / dpi}in}
+\geometry{hmargin={0in,0in},vmargin={0in,0in}}
+
+\usepackage{fontspec}
+
+%- if gabc is not none
+\usepackage[autocompile]{gregoriotex}
+%- endif
+
+\begin{document}
+
+\fontsize{\VAR{72 * fontsize / dpi}}{\VAR{1.2 *
+		72 * fontsize / dpi}}
+
+%- if gabc is not none
+% the gabc code
+% size of the initial line
+\gresetinitiallines{\VAR{initialline}}
+\grechangestyle{initial}{\VAR{72 * initialsize / dpi}pt}
+% use red lines
+\gresetlinecolor{gregoriocolor}
+\grechangestaffsize{\VAR{72 * staffsize // dpi}}
+\gresetgregoriofont{\VAR{gregoriofont}}
+\gregorioscore{name: temp-chant;
+	%%
+	\VAR{gabc | safe}}
+%- endif
+
+\end{document}

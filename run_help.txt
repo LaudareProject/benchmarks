@@ -4,70 +4,100 @@ USAGE:
   ./run.sh [OPTIONS]
 
 DESCRIPTION:
-  Runs annotation generation and benchmarks for OCR, OMR, and Layout tasks
-  on the Laudare Dataset with fixed model support:
-  - OCR/OMR: TrOCR large (`large`)
-  - Layout: YOLOv8n (`yolov8n`)
+  Runs the complete benchmarking workflow for OCR, OMR, and Layout Analysis tasks
+  on the Laudare Dataset. The script can operate in multiple modes:
+  1. Single Fold: Runs training and evaluation on a specific data fold.
+  2. N-Fold Cross-Validation: Runs the benchmark across all folds and aggregates results.
+  3. Sequential Learning: Simulates a continual learning scenario with different data strategies.
+  4. Train/Test Directory Mode: Uses custom train and test directories.
+  
+  The workflow consists of two main stages:
+  1. Data Preparation: Processes annotations into folds or sequential splits. These annotations are already provided in the repo. Optionally generate synthetic data for pre-training (not provided).
+  2. Benchmarking: Fine-tunes and evaluates models on the processed data according to the selected mode.
 
-  Available execution modes:
-  1. 5-Fold Cross-Validation (`--n-fold`)
-  2. Sequential Learning (`--strategy`)
-  3. Train/Test Directory Mode (`--train-dir` + `--test-dir`)
-
-  Annotation generation is supported via `--task annotations`.
-  Synthetic pretraining and synthesis are not supported.
-
-MANDATORY PARAMETERS:
-  --task is always mandatory.
-  For annotations: --edition and --data-dir are mandatory.
-  For ocr, omr, and layout: --edition and --framework are mandatory.
+  MANDATORY PARAMETERS: --task 
+  For ocr, omr, and layout tasks: --edition, --framework are mandatory. --model-name defaults to "default".
 
 WORKFLOW CONTROL OPTIONS:
   --help                     Show this help message and exit.
-  --debug                    Enable debug mode with reduced data/training.
-  --device DEVICE            Specify the device (default: cuda:0).
-                             Examples: cuda:0, cpu
-  --edition EDITION          [MANDATORY for ocr, omr, layout]
+  --debug                    Enable debug mode with a reduced dataset and fewer training steps/folds.
+  --device DEVICE            Specify the training device (default: cuda:0).
+                             Examples: cuda:0, cpu; NOTE: this option works by overriding
+                             the CUDA_VISIBLE_DEVICES environment variable, so you should not
+                             set it manually.
+  --edition EDITION          [MANDATORY for ocr, omr, layout] Choose the edition type.
                              Options: diplomatic, editorial
   --editorial                Shortcut for '--edition editorial'.
-  --framework FRAMEWORK      [MANDATORY for ocr, omr, layout]
-                             Options: trocr, yolo
-  --task TASK                [MANDATORY]
-                             Options: annotations, ocr, omr, layout
-  --data-dir DIR             Dataset base directory (required for --n-fold and --strategy).
-  --train-dir DIR            Custom training directory (train/test mode).
-  --test-dir DIR             Custom testing directory (train/test mode).
-  --augment BOOL             Enable/disable augmentation (default: true).
-  --model-name NAME          Allowed values only:
-                             - large (required for ocr/omr; default if omitted)
-                             - yolov8n (required for layout; default if omitted)
+  --framework FRAMEWORK      [MANDATORY for ocr, omr, layout] Run benchmarks for a specific framework.
+                             Options: kraken, calamari, trocr, faster-rcnn, yolo, detr
+  --task TASK                [MANDATORY] Specify the task to run.
+                             Options: annotations, ocr, omr, layout, synthesis
+  --data-dir DIR             Base data directory (if not using train/test directories).
+  --train-dir DIR            Custom training directory (for train/test mode).
+  --test-dir DIR             Custom testing directory (for train/test mode).
+  --augment BOOL             Enable/disable data augmentation (default: true).
+
+MODEL AND FOLD OPTIONS:
+  --fold N                   In single fold mode, specify which fold to run (default: 0).
+  --model-name NAME          Selects the model configuration from 'benchmarking/models.json'
+                             for the specified framework and task using the model name as key (default: "default").
 
 EXECUTION MODES:
-  --n-fold                   Run 5-fold cross-validation and aggregate results.
-  --strategy S               Run sequential learning mode.
+  --n-fold                   Enable N-fold cross-validation mode. Runs on all folds and aggregates results.
+  --strategy S               Enable sequential learning mode with the specified strategy.
                              Options: random_sample, sequential_sample
 
+PRE-TRAINING OPTIONS:
+  --enable-pretrain          Enable pre-training on synthetic data. Note that if a pre-trained model is found in the standard directory, it is loaded and pre-training is skipped.
+  --pretrain-dir DIR         Custom directory for pre-training data (overrides default synthetic data from ./data/pretrain_data/).
+                             When provided, models will be named with the directory basename to avoid conflicts.
+  --pretrain-samples N       Number of synthetic samples to generate. Sets OCR samples to N and OMR samples to N/20 (default: OCR=5000, OMR=250).
+  --font-dir DIR             Directory with fonts for OCR data generation (default: ./fonts).
+  --capitals-dir DIR         Directory with decorative capital fonts (default: ./fonts/capitals).
+  --latex-jobs N             Number of parallel LaTeX jobs for OMR data generation (default: 8).
+                             
+  Note: Pre-training data is generated during the 'synthesis' task step and saved in ./data/pretrain_data/.
+
 EXAMPLES:
+  # Run a single benchmark on fold 0 for OCR with Kraken using "default" model on diplomatic edition.
+  ./run.sh --framework kraken --model-name default --task ocr --edition diplomatic
+
+  # Run N-fold cross-validation for the Kraken OCR task on the editorial edition.
+  ./run.sh --n-fold --framework kraken --model-name default --task ocr --edition editorial
+
+  # Run a sequential learning experiment with the 'random_sample' strategy for OMR with Calamari.
+  ./run.sh --strategy random_sample --framework calamari --model-name default --task omr --edition diplomatic
+
+  # Run only the layout task for YOLO "yolov8n" model on fold 2 in debug mode.
+  ./run.sh --framework yolo --model-name yolov8n --task layout --edition diplomatic --fold 2 --debug
+
+  # Generate pre-training data
+  ./run.sh --task synthesis
+
   # Generate annotations
-  ./run.sh --task annotations --edition diplomatic --data-dir ./data/I-Ct_91
+  ./run.sh --task annotations
 
-  # OCR 5-fold (TrOCR large)
-  ./run.sh --n-fold --framework trocr --task ocr --edition diplomatic --data-dir ./data/I-Ct_91 --model-name large
+  # Run with custom train/test directories
+  ./run.sh --framework kraken --model-name default --task ocr --edition diplomatic --train-dir /path/to/train --test-dir /path/to/test
 
-  # OMR sequential (TrOCR large)
-  ./run.sh --strategy sequential_sample --framework trocr --task omr --edition editorial --data-dir ./data/I-Ct_91 --model-name large
+  # Pretrain on custom data, then use for OCR
+  ./run.sh --framework kraken --model-name my_model --task ocr --edition diplomatic --train-dir /path/to/custom --test-dir /path/to/custom --enable-pretrain --pretrain-dir /path/to/custom
 
-  # Layout train/test (YOLOv8n)
-  ./run.sh --framework yolo --task layout --edition diplomatic --train-dir /path/to/train --test-dir /path/to/test --model-name yolov8n
+  # Run OCR with sequential learning
+  ./run.sh --framework kraken --model-name my_model --task ocr --edition diplomatic --data-dir data/I-Ct_91 --strategy sequential_sample
+
+  # Prepare only annotations for diplomatic edition
+  ./run.sh --task annotations --edition diplomatic
 
 OUTPUT:
-  - Final results: ./results/{data_dir_name}/{edition}/
-  - 5-fold aggregated results: ./results/{data_dir_name}/{edition}/aggregated/
-  - Sequential splits: ./data/{data_dir}/annotations-{edition}/processed_splits/{strategy}/
-  - Processed annotation splits: ./data/{data_dir}/annotations-{edition}/processed_splits/
+  - Final results are saved in: ./results/{data_dir_name}/{edition}/
+  - N-fold aggregated results are in: ./results/{data_dir_name}/{edition}/aggregated/
+  - Sequential results are processed in: ./data/{data_dir}/annotations-{edition}/processed_splits/{strategy}/
+  - Processed data splits are in: ./data/{data_dir}/annotations-{edition}/processed_splits/
+  - Synthetic pre-training data is in: ./data/pretrain_data/
 
 REQUIREMENTS:
-  - Master annotation file: data/{dataset}/annotations-{edition}/gt.json
+  - Master annotation files in data/{dataset}/annotations-{edition}/gt.json
   - 'uv' Python package manager installed
-  - GPU with CUDA support recommended
-  - Framework environments for trocr and yolo
+  - GPU with CUDA support (recommended for performance)
+  - Virtual environments set up for framework-specific dependencies (kraken, calamari)

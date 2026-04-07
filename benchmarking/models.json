@@ -1,14 +1,44 @@
 {
+  "kraken": {
+    "ocr": {
+      "default": "./models/catmus-medieval-1.6.0.mlmodel"
+    },
+    "omr": {
+      "default": "./models/catmus-medieval-1.6.0.mlmodel"
+    }
+  },
+  "calamari": {
+    "ocr": {
+      "default": "models/calamari_models/antiqua_historical_ligs/0.ckpt"
+    },
+    "omr": {
+      "default": "models/calamari_models/antiqua_historical_ligs/0.ckpt"
+    }
+  },
   "trocr": {
     "ocr": {
+      "small": "microsoft/trocr-small-handwritten",
       "large": "microsoft/trocr-large-handwritten"
     },
     "omr": {
+      "small": "microsoft/trocr-small-handwritten",
       "large": "microsoft/trocr-large-handwritten"
+    }
+  },
+  "detr": {
+    "layout": {
+      "default": "facebook/detr-resnet-50"
+    }
+  },
+  "faster_rcnn": {
+    "layout": {
+      "resnet50": "resnet50",
+      "mobilenet": "mobilenet"
     }
   },
   "yolo": {
     "layout": {
+      "yolov8s": "yolov8s",
       "yolov8n": "yolov8n"
     }
   }

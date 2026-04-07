@@ -10,8 +10,31 @@ cross-manuscript setups.
 
 Install system dependencies:
 
+- `gcc` (recommended) or `clang` (not tested)
+- Python 3 [development headers](https://stackoverflow.com/a/21530768)
 - [`uv`](https://docs.astral.sh/uv/getting-started/installation/) package manager
 - `curl` and `jq`
+
+1. clone all submodules:
+
+  ```
+  git submodule update --init --recursive
+  ```
+
+  or, if you haven't cloned the repo yet:
+
+  ```
+  git clone git@github.com:LaudareProject/LaudareBenchmarks.git --recursive
+  ```
+
+2. Install python dependencies using `./setup_environments.sh`.
+   This will create 3 different venvs, in the following paths:
+    - `.venv` used for all the other models
+    - `.venv-calamari` used for calamari (which is incompatible with kraken), inherits packages from
+    `.venv`
+    - `.venv-kraken` used for kraken (which is incompatible with calamari), inherits packages from
+    `.venv`
+  It will also download Kraken models for OCR and Layout Analysis.
 
 ## Reproducibility
 
@@ -19,6 +42,7 @@ Install system dependencies:
 2. **Run the experiments**: to reproduce my experiments, just run the main script:
 
 ```bash
+./run.sh --task synthesis
 ./experiments.sh data/I-Ct_91
 ./experiments.sh data/I-Fn_BR_18
 ```
@@ -28,6 +52,45 @@ You can also run more specific experiments (see the Help file) and/or add your o
 3. **Review Results**:
     - Benchmark results for the single fold run will be stored in subdirectories under `benchmarking/results/diplomatic/fold_test_0/`.
     - Log files for each tool and task will also be available.
+
+### Pre-training on Synthetic Data
+
+The framework supports pre-training models on synthetically generated data before fine-tuning on
+real data. This can improve performance, especially when training data is limited.
+
+For generating the synthetic data, you need `gregoriotex` installed and available in your PATH. A
+simple way is to install the following packages with your OS package manager or using the [official
+package](https://tug.org/texlive/quickinstall.html) (in case of troubles, just install the full
+Texlive distribution):
+
+- `texLive-music`
+- `texlive-latex-recommended`
+- `texlive-luatex`
+- `texlive-latex-extra`
+
+Generate data with the following command:
+
+```
+./run.sh --task synthesis
+```
+
+For this task, the number of generated samples, the font and the capital letter directories can also
+be specified (see `./run.sh --help`). Note that the number of OMR samples is divided by 20 for
+keeping a similar time for the generation.
+
+1. Synthetic Data Generation: Creates artificial text/music images using:
+    - Historical text from Biblioteca Italiana (for OCR)
+    - Gregorian chant notation from GregoBase (for OMR)
+    - Medieval fonts and decorative capitals
+    - Realistic background textures and distortions
+2. Pre-training Phase: Models are first trained on large amounts of synthetic data to learn general patterns
+3. Fine-tuning Phase: Pre-trained models are then fine-tuned on your real dataset
+
+Generated synthetic data is cached in `./data/pretrain_data/`.
+You can enable pre-training with the flag `--enable-pretraining` when running experiments on real
+datasets. This flag will save the pretrained model in a standardized path. If you run the script
+`run.sh` again with the same `--enable-pretrain` flag, it will reuse the pre-trained model (if any
+exists), skipping the pre-training.
 
 ## Use this Dataset with your Model/Framework
 
@@ -76,12 +139,12 @@ def train_test_yourmodel(
     model = train_your_model(train_json, val_json, model)
 
     save_your_model_function(model, save_model_path)
-
+    
     if test_json is not None:
       # then load the best model and run predictions on the test set
       # see below for the standardized output formats
       test_predictions = predict_your_model(test_json, model)
-
+      
       # save predictions in the given directory with the proper naming scheme
       # you can use annotations.ann_handler.create_new_pagexml_file(...) to easily create
       # PageXML files
@@ -101,7 +164,7 @@ Here is an example of our COCO-style JSON format:
     {
       "id": 5,                    // Unique image identifier
       "width": 2083,              // Image dimensions
-      "height": 2717,
+      "height": 2717, 
       "file_name": "c003r.png"    // Relative path from image-root
     }
   ],
@@ -136,7 +199,7 @@ with the function `benchmarking.utils.path_json2pagexml(...)`.
 
 ### Output Requirements
 
-#### HTR/HMR Tasks
+#### OCR/OMR Tasks
 
 - **Format**: Text files (`{image_stem}.pred.txt`) or, alternatively, PageXML files.
 - **Content**: Concatenated text predictions for all lines in image
@@ -158,7 +221,7 @@ Add to `benchmarking/models.json`:
 "yourmodel": {
   "ocr": {
     "small": "yourmodel-small-ocr",
-    "base": "yourmodel-base-ocr",
+    "base": "yourmodel-base-ocr", 
     "large": "yourmodel-large-ocr"
   },
   "omr": {
@@ -169,6 +232,10 @@ Add to `benchmarking/models.json`:
   }
 }
 ```
+
+### Testing Your Implementation
+
+See the file `./test.sh` for the commands I used to test the implemented frameworks.
 
 ## Credits
 
