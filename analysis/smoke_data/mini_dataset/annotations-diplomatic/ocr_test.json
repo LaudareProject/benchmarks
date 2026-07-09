@@ -1,0 +1,49 @@
+{
+  "images": [
+    {
+      "id": 3,
+      "width": 900,
+      "height": 700,
+      "file_name": "page3.png"
+    }
+  ],
+  "annotations": [
+    {
+      "id": 5,
+      "image_id": 3,
+      "category_id": 1,
+      "bbox": [
+        90,
+        180,
+        260,
+        40
+      ],
+      "area": 10400,
+      "iscrowd": 0,
+      "segmentation": [],
+      "description": "Pater noster qui es"
+    },
+    {
+      "id": 6,
+      "image_id": 3,
+      "category_id": 1,
+      "bbox": [
+        90,
+        300,
+        240,
+        40
+      ],
+      "area": 9600,
+      "iscrowd": 0,
+      "segmentation": [],
+      "description": "Ave maria gratia"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "line",
+      "supercategory": "layout"
+    }
+  ]
+}

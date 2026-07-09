@@ -41,5 +41,17 @@
       "yolov8s": "yolov8s",
       "yolov8n": "yolov8n"
     }
+  },
+  "doclayout_yolo": {
+    "layout": {
+      "default": "neuralshift/doc-layout-yolov8n::weights/best.pt",
+      "official": "juliozhao/DocLayout-YOLO-DocLayNet-Docsynth300K_pretrained::doclayout_yolo_doclaynet_imgsz1120_docsynth_pretrain.pt"
+    }
+  },
+  "paddleocr_vl": {
+    "ocr": {
+      "default": "PaddlePaddle/PaddleOCR-VL-1.5",
+      "v1": "PaddlePaddle/PaddleOCR-VL"
+    }
   }
 }
