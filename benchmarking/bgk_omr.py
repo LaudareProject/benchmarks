@@ -14,6 +14,8 @@ from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 
+from .utils import load_image_stems_from_json, save_text_predictions
+
 SYMBOL_CATEGORY_NAMES = {"neume", "clef", "custos", "musicDelimiter"}
 LABELS = ["background", "neume", "clef_c", "clef_f", "custos", "delimiter"]
 LABEL_TO_INDEX = {label: idx for idx, label in enumerate(LABELS)}
@@ -523,13 +525,26 @@ def _predict_symbols(
     return predictions["baseline"], predictions["uncertain"]
 
 
-def _write_predictions(samples: Sequence[StaffSample], texts: Dict[str, List[str]], output_dir: Path) -> None:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    for sample in samples:
-        texts.setdefault(sample.image_stem, [])
-    for image_stem, parts in texts.items():
-        text = " ".join(part for part in parts if part).strip()
-        (output_dir / f"{image_stem}.pred.txt").write_text(text, encoding="utf-8")
+def _write_predictions(expected_stems: Sequence[str], texts: Dict[str, Dict[int, str]], output_dir: Path) -> None:
+    seen = set()
+    ordered_stems = []
+    for stem in expected_stems:
+        if stem not in seen:
+            ordered_stems.append(stem)
+            seen.add(stem)
+    for stem in texts:
+        if stem not in seen:
+            ordered_stems.append(stem)
+            seen.add(stem)
+
+    for image_stem in ordered_stems:
+        staff_texts = texts.get(image_stem, {})
+        text = " ".join(
+            value.strip()
+            for _, value in sorted(staff_texts.items())
+            if value and value.strip()
+        ).strip()
+        save_text_predictions(image_stem, text, output_dir)
 
 
 def _model_path(path: Optional[Path]) -> Optional[Path]:
@@ -602,6 +617,7 @@ def run_bgk_omr_pipeline(
     train_samples = build_staff_samples(Path(train_json), data_root)
     val_samples = build_staff_samples(Path(val_json), data_root)
     test_samples = build_staff_samples(Path(test_json), data_root) if test_json else []
+    expected_test_stems = load_image_stems_from_json(Path(test_json)) if test_json else []
     print(f"🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)}")
 
     existing_model = _model_path(Path(load_model_path) if load_model_path else None)
@@ -612,11 +628,13 @@ def run_bgk_omr_pipeline(
         _train_model(model, train_samples, val_samples, save_model_path, device, getattr(args, "debug", False))
 
     bank = build_prototype_bank(train_samples)
-    page_texts: Dict[str, List[str]] = defaultdict(list)
+    page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
     previous_clef_by_page: Dict[str, Optional[str]] = defaultdict(lambda: None)
     for sample in test_samples:
         baseline, uncertain = _predict_symbols(model, sample, bank, device)
         tokens, current_clef = _postprocess_staff(baseline, uncertain, previous_clef_by_page[sample.image_stem], sample.dsl)
         previous_clef_by_page[sample.image_stem] = current_clef
-        page_texts[sample.image_stem].append(" ".join(token.description for token in tokens if token.description))
-    _write_predictions(test_samples, page_texts, output_dir)
+        page_texts[sample.image_stem][sample.staff_index] = " ".join(
+            token.description for token in tokens if token.description
+        )
+    _write_predictions(expected_test_stems, page_texts, output_dir)

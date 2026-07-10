@@ -249,6 +249,26 @@ def get_transforms(augment=False):
     return train_transform, eval_transform
 
 
+def load_image_stems_from_json(json_file: Path) -> List[str]:
+    """Load ordered image stems from a task JSON file."""
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if "images" in data:
+        return [Path(img["file_name"]).stem for img in data.get("images", [])]
+    if "data_list" in data:
+        return [Path(item.get("img_path", "")).stem for item in data.get("data_list", [])]
+    return []
+
+
+def save_text_predictions(image_stem: str, text: str, output_dir: Path) -> Path:
+    """Save OCR/OMR prediction in the framework-standard `{image_stem}.pred.txt` format."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / f"{image_stem}.pred.txt"
+    output_path.write_text(text.strip(), encoding="utf-8")
+    return output_path
+
+
 def model_name2identifier(
     framework: str, task: str, name: str, models_file: Path
 ) -> Tuple[str, str]:
