@@ -18,7 +18,7 @@ def get_frameworks_for_task(task):
     elif task == "ocr":
         return ["kraken", "calamari", "trocr"]
     elif task == "omr":
-        return ["kraken", "calamari", "trocr"]
+        return ["kraken", "calamari", "trocr", "bgk"]
     return []
 
 
@@ -208,7 +208,7 @@ def main():
         "--framework",
         type=str,
         required=True,
-        choices=["kraken", "calamari", "faster_rcnn", "yolo", "trocr", "detr", "all"],
+        choices=["kraken", "calamari", "faster_rcnn", "yolo", "trocr", "detr", "bgk", "all"],
     )
     parser.add_argument(
         "--task", type=str, required=True, choices=["ocr", "omr", "layout"]

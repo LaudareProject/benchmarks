@@ -29,7 +29,7 @@ WORKFLOW CONTROL OPTIONS:
                              Options: diplomatic, editorial
   --editorial                Shortcut for '--edition editorial'.
   --framework FRAMEWORK      [MANDATORY for ocr, omr, layout] Run benchmarks for a specific framework.
-                             Options: kraken, calamari, trocr, faster-rcnn, yolo, detr
+                             Options: kraken, calamari, trocr, bgk, faster-rcnn, yolo, detr
   --task TASK                [MANDATORY] Specify the task to run.
                              Options: annotations, ocr, omr, layout, synthesis
   --data-dir DIR             Base data directory (if not using train/test directories).

@@ -315,6 +315,51 @@ if [ "$TASK" == "synthesis" ]; then
   fi
 fi
 
+resolve_python_exec_args() {
+  local framework=$1
+  local task=$2
+  local model_name=$3
+
+  case "$framework" in
+  kraken)
+    echo "-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
+    return
+    ;;
+  calamari)
+    echo "-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
+    return
+    ;;
+  bgk)
+    local backend
+    backend=$(python3 - "$task" "$model_name" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+task, model_name = sys.argv[1:3]
+models = json.loads(Path("benchmarking/models.json").read_text())
+identifier = models["bgk"][task][model_name]
+print(identifier.split("::", 1)[0] if "::" in identifier else "calamari")
+PY
+)
+    case "$backend" in
+    kraken)
+      echo "-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
+      ;;
+    calamari)
+      echo "-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
+      ;;
+    *)
+      echo ""
+      ;;
+    esac
+    return
+    ;;
+  esac
+
+  echo ""
+}
+
 # Function to run benchmark for a specific fold
 run_benchmarks_for_fold() {
   local fold_to_run=$1
@@ -322,15 +367,11 @@ run_benchmarks_for_fold() {
   shift 2
   local base_args=("$@")
 
-  local -A python_exec_map=(
-    ["kraken"]="-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
-    ["calamari"]="-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
-  )
-
   echo "🚀 Launching benchmark for ${FRAMEWORK}/${TASK} with model name ${model_name_to_run}..."
   local run_args=("${base_args[@]}" --fold "$fold_to_run" --framework "$FRAMEWORK" --task "$TASK" --model-name "$model_name_to_run")
 
-  local exec_args=${python_exec_map[$FRAMEWORK]}
+  local exec_args
+  exec_args=$(resolve_python_exec_args "$FRAMEWORK" "$TASK" "$model_name_to_run")
   command="uv run $exec_args python -m ${BENCHMARKING_DIR}.run_single_fold_benchmark ${run_args[@]}"
   echo "Running command: $command"
   $command
@@ -416,18 +457,13 @@ if [[ "$TASK" =~ ^(ocr|omr|layout|ocmr)$ ]]; then
     for i in $(seq 0 $((NUM_STEPS - 1))); do
       echo "    --- Running Sequential Step $((i + 1))/$NUM_STEPS for ${current_strategy} ---"
 
-      declare -A python_exec_map=(
-        ["kraken"]="-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
-        ["calamari"]="-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
-      )
-
       # Use the specified model name for sequential mode
       seq_model_name="$MODEL_NAME"
       echo "    🚀 Launching benchmark for ${FRAMEWORK}/${TASK} with model name ${seq_model_name}..."
       seq_run_args=("${benchmark_args[@]}" "--framework" "$FRAMEWORK" --task "$TASK" "--sequential-step" "$i" "--sequential-strategy" "$current_strategy")
       seq_run_args+=("--model-name" "$seq_model_name")
 
-      exec_args=${python_exec_map[$FRAMEWORK]}
+      exec_args=$(resolve_python_exec_args "$FRAMEWORK" "$TASK" "$seq_model_name")
       uv run $exec_args python -m "${BENCHMARKING_DIR}.run_single_fold_benchmark" "${seq_run_args[@]}"
 
     done
@@ -444,12 +480,8 @@ if [[ "$TASK" =~ ^(ocr|omr|layout|ocmr)$ ]]; then
       echo "📂 Training on: ${TRAIN_DIR}"
       echo "🧪 Testing on: ${TEST_DIR}"
 
-      declare -A python_exec_map=(
-        ["kraken"]="-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
-        ["calamari"]="-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
-      )
       train_test_args=("${benchmark_args[@]}" --framework "$FRAMEWORK" --task "$TASK" --model-name "$MODEL_NAME" --train-dir "$TRAIN_DIR" --test-dir "$TEST_DIR")
-      exec_args=${python_exec_map[$FRAMEWORK]}
+      exec_args=$(resolve_python_exec_args "$FRAMEWORK" "$TASK" "$MODEL_NAME")
       uv run $exec_args python -m "${BENCHMARKING_DIR}.run_single_fold_benchmark" "${train_test_args[@]}"
     else
       # SINGLE FOLD MODE

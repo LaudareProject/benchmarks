@@ -53,5 +53,12 @@
       "default": "PaddlePaddle/PaddleOCR-VL-1.5",
       "v1": "PaddlePaddle/PaddleOCR-VL"
     }
+  },
+  "bgk": {
+    "omr": {
+      "default": "calamari::models/calamari_models/antiqua_historical_ligs/0.ckpt",
+      "kraken": "kraken::./models/catmus-medieval-1.6.0.mlmodel",
+      "trocr_large": "trocr::microsoft/trocr-large-handwritten"
+    }
   }
 }

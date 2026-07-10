@@ -61,6 +61,9 @@ FRAMEWORK_DISPLAY_NAMES = {
     "trocr_ocr_large": "TrOCR-Large",
     "trocr_omr_small": "TrOCR-Small",
     "trocr_omr_large": "TrOCR-Large",
+    "bgk_omr_default": "BGK-OMR (Calamari)",
+    "bgk_omr_kraken": "BGK-OMR (Kraken)",
+    "bgk_omr_trocr_large": "BGK-OMR (TrOCR-Large)",
     # Layout frameworks
     "yolo_layout_yolov8n": "YOLOv8n",
     "yolo_layout_yolov8s": "YOLOv8s",
