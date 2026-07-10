@@ -330,29 +330,7 @@ resolve_python_exec_args() {
     return
     ;;
   bgk)
-    local backend
-    backend=$(python3 - "$task" "$model_name" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-task, model_name = sys.argv[1:3]
-models = json.loads(Path("benchmarking/models.json").read_text())
-identifier = models["bgk"][task][model_name]
-print(identifier.split("::", 1)[0] if "::" in identifier else "calamari")
-PY
-)
-    case "$backend" in
-    kraken)
-      echo "-p ${PROJECT_ROOT}/.venv-kraken/bin/python"
-      ;;
-    calamari)
-      echo "-p ${PROJECT_ROOT}/.venv-calamari/bin/python"
-      ;;
-    *)
-      echo ""
-      ;;
-    esac
+    echo ""
     return
     ;;
   esac
