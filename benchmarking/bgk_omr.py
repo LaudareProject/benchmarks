@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
+import shutil
+import tempfile
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,12 +13,17 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
+import yaml
 from PIL import Image
 from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
+from ultralytics import YOLO
 
+from .ultralytics_monkey_patch import apply_ultralytics_monkey_patch
 from .utils import load_image_stems_from_json, save_text_predictions
+
+apply_ultralytics_monkey_patch()
 
 SYMBOL_CATEGORY_NAMES = {"neume", "clef", "custos", "musicDelimiter"}
 BASE_LABELS = ["background", "clef_c", "clef_f", "custos", "delimiter_1", "delimiter_2"]
@@ -24,6 +32,7 @@ PAPER_BASE_CHANNELS = 64
 NOTE_ORDER = "CDEFGAB"
 PITCH_RE = re.compile(r"([A-G])(\d+)")
 CLEF_RE = re.compile(r"^K([CF])(\d+)$")
+N_STAFF_LINES = 5
 
 
 @dataclass
@@ -447,8 +456,8 @@ def _symbol_center_from_annotation(symbol: SymbolAnnotation) -> Tuple[float, flo
     return x + w / 2.0, y + h / 2.0
 
 
-def _staff_step_height(sample: StaffSample) -> float:
-    return max(sample.staff_box[3] / 6.0, 1e-6)
+def _staff_pitch_step(sample: StaffSample) -> float:
+    return max(sample.staff_box[3] / (N_STAFF_LINES * 2.0), 1e-6)
 
 
 def _clef_pitch_value(description: str) -> int:
@@ -475,7 +484,7 @@ def build_neume_templates(samples: Sequence[StaffSample]) -> Dict[str, Tuple[flo
             pitches = _extract_pitch_tokens(symbol.description)
             if len(pitches) != _neume_size(symbol.label):
                 continue
-            anchor = _clef_pitch_value(current_clef.description) + (current_clef.center_y - center_y) / _staff_step_height(sample)
+            anchor = _clef_pitch_value(current_clef.description) + (current_clef.center_y - center_y) / _staff_pitch_step(sample)
             offsets_by_label[symbol.label].append(tuple(_pitch_to_value(pitch) - anchor for pitch in pitches))
         previous_clef_by_page[sample.image_stem] = current_clef
 
@@ -581,14 +590,13 @@ def _postprocess_staff(
 
 def _estimate_clef_line(symbol: PredictedSymbol, sample: StaffSample) -> int:
     _, staff_top, _, staff_height = sample.staff_box
-    line_spacing = max(staff_height / 3.0, 1e-6)
-    line_positions = [staff_top + idx * line_spacing for idx in range(4)]
-    nearest_from_top = min(range(4), key=lambda idx: abs(line_positions[idx] - symbol.center[1]))
-    return max(1, min(4, 4 - nearest_from_top))
+    line_spacing = max(staff_height / float(N_STAFF_LINES), 1e-6)
+    k = min(range(N_STAFF_LINES), key=lambda i: abs(symbol.center[1] - (staff_top + i * line_spacing)))
+    return max(1, min(4, N_STAFF_LINES - k))
 
 
 def _symbol_anchor_value(symbol: PredictedSymbol, clef: ClefState, sample: StaffSample) -> float:
-    return _clef_pitch_value(clef.description) + (clef.center_y - symbol.center[1]) / _staff_step_height(sample)
+    return _clef_pitch_value(clef.description) + (clef.center_y - symbol.center[1]) / _staff_pitch_step(sample)
 
 
 def _decode_symbol_description(
@@ -728,6 +736,152 @@ def _model_path(path: Optional[Path]) -> Optional[Path]:
     return path if path.exists() else None
 
 
+def _save_yolo_crop(sample: StaffSample, image_dir: Path) -> Tuple[Path, Image.Image]:
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / f"{sample.image_stem}_staff{sample.staff_index:02d}.png"
+    crop = _load_crop(sample).convert("RGB")
+    crop.save(image_path)
+    return image_path, crop
+
+
+def _write_yolo_label(sample: StaffSample, label_dir: Path, label_to_index: Dict[str, int], crop_size: Tuple[int, int]) -> None:
+    label_dir.mkdir(parents=True, exist_ok=True)
+    label_path = label_dir / f"{sample.image_stem}_staff{sample.staff_index:02d}.txt"
+    width, height = crop_size
+    lines: List[str] = []
+    for symbol in sample.symbols:
+        if symbol.label not in label_to_index:
+            continue
+        x, y, w, h = symbol.bbox
+        cx = (x + w / 2.0) / max(width, 1)
+        cy = (y + h / 2.0) / max(height, 1)
+        nw = w / max(width, 1)
+        nh = h / max(height, 1)
+        lines.append(f"{label_to_index[symbol.label]} {cx:.6f} {cy:.6f} {nw:.6f} {nh:.6f}")
+    label_path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def _prepare_yolo_split(samples: Sequence[StaffSample], split_dir: Path, label_to_index: Dict[str, int]) -> Dict[str, StaffSample]:
+    image_dir = split_dir / "images"
+    label_dir = split_dir / "labels"
+    mapping: Dict[str, StaffSample] = {}
+    for sample in samples:
+        image_path, crop = _save_yolo_crop(sample, image_dir)
+        _write_yolo_label(sample, label_dir, label_to_index, crop.size)
+        mapping[image_path.name] = sample
+    return mapping
+
+
+def _prepare_yolo_dataset(
+    train_samples: Sequence[StaffSample],
+    val_samples: Sequence[StaffSample],
+    test_samples: Sequence[StaffSample],
+    labels: Sequence[str],
+) -> Tuple[Path, Dict[str, Dict[str, StaffSample]]]:
+    artifacts_dir = Path(tempfile.mkdtemp(prefix="bgk_yolo_artifacts_"))
+    dataset_dir = artifacts_dir / "dataset"
+    detector_labels = [label for label in labels if label != "background"]
+    detector_label_to_index = {label: idx for idx, label in enumerate(detector_labels)}
+    mappings = {
+        "train": _prepare_yolo_split(train_samples, dataset_dir / "train", detector_label_to_index),
+        "val": _prepare_yolo_split(val_samples, dataset_dir / "val", detector_label_to_index),
+        "test": _prepare_yolo_split(test_samples, dataset_dir / "test", detector_label_to_index),
+    }
+    yaml_path = dataset_dir / "data.yaml"
+    yaml_path.write_text(
+        yaml.safe_dump(
+            {
+                "path": str(dataset_dir.resolve()),
+                "train": "train/images",
+                "val": "val/images",
+                "names": {idx: label for idx, label in enumerate(detector_labels)},
+            }
+        ),
+        encoding="utf-8",
+    )
+    return artifacts_dir, mappings
+
+
+def _train_yolo_model(
+    train_samples: Sequence[StaffSample],
+    val_samples: Sequence[StaffSample],
+    test_samples: Sequence[StaffSample],
+    labels: Sequence[str],
+    save_model_path: Path,
+    load_model_path: Optional[Path],
+    model_identifier: str,
+    debug: bool,
+) -> Tuple[Path, Path, Dict[str, Dict[str, StaffSample]]]:
+    artifacts_dir, mappings = _prepare_yolo_dataset(train_samples, val_samples, test_samples, labels)
+    existing_model = _model_path(load_model_path)
+    model_source = str(existing_model) if existing_model else model_identifier
+    model = YOLO(model_source)
+    if existing_model is None:
+        epochs = 1 if debug else 30
+        model.train(
+            data=str(artifacts_dir / "dataset" / "data.yaml"),
+            epochs=epochs,
+            patience=10,
+            imgsz=960,
+            project=str(artifacts_dir),
+            name="train",
+            exist_ok=True,
+            device="cuda:0" if torch.cuda.is_available() else "cpu",
+            batch=8 if not debug else 4,
+            workers=2,
+            lr0=0.01,
+        )
+        best_model_path = artifacts_dir / "train" / "weights" / "best.pt"
+        if not best_model_path.exists():
+            best_model_path = artifacts_dir / "train" / "weights" / "last.pt"
+        save_model_path.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(best_model_path, save_model_path / "model.pt")
+    else:
+        best_model_path = existing_model
+    return best_model_path, artifacts_dir, mappings
+
+
+def _predict_symbols_yolo(
+    model: YOLO,
+    detector_labels: Sequence[str],
+    image_path: Path,
+) -> Tuple[List[PredictedSymbol], List[PredictedSymbol]]:
+    results = model.predict(
+        source=str(image_path),
+        conf=0.05,
+        iou=0.5,
+        device="cuda:0" if torch.cuda.is_available() else "cpu",
+        verbose=False,
+    )
+    baseline: List[PredictedSymbol] = []
+    uncertain: List[PredictedSymbol] = []
+    if not results:
+        return baseline, uncertain
+    res = results[0]
+    if res.boxes is None:
+        return baseline, uncertain
+    for box in res.boxes:
+        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+        conf = float(box.conf[0].item())
+        class_idx = int(box.cls[0].item())
+        if class_idx < 0 or class_idx >= len(detector_labels):
+            continue
+        label = detector_labels[class_idx]
+        pred = PredictedSymbol(
+            label=label,
+            description="",
+            bbox=(float(x1), float(y1), float(x2 - x1), float(y2 - y1)),
+            center=(float((x1 + x2) / 2.0), float((y1 + y2) / 2.0)),
+            confidence=conf,
+            source="baseline" if conf >= 0.25 else "uncertain",
+        )
+        if conf >= 0.25:
+            baseline.append(pred)
+        else:
+            uncertain.append(pred)
+    return baseline, uncertain
+
+
 def _train_model(
     model: nn.Module,
     train_samples: Sequence[StaffSample],
@@ -789,6 +943,7 @@ def run_bgk_omr_pipeline(
     output_dir: Path,
     save_model_path: Path,
     load_model_path: Optional[Path],
+    model_identifier: str = "yolov8n.pt",
 ) -> None:
     data_root = Path(args.data_dir) if getattr(args, "data_dir", None) else Path("data")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -803,19 +958,26 @@ def run_bgk_omr_pipeline(
     labels, label_to_index, index_to_label = build_label_space([*train_samples, *val_samples])
     print(f"🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)} labels={len(labels)}")
 
-    model = SimpleUNet(out_channels=len(labels)).to(device)
-    existing_model = _model_path(Path(load_model_path) if load_model_path else None)
-    if existing_model:
-        print(f"📦 Loading BGK model from {existing_model}")
-        model.load_state_dict(torch.load(existing_model, map_location=device))
-    else:
-        _train_model(model, train_samples, val_samples, label_to_index, save_model_path, device, getattr(args, "debug", False))
+    detector_labels = [label for label in labels if label != "background"]
+    best_model_path, artifacts_dir, mappings = _train_yolo_model(
+        train_samples=train_samples,
+        val_samples=val_samples,
+        test_samples=test_samples,
+        labels=labels,
+        save_model_path=save_model_path,
+        load_model_path=Path(load_model_path) if load_model_path else None,
+        model_identifier=model_identifier,
+        debug=getattr(args, "debug", False),
+    )
+    yolo_model = YOLO(str(best_model_path))
 
     neume_templates = build_neume_templates(train_samples)
     page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
     previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
-    for sample in test_samples:
-        baseline, uncertain = _predict_symbols(model, sample, index_to_label, device)
+    test_image_map = mappings["test"]
+    for image_name, sample in sorted(test_image_map.items(), key=lambda item: (item[1].image_stem, item[1].staff_index)):
+        image_path = artifacts_dir / "dataset" / "test" / "images" / image_name
+        baseline, uncertain = _predict_symbols_yolo(yolo_model, detector_labels, image_path)
         tokens = _postprocess_staff(baseline, uncertain, previous_clef_by_page[sample.image_stem], sample.dsl)
         decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef_by_page[sample.image_stem], neume_templates)
         previous_clef_by_page[sample.image_stem] = current_clef
@@ -823,3 +985,4 @@ def run_bgk_omr_pipeline(
             token.description for token in decoded_tokens if token.description
         )
     _write_predictions(expected_test_stems, page_texts, output_dir)
+    shutil.rmtree(artifacts_dir, ignore_errors=True)

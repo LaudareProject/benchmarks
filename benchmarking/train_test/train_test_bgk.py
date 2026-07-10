@@ -27,4 +27,5 @@ def train_test_bgk(
         output_dir=output_dir,
         save_model_path=save_model_path,
         load_model_path=load_model_path,
+        model_identifier=model_identifier,
     )
