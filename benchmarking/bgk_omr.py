@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -17,12 +18,12 @@ from torch.utils.data import DataLoader, Dataset
 from .utils import load_image_stems_from_json, save_text_predictions
 
 SYMBOL_CATEGORY_NAMES = {"neume", "clef", "custos", "musicDelimiter"}
-LABELS = ["background", "neume", "clef_c", "clef_f", "custos", "delimiter"]
-LABEL_TO_INDEX = {label: idx for idx, label in enumerate(LABELS)}
-INDEX_TO_LABEL = {idx: label for label, idx in LABEL_TO_INDEX.items()}
+BASE_LABELS = ["background", "clef_c", "clef_f", "custos", "delimiter_1", "delimiter_2"]
 FIXED_IMAGE_HEIGHT = 80
-PROTOTYPE_SIZE = (48, 48)
 PAPER_BASE_CHANNELS = 64
+NOTE_ORDER = "CDEFGAB"
+PITCH_RE = re.compile(r"([A-G])(\d+)")
+CLEF_RE = re.compile(r"^K([CF])(\d+)$")
 
 
 @dataclass
@@ -38,6 +39,7 @@ class StaffSample:
     image_stem: str
     staff_index: int
     crop_box: Tuple[int, int, int, int]
+    staff_box: Tuple[float, float, float, float]
     dsl: float
     symbols: List[SymbolAnnotation]
 
@@ -50,6 +52,12 @@ class PredictedSymbol:
     center: Tuple[float, float]
     confidence: float
     source: str
+
+
+@dataclass
+class ClefState:
+    description: str
+    center_y: float
 
 
 class DoubleConv(nn.Module):
@@ -93,7 +101,7 @@ class Up(nn.Module):
 
 
 class SimpleUNet(nn.Module):
-    def __init__(self, in_channels: int = 1, out_channels: int = len(LABELS), base_channels: int = PAPER_BASE_CHANNELS):
+    def __init__(self, in_channels: int = 1, out_channels: int = len(BASE_LABELS), base_channels: int = PAPER_BASE_CHANNELS):
         super().__init__()
         self.inc = DoubleConv(in_channels, base_channels)
         self.down1 = Down(base_channels, base_channels * 2)
@@ -123,17 +131,99 @@ def _load_coco(json_path: Path) -> Dict:
     return json.loads(json_path.read_text(encoding="utf-8"))
 
 
+def _pitch_to_value(token: str) -> int:
+    match = PITCH_RE.fullmatch(token)
+    if match is None:
+        raise ValueError(f"Invalid pitch token: {token}")
+    note, octave = match.groups()
+    return int(octave) * 7 + NOTE_ORDER.index(note)
+
+
+def _value_to_pitch(value: int) -> str:
+    octave, note_index = divmod(value, len(NOTE_ORDER))
+    return f"{NOTE_ORDER[note_index]}{octave}"
+
+
+def _extract_pitch_tokens(description: str) -> List[str]:
+    return [match.group(0) for match in PITCH_RE.finditer(description)]
+
+
+def _contour_from_pitches(pitches: Sequence[str]) -> str:
+    if len(pitches) <= 1:
+        return ""
+    values = [_pitch_to_value(token) for token in pitches]
+    contour = []
+    for current, nxt in zip(values, values[1:]):
+        if nxt > current:
+            contour.append("u")
+        elif nxt < current:
+            contour.append("d")
+        else:
+            contour.append("s")
+    return "".join(contour)
+
+
+def _neume_label(count: int, contour: str) -> str:
+    return f"neume_{count}" if not contour else f"neume_{count}_{contour}"
+
+
+def _neume_size(label: str) -> int:
+    parts = label.split("_")
+    if len(parts) < 2 or parts[0] != "neume":
+        raise ValueError(f"Invalid neume label: {label}")
+    return int(parts[1])
+
+
+def _neume_contour(label: str) -> str:
+    parts = label.split("_", 2)
+    return parts[2] if len(parts) == 3 else ""
+
+
+def _default_neume_offsets(label: str) -> Tuple[float, ...]:
+    count = _neume_size(label)
+    contour = _neume_contour(label)
+    steps = [0.0]
+    for token in contour:
+        delta = 1.0 if token == "u" else -1.0 if token == "d" else 0.0
+        steps.append(steps[-1] + delta)
+    if len(steps) != count:
+        steps = list(range(count))
+    mean_step = sum(steps) / len(steps)
+    return tuple(step - mean_step for step in steps)
+
+
+def _label_sort_key(label: str) -> Tuple[int, int, str]:
+    if label in BASE_LABELS:
+        return (0, BASE_LABELS.index(label), "")
+    if label.startswith("neume_"):
+        return (1, _neume_size(label), _neume_contour(label))
+    return (2, 0, label)
+
+
+def _label_family(label: str) -> str:
+    if label.startswith("neume_"):
+        return "neume"
+    if label.startswith("delimiter_"):
+        return "delimiter"
+    return label
+
+
 def _label_from_annotation(category_name: str, description: str) -> Optional[str]:
     if category_name == "neume":
-        return "neume"
+        pitches = _extract_pitch_tokens(description)
+        if not pitches:
+            return None
+        return _neume_label(len(pitches), _contour_from_pitches(pitches))
     if category_name == "custos":
         return "custos"
     if category_name == "musicDelimiter":
-        return "delimiter"
+        return "delimiter_2" if description.count("/") >= 2 else "delimiter_1"
     if category_name == "clef":
         if description.startswith("KC"):
             return "clef_c"
-        return "clef_f"
+        if description.startswith("KF"):
+            return "clef_f"
+        return None
     return None
 
 
@@ -229,11 +319,28 @@ def build_staff_samples(split_json: Path, data_root: Path) -> List[StaffSample]:
                         image_stem=image_stem,
                         staff_index=staff_index,
                         crop_box=(left, top, right, bottom),
+                        staff_box=(x - left, y - top, w, h),
                         dsl=dsl,
                         symbols=symbols,
                     )
                 )
     return samples
+
+
+def build_label_space(samples: Sequence[StaffSample]) -> Tuple[List[str], Dict[str, int], Dict[int, str]]:
+    neume_labels = sorted(
+        {
+            symbol.label
+            for sample in samples
+            for symbol in sample.symbols
+            if symbol.label.startswith("neume_")
+        },
+        key=_label_sort_key,
+    )
+    labels = [*BASE_LABELS, *neume_labels]
+    label_to_index = {label: idx for idx, label in enumerate(labels)}
+    index_to_label = {idx: label for label, idx in label_to_index.items()}
+    return labels, label_to_index, index_to_label
 
 
 def _load_crop(sample: StaffSample) -> Image.Image:
@@ -262,8 +369,9 @@ def _draw_disk(mask: np.ndarray, cx: float, cy: float, radius: int, value: int) 
 
 
 class BGKStaffDataset(Dataset):
-    def __init__(self, samples: Sequence[StaffSample], image_height: int = FIXED_IMAGE_HEIGHT):
+    def __init__(self, samples: Sequence[StaffSample], label_to_index: Dict[str, int], image_height: int = FIXED_IMAGE_HEIGHT):
         self.samples = list(samples)
+        self.label_to_index = label_to_index
         self.image_height = image_height
 
     def __len__(self) -> int:
@@ -276,10 +384,12 @@ class BGKStaffDataset(Dataset):
         mask = np.zeros(image_arr.shape, dtype=np.int64)
         radius = max(2, int(round(sample.dsl * sy / 8.0)))
         for symbol in sample.symbols:
+            if symbol.label not in self.label_to_index:
+                continue
             x, y, w, h = symbol.bbox
             cx = (x + w / 2.0) * sx
             cy = (y + h / 2.0) * sy
-            _draw_disk(mask, cx, cy, radius, LABEL_TO_INDEX[symbol.label])
+            _draw_disk(mask, cx, cy, radius, self.label_to_index[symbol.label])
         return {
             "image": torch.from_numpy(image_arr).unsqueeze(0),
             "mask": torch.from_numpy(mask),
@@ -332,47 +442,51 @@ def _connected_components(binary_mask: np.ndarray) -> List[List[Tuple[int, int]]
     return components
 
 
-def _prototype_vector(image: Image.Image) -> np.ndarray:
-    resized = image.resize(PROTOTYPE_SIZE[::-1], Image.BILINEAR)
-    arr = np.asarray(resized, dtype=np.float32) / 255.0
-    arr = 1.0 - arr
-    vec = arr.flatten()
-    norm = np.linalg.norm(vec)
-    return vec if norm == 0 else vec / norm
+def _symbol_center_from_annotation(symbol: SymbolAnnotation) -> Tuple[float, float]:
+    x, y, w, h = symbol.bbox
+    return x + w / 2.0, y + h / 2.0
 
 
-def build_prototype_bank(samples: Sequence[StaffSample]) -> Dict[str, List[Tuple[np.ndarray, str]]]:
-    bank: Dict[str, List[Tuple[np.ndarray, str]]] = defaultdict(list)
-    cache: Dict[Path, Image.Image] = {}
-    for sample in samples:
-        if sample.image_path not in cache:
-            cache[sample.image_path] = Image.open(sample.image_path).convert("L")
-        page = cache[sample.image_path]
-        left, top, _, _ = sample.crop_box
-        for symbol in sample.symbols:
-            x, y, w, h = symbol.bbox
-            gx0 = int(left + x)
-            gy0 = int(top + y)
-            gx1 = int(gx0 + w)
-            gy1 = int(gy0 + h)
-            patch = page.crop((gx0, gy0, gx1, gy1))
-            bank[symbol.label].append((_prototype_vector(patch), symbol.description))
-    return bank
+def _staff_step_height(sample: StaffSample) -> float:
+    return max(sample.staff_box[3] / 6.0, 1e-6)
 
 
-def _classify_crop(patch: Image.Image, label: str, bank: Dict[str, List[Tuple[np.ndarray, str]]]) -> Tuple[str, float]:
-    candidates = bank.get(label, [])
-    if not candidates:
-        return "", 0.0
-    vec = _prototype_vector(patch)
-    best_description = ""
-    best_score = -1.0
-    for prototype, description in candidates:
-        score = float(np.dot(vec, prototype))
-        if score > best_score:
-            best_score = score
-            best_description = description
-    return best_description, best_score
+def _clef_pitch_value(description: str) -> int:
+    match = CLEF_RE.fullmatch(description)
+    if match is None:
+        raise ValueError(f"Invalid clef token: {description}")
+    kind, _ = match.groups()
+    return _pitch_to_value("C4" if kind == "C" else "F3")
+
+
+def build_neume_templates(samples: Sequence[StaffSample]) -> Dict[str, Tuple[float, ...]]:
+    offsets_by_label: Dict[str, List[Tuple[float, ...]]] = defaultdict(list)
+    previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
+    ordered_samples = sorted(samples, key=lambda sample: (sample.image_stem, sample.staff_index))
+    for sample in ordered_samples:
+        current_clef = previous_clef_by_page[sample.image_stem]
+        for symbol in sorted(sample.symbols, key=lambda item: _symbol_center_from_annotation(item)[0]):
+            _, center_y = _symbol_center_from_annotation(symbol)
+            if symbol.label.startswith("clef"):
+                current_clef = ClefState(description=symbol.description, center_y=center_y)
+                continue
+            if current_clef is None or not symbol.label.startswith("neume_"):
+                continue
+            pitches = _extract_pitch_tokens(symbol.description)
+            if len(pitches) != _neume_size(symbol.label):
+                continue
+            anchor = _clef_pitch_value(current_clef.description) + (current_clef.center_y - center_y) / _staff_step_height(sample)
+            offsets_by_label[symbol.label].append(tuple(_pitch_to_value(pitch) - anchor for pitch in pitches))
+        previous_clef_by_page[sample.image_stem] = current_clef
+
+    templates: Dict[str, Tuple[float, ...]] = {}
+    for label, examples in offsets_by_label.items():
+        count = _neume_size(label)
+        templates[label] = tuple(
+            float(np.mean([example[idx] for example in examples]))
+            for idx in range(count)
+        )
+    return templates
 
 
 def _normalized_overlap(a: PredictedSymbol, b: PredictedSymbol, dsl: float) -> bool:
@@ -385,8 +499,8 @@ def _normalized_overlap(a: PredictedSymbol, b: PredictedSymbol, dsl: float) -> b
     }
     ax, ay = a.center
     bx, by = b.center
-    aw, ah = scale.get(a.label, (0.4, 0.4))
-    bw, bh = scale.get(b.label, (0.4, 0.4))
+    aw, ah = scale.get(_label_family(a.label), (0.4, 0.4))
+    bw, bh = scale.get(_label_family(b.label), (0.4, 0.4))
     a_box = (ax - dsl * aw, ay - dsl * ah, ax + dsl * aw, ay + dsl * ah)
     b_box = (bx - dsl * bw, by - dsl * bh, bx + dsl * bw, by + dsl * bh)
     return not (
@@ -416,7 +530,7 @@ def _remove_overlaps(symbols: List[PredictedSymbol], dsl: float) -> List[Predict
 def _ensure_leading_clef(
     baseline: List[PredictedSymbol],
     uncertain: List[PredictedSymbol],
-    previous_clef: Optional[str],
+    previous_clef: Optional[ClefState],
     dsl: float,
 ) -> List[PredictedSymbol]:
     result = list(baseline)
@@ -431,10 +545,10 @@ def _ensure_leading_clef(
         result.insert(
             0,
             PredictedSymbol(
-                label="clef_c" if previous_clef.startswith("KC") else "clef_f",
-                description=previous_clef,
-                bbox=(0.0, 0.0, dsl, dsl * 2),
-                center=(dsl, dsl),
+                label="clef_c" if previous_clef.description.startswith("KC") else "clef_f",
+                description=previous_clef.description,
+                bbox=(0.0, max(0.0, previous_clef.center_y - dsl), dsl, dsl * 2),
+                center=(dsl, previous_clef.center_y),
                 confidence=0.0,
                 source="prior",
             ),
@@ -445,35 +559,95 @@ def _ensure_leading_clef(
 def _postprocess_staff(
     baseline: List[PredictedSymbol],
     uncertain: List[PredictedSymbol],
-    previous_clef: Optional[str],
+    previous_clef: Optional[ClefState],
     dsl: float,
-) -> Tuple[List[PredictedSymbol], Optional[str]]:
+) -> List[PredictedSymbol]:
     cleaned = _remove_overlaps(baseline, dsl)
     cleaned = _ensure_leading_clef(cleaned, uncertain, previous_clef, dsl)
     tokens: List[PredictedSymbol] = []
     last_delimiter = False
-    current_clef = previous_clef
     for symbol in cleaned:
-        if not symbol.description:
-            continue
-        if symbol.label == "delimiter":
+        if _label_family(symbol.label) == "delimiter":
             if last_delimiter and tokens:
                 tokens[-1] = symbol
             else:
                 tokens.append(symbol)
             last_delimiter = True
             continue
-        if symbol.label.startswith("clef"):
-            current_clef = symbol.description
         last_delimiter = False
         tokens.append(symbol)
-    return tokens, current_clef
+    return tokens
+
+
+def _estimate_clef_line(symbol: PredictedSymbol, sample: StaffSample) -> int:
+    _, staff_top, _, staff_height = sample.staff_box
+    line_spacing = max(staff_height / 3.0, 1e-6)
+    line_positions = [staff_top + idx * line_spacing for idx in range(4)]
+    nearest_from_top = min(range(4), key=lambda idx: abs(line_positions[idx] - symbol.center[1]))
+    return max(1, min(4, 4 - nearest_from_top))
+
+
+def _symbol_anchor_value(symbol: PredictedSymbol, clef: ClefState, sample: StaffSample) -> float:
+    return _clef_pitch_value(clef.description) + (clef.center_y - symbol.center[1]) / _staff_step_height(sample)
+
+
+def _decode_symbol_description(
+    symbol: PredictedSymbol,
+    sample: StaffSample,
+    current_clef: Optional[ClefState],
+    neume_templates: Dict[str, Tuple[float, ...]],
+) -> str:
+    if symbol.label == "delimiter_1":
+        return "/"
+    if symbol.label == "delimiter_2":
+        return "//"
+    if symbol.label.startswith("clef"):
+        if symbol.source == "prior" and symbol.description:
+            return symbol.description
+        line = _estimate_clef_line(symbol, sample)
+        return f"K{'C' if symbol.label == 'clef_c' else 'F'}{line}"
+    if current_clef is None:
+        return ""
+    anchor = _symbol_anchor_value(symbol, current_clef, sample)
+    if symbol.label == "custos":
+        return _value_to_pitch(int(round(anchor)))
+    if symbol.label.startswith("neume_"):
+        offsets = neume_templates.get(symbol.label, _default_neume_offsets(symbol.label))
+        notes = [_value_to_pitch(int(round(anchor + offset))) for offset in offsets]
+        return f"({' '.join(notes)})"
+    return ""
+
+
+def _decode_staff(
+    symbols: Sequence[PredictedSymbol],
+    sample: StaffSample,
+    previous_clef: Optional[ClefState],
+    neume_templates: Dict[str, Tuple[float, ...]],
+) -> Tuple[List[PredictedSymbol], Optional[ClefState]]:
+    decoded: List[PredictedSymbol] = []
+    current_clef = previous_clef
+    for symbol in sorted(symbols, key=lambda item: item.center[0]):
+        description = _decode_symbol_description(symbol, sample, current_clef, neume_templates)
+        if not description:
+            continue
+        decoded_symbol = PredictedSymbol(
+            label=symbol.label,
+            description=description,
+            bbox=symbol.bbox,
+            center=symbol.center,
+            confidence=symbol.confidence,
+            source=symbol.source,
+        )
+        decoded.append(decoded_symbol)
+        if decoded_symbol.label.startswith("clef"):
+            current_clef = ClefState(description=decoded_symbol.description, center_y=decoded_symbol.center[1])
+    return decoded, current_clef
 
 
 def _predict_symbols(
     model: nn.Module,
     sample: StaffSample,
-    bank: Dict[str, List[Tuple[np.ndarray, str]]],
+    index_to_label: Dict[int, str],
     device: torch.device,
     image_height: int = FIXED_IMAGE_HEIGHT,
 ) -> Tuple[List[PredictedSymbol], List[PredictedSymbol]]:
@@ -496,7 +670,7 @@ def _predict_symbols(
             baseline_mask = best_non_bg.copy()
             baseline_mask[bg >= 0.5] = 0
             label_map[baseline_mask > 0] = 0
-        for label_idx in range(1, len(LABELS)):
+        for label_idx in range(1, len(index_to_label)):
             class_mask = label_map == label_idx
             components = _connected_components(class_mask)
             for component in components:
@@ -504,31 +678,19 @@ def _predict_symbols(
                     continue
                 min_x, min_y, width, height = _component_bbox(component)
                 conf = float(np.mean([confidence[y, x] for y, x in component]))
-                cx = min_x + width / 2.0
-                cy = min_y + height / 2.0
                 orig_bbox = (
                     min_x / sx,
                     min_y / sy,
                     max(1.0, width / sx),
                     max(1.0, height / sy),
                 )
-                patch = crop.crop(
-                    (
-                        int(orig_bbox[0]),
-                        int(orig_bbox[1]),
-                        int(orig_bbox[0] + orig_bbox[2]),
-                        int(orig_bbox[1] + orig_bbox[3]),
-                    )
-                )
-                label = INDEX_TO_LABEL[label_idx]
-                description, score = _classify_crop(patch, label, bank)
                 predictions[source].append(
                     PredictedSymbol(
-                        label=label,
-                        description=description,
+                        label=index_to_label[label_idx],
+                        description="",
                         bbox=orig_bbox,
                         center=(orig_bbox[0] + orig_bbox[2] / 2.0, orig_bbox[1] + orig_bbox[3] / 2.0),
-                        confidence=(conf + score) / 2.0,
+                        confidence=conf,
                         source=source,
                     )
                 )
@@ -570,12 +732,23 @@ def _train_model(
     model: nn.Module,
     train_samples: Sequence[StaffSample],
     val_samples: Sequence[StaffSample],
+    label_to_index: Dict[str, int],
     save_model_path: Path,
     device: torch.device,
     debug: bool,
 ) -> None:
-    train_loader = DataLoader(BGKStaffDataset(train_samples), batch_size=2 if not debug else 1, shuffle=True, collate_fn=_collate)
-    val_loader = DataLoader(BGKStaffDataset(val_samples), batch_size=2 if not debug else 1, shuffle=False, collate_fn=_collate)
+    train_loader = DataLoader(
+        BGKStaffDataset(train_samples, label_to_index),
+        batch_size=2 if not debug else 1,
+        shuffle=True,
+        collate_fn=_collate,
+    )
+    val_loader = DataLoader(
+        BGKStaffDataset(val_samples, label_to_index),
+        batch_size=2 if not debug else 1,
+        shuffle=False,
+        collate_fn=_collate,
+    )
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     best_val = float("inf")
     epochs = 1 if debug else 30
@@ -619,7 +792,6 @@ def run_bgk_omr_pipeline(
 ) -> None:
     data_root = Path(args.data_dir) if getattr(args, "data_dir", None) else Path("data")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SimpleUNet().to(device)
 
     if train_json is None or val_json is None:
         raise ValueError("bgk requires train_json and val_json")
@@ -628,23 +800,26 @@ def run_bgk_omr_pipeline(
     val_samples = build_staff_samples(Path(val_json), data_root)
     test_samples = build_staff_samples(Path(test_json), data_root) if test_json else []
     expected_test_stems = load_image_stems_from_json(Path(test_json)) if test_json else []
-    print(f"🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)}")
+    labels, label_to_index, index_to_label = build_label_space([*train_samples, *val_samples])
+    print(f"🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)} labels={len(labels)}")
 
+    model = SimpleUNet(out_channels=len(labels)).to(device)
     existing_model = _model_path(Path(load_model_path) if load_model_path else None)
     if existing_model:
         print(f"📦 Loading BGK model from {existing_model}")
         model.load_state_dict(torch.load(existing_model, map_location=device))
     else:
-        _train_model(model, train_samples, val_samples, save_model_path, device, getattr(args, "debug", False))
+        _train_model(model, train_samples, val_samples, label_to_index, save_model_path, device, getattr(args, "debug", False))
 
-    bank = build_prototype_bank(train_samples)
+    neume_templates = build_neume_templates(train_samples)
     page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
-    previous_clef_by_page: Dict[str, Optional[str]] = defaultdict(lambda: None)
+    previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
     for sample in test_samples:
-        baseline, uncertain = _predict_symbols(model, sample, bank, device)
-        tokens, current_clef = _postprocess_staff(baseline, uncertain, previous_clef_by_page[sample.image_stem], sample.dsl)
+        baseline, uncertain = _predict_symbols(model, sample, index_to_label, device)
+        tokens = _postprocess_staff(baseline, uncertain, previous_clef_by_page[sample.image_stem], sample.dsl)
+        decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef_by_page[sample.image_stem], neume_templates)
         previous_clef_by_page[sample.image_stem] = current_clef
         page_texts[sample.image_stem][sample.staff_index] = " ".join(
-            token.description for token in tokens if token.description
+            token.description for token in decoded_tokens if token.description
         )
     _write_predictions(expected_test_stems, page_texts, output_dir)
