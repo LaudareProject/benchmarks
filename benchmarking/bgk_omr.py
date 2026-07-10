@@ -20,8 +20,9 @@ SYMBOL_CATEGORY_NAMES = {"neume", "clef", "custos", "musicDelimiter"}
 LABELS = ["background", "neume", "clef_c", "clef_f", "custos", "delimiter"]
 LABEL_TO_INDEX = {label: idx for idx, label in enumerate(LABELS)}
 INDEX_TO_LABEL = {idx: label for label, idx in LABEL_TO_INDEX.items()}
-FIXED_IMAGE_SIZE = (256, 1024)
+FIXED_IMAGE_HEIGHT = 80
 PROTOTYPE_SIZE = (48, 48)
+PAPER_BASE_CHANNELS = 64
 
 
 @dataclass
@@ -92,7 +93,7 @@ class Up(nn.Module):
 
 
 class SimpleUNet(nn.Module):
-    def __init__(self, in_channels: int = 1, out_channels: int = len(LABELS), base_channels: int = 32):
+    def __init__(self, in_channels: int = 1, out_channels: int = len(LABELS), base_channels: int = PAPER_BASE_CHANNELS):
         super().__init__()
         self.inc = DoubleConv(in_channels, base_channels)
         self.down1 = Down(base_channels, base_channels * 2)
@@ -174,7 +175,7 @@ def _resolve_annotation_source(split_json: Path) -> Dict:
     return master
 
 
-def build_staff_samples(split_json: Path, data_root: Path, margin_ratio: float = 0.25) -> List[StaffSample]:
+def build_staff_samples(split_json: Path, data_root: Path) -> List[StaffSample]:
     data = _resolve_annotation_source(split_json)
     images = {img["id"]: img for img in data.get("images", [])}
     categories = {cat["id"]: cat["name"] for cat in data.get("categories", [])}
@@ -192,12 +193,13 @@ def build_staff_samples(split_json: Path, data_root: Path, margin_ratio: float =
         for staff_index, staff_ann in enumerate(staff_anns):
             x, y, w, h = staff_ann["bbox"]
             dsl = max(8.0, h / 4.0)
-            margin_x = int(max(8, w * margin_ratio * 0.1))
-            margin_y = int(max(8, dsl * 0.8))
-            left = max(0, int(x - margin_x))
-            top = max(0, int(y - margin_y))
-            right = int(x + w + margin_x)
-            bottom = int(y + h + margin_y)
+            margin_y = int(max(1, round(dsl)))
+            margin_right = int(max(1, round(dsl)))
+            margin_left = int(max(1, round(4 * dsl)))
+            left = max(0, int(round(x - margin_left)))
+            top = max(0, int(round(y - margin_y)))
+            right = int(round(x + w + margin_right))
+            bottom = int(round(y + h + margin_y))
             symbols: List[SymbolAnnotation] = []
             for ann in page_anns:
                 category_name = categories.get(ann["category_id"])
@@ -239,8 +241,8 @@ def _load_crop(sample: StaffSample) -> Image.Image:
     return image.crop(sample.crop_box)
 
 
-def _resize_image(image: Image.Image, size: Tuple[int, int]) -> Tuple[np.ndarray, float, float]:
-    target_h, target_w = size
+def _resize_image(image: Image.Image, target_h: int = FIXED_IMAGE_HEIGHT) -> Tuple[np.ndarray, float, float]:
+    target_w = max(1, int(round(image.width * (target_h / max(1, image.height)))))
     resized = image.resize((target_w, target_h), Image.BILINEAR)
     arr = np.asarray(resized, dtype=np.float32) / 255.0
     sx = target_w / image.width
@@ -260,9 +262,9 @@ def _draw_disk(mask: np.ndarray, cx: float, cy: float, radius: int, value: int) 
 
 
 class BGKStaffDataset(Dataset):
-    def __init__(self, samples: Sequence[StaffSample], image_size: Tuple[int, int] = FIXED_IMAGE_SIZE):
+    def __init__(self, samples: Sequence[StaffSample], image_height: int = FIXED_IMAGE_HEIGHT):
         self.samples = list(samples)
-        self.image_size = image_size
+        self.image_height = image_height
 
     def __len__(self) -> int:
         return len(self.samples)
@@ -270,8 +272,8 @@ class BGKStaffDataset(Dataset):
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         sample = self.samples[idx]
         crop = _load_crop(sample)
-        image_arr, sx, sy = _resize_image(crop, self.image_size)
-        mask = np.zeros(self.image_size, dtype=np.int64)
+        image_arr, sx, sy = _resize_image(crop, self.image_height)
+        mask = np.zeros(image_arr.shape, dtype=np.int64)
         radius = max(2, int(round(sample.dsl * sy / 8.0)))
         for symbol in sample.symbols:
             x, y, w, h = symbol.bbox
@@ -284,10 +286,18 @@ class BGKStaffDataset(Dataset):
         }
 
 
+def _pad_to_width(tensor: torch.Tensor, width: int) -> torch.Tensor:
+    pad_width = width - tensor.shape[-1]
+    if pad_width <= 0:
+        return tensor
+    return F.pad(tensor, (0, pad_width))
+
+
 def _collate(batch: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
+    max_width = max(item["image"].shape[-1] for item in batch)
     return {
-        "image": torch.stack([item["image"] for item in batch]),
-        "mask": torch.stack([item["mask"] for item in batch]),
+        "image": torch.stack([_pad_to_width(item["image"], max_width) for item in batch]),
+        "mask": torch.stack([_pad_to_width(item["mask"], max_width) for item in batch]),
     }
 
 
@@ -465,10 +475,10 @@ def _predict_symbols(
     sample: StaffSample,
     bank: Dict[str, List[Tuple[np.ndarray, str]]],
     device: torch.device,
-    image_size: Tuple[int, int] = FIXED_IMAGE_SIZE,
+    image_height: int = FIXED_IMAGE_HEIGHT,
 ) -> Tuple[List[PredictedSymbol], List[PredictedSymbol]]:
     crop = _load_crop(sample)
-    image_arr, sx, sy = _resize_image(crop, image_size)
+    image_arr, sx, sy = _resize_image(crop, image_height)
     image_tensor = torch.from_numpy(image_arr).unsqueeze(0).unsqueeze(0).to(device)
     model.eval()
     with torch.no_grad():
@@ -566,9 +576,9 @@ def _train_model(
 ) -> None:
     train_loader = DataLoader(BGKStaffDataset(train_samples), batch_size=2 if not debug else 1, shuffle=True, collate_fn=_collate)
     val_loader = DataLoader(BGKStaffDataset(val_samples), batch_size=2 if not debug else 1, shuffle=False, collate_fn=_collate)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     best_val = float("inf")
-    epochs = 1 if debug else 8
+    epochs = 1 if debug else 30
     save_model_path.mkdir(parents=True, exist_ok=True)
     out_path = save_model_path / "model.pt"
     for epoch in range(epochs):
