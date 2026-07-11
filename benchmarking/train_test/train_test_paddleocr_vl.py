@@ -1,5 +1,5 @@
 """
-Zero-shot PaddleOCR-VL adapter for OCR smoke tests.
+Zero-shot PaddleOCR-VL adapter for OCR and OMR benchmarks.
 """
 
 import json
@@ -11,7 +11,10 @@ import torch
 from PIL import Image
 from transformers import AutoModelForImageTextToText, AutoProcessor
 
-PROMPT = "OCR:"
+PROMPTS = {
+    "ocr": "OCR:",
+    "omr": "OMR:",
+}
 MAX_PIXELS = 1280 * 28 * 28
 UPSCALE_THRESHOLD = 1500
 
@@ -70,13 +73,13 @@ def _crop_line_image(data_dir: Path, image_info: dict, ann: dict) -> Image.Image
     return image
 
 
-def _prepare_inputs(processor, image: Image.Image, device: torch.device):
+def _prepare_inputs(processor, image: Image.Image, device: torch.device, prompt: str):
     messages = [
         {
             "role": "user",
             "content": [
                 {"type": "image", "image": image},
-                {"type": "text", "text": PROMPT},
+                {"type": "text", "text": prompt},
             ],
         }
     ]
@@ -117,10 +120,12 @@ def predict(args, model, processor, device, output_dir, test_json):
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    prompt = PROMPTS.get(args.task, f"{args.task.upper()}:")
+
     for index, ann in enumerate(annotations, start=1):
         image_info = image_map[ann["image_id"]]
         image = _crop_line_image(data_dir, image_info, ann)
-        inputs = _prepare_inputs(processor, image, device)
+        inputs = _prepare_inputs(processor, image, device, prompt)
 
         with torch.no_grad():
             outputs = model.generate(**inputs, max_new_tokens=256)
@@ -152,10 +157,10 @@ def train_test_paddleocr_vl(
     load_model_path,
     model_identifier,
 ):
-    if args.task != "ocr":
-        raise ValueError("paddleocr_vl currently supports only task=ocr")
+    if args.task not in {"ocr", "omr"}:
+        raise ValueError("paddleocr_vl supports only task=ocr|omr")
 
-    print("⚠️  Zero-shot smoke-test adapter: training is skipped.")
+    print(f"⚠️  Zero-shot adapter: training is skipped for task={args.task}.")
 
     if test_json is None:
         print("⏭️  No test split provided; nothing to run.")
