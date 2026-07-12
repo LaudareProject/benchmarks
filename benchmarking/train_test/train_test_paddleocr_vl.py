@@ -344,14 +344,13 @@ def load_model(model_identifier, load_model_path):
 
     if load_model_path and Path(load_model_path).exists():
         model_source = str(load_model_path)
-        processor_source = str(load_model_path)
         print(f"   Fine-tuning from checkpoint: {model_source}")
     else:
         model_source = model_identifier
-        processor_source = model_identifier
         print(f"   Loading base model: {model_source}")
 
-    processor = AutoProcessor.from_pretrained(processor_source, use_fast=False)
+    processor = AutoProcessor.from_pretrained(model_identifier, use_fast=False)
+
     model = PaddleOCRVLForConditionalGeneration.from_pretrained(
         model_source,
         dtype=dtype,
