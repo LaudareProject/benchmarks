@@ -58,6 +58,14 @@
       "v1": "PaddlePaddle/PaddleOCR-VL"
     }
   },
+  "vlt": {
+    "ocr": {
+      "default": "microsoft/trocr-small-handwritten"
+    },
+    "omr": {
+      "default": "microsoft/trocr-small-handwritten"
+    }
+  },
   "bgk": {
     "omr": {
       "default": "yolov8s.pt",

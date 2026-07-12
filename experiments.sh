@@ -153,6 +153,10 @@ COMMON_ARGS="$DEBUG_FLAG $DEVICE_FLAG"
 ./run.sh --framework paddleocr_vl --task ocr --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework bgk --task omr --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework bgk --task omr --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework doclayout_yolo --task layout --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
@@ -198,6 +202,10 @@ COMMON_ARGS="$DEBUG_FLAG $DEVICE_FLAG"
 ./run.sh --framework paddleocr_vl --task ocr --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework bgk --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework bgk --task omr --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework doclayout_yolo --task layout --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
@@ -216,6 +224,8 @@ COMMON_ARGS="$DEBUG_FLAG $DEVICE_FLAG"
 # ./run.sh --framework calamari --task omr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task ocr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework bgk --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 
 #@@@@@@@@@@@@@@
@@ -242,6 +252,8 @@ fi
 # ./run.sh --framework yolo --task layout --model-name "yolov8s" --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task ocr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 ./run.sh --framework bgk --task omr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 ./run.sh --framework doclayout_yolo --task layout --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 
@@ -254,5 +266,7 @@ fi
 # ./run.sh --framework yolo --task layout --model-name "yolov8s" --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task ocr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 ./run.sh --framework bgk --task omr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 ./run.sh --framework doclayout_yolo --task layout --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
