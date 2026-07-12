@@ -61,6 +61,8 @@ FRAMEWORK_DISPLAY_NAMES = {
     "trocr_ocr_large": "TrOCR-Large",
     "trocr_omr_small": "TrOCR-Small",
     "trocr_omr_large": "TrOCR-Large",
+    "dtrocr_ocr_default": "DTrOCR",
+    "dtrocr_omr_default": "DTrOCR",
     "paddleocr_vl_ocr_default": "PaddleOCR-VL",
     "paddleocr_vl_omr_default": "PaddleOCR-VL",
     "vlt_ocr_default": "VLT",

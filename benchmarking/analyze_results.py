@@ -16,9 +16,9 @@ def get_frameworks_for_task(task):
     if task == "layout":
         return ["detr", "faster_rcnn", "yolo", "doclayout_yolo"]
     elif task == "ocr":
-        return ["kraken", "calamari", "trocr", "paddleocr_vl", "vlt"]
+        return ["kraken", "calamari", "trocr", "dtrocr", "paddleocr_vl", "vlt"]
     elif task == "omr":
-        return ["kraken", "calamari", "trocr", "paddleocr_vl", "vlt", "bgk"]
+        return ["kraken", "calamari", "trocr", "dtrocr", "paddleocr_vl", "vlt", "bgk"]
     return []
 
 

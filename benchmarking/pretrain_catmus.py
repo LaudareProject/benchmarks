@@ -13,7 +13,7 @@ DEFAULT_DATASET_DIR = PROJECT_ROOT / "data" / "CATMuS_medieval"
 DEFAULT_CHECKPOINT_DIR = PROJECT_ROOT / "models" / "catmus"
 DEFAULT_RESULTS_DIR = PROJECT_ROOT / "results" / "catmus_pretrain"
 
-SUPPORTED_FRAMEWORKS = ("kraken", "calamari", "trocr", "paddleocr_vl", "vlt")
+SUPPORTED_FRAMEWORKS = ("kraken", "calamari", "trocr", "dtrocr", "paddleocr_vl", "vlt")
 RECOGNITION_TASKS = ("ocr", "omr")
 TASK_CATEGORY_IDS = {"ocr": 6, "omr": 5}
 FRAMEWORK_SUFFIXES = {
