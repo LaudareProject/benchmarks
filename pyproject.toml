@@ -25,7 +25,7 @@ dependencies = [
   "tiktoken>=0.12.0",
   "timm>=1.0.19",
   "torchvision>=0.22.1",
-  "transformers[torch]>=4.48.3",
+  "transformers[torch]>=5.0.0",
   "ultralytics>=8.3.204",
   "werpy>=3.3.0",
 ]
@@ -33,7 +33,7 @@ dependencies = [
 [tool.uv.sources]
 fastwer = { git = "https://github.com/00sapo/fastwer.git", rev = "9cc6bd33bfa2f0912f04f87eb29cb9816da0bf99" }
 augraphy = { git = "https://github.com/sparkfish/augraphy" }
-dtrocr = { git = "https://github.com/00sapo/DTrOCR.git", rev = "0849214fa1e87fe8397882c80966d9c763e16585" }
+dtrocr = { git = "https://github.com/00sapo/DTrOCR.git", rev = "68967e1b76f45fec18cde4db469152f833d228e1" }
 
 [dependency-groups]
 dev = ["ipdb>=0.13.13", "notebook>=7.3.3", "py-spy>=0.4.0"]
