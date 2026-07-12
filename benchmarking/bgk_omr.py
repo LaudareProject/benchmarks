@@ -816,28 +816,25 @@ def _train_yolo_model(
     existing_model = _model_path(load_model_path)
     model_source = str(existing_model) if existing_model else model_identifier
     model = YOLO(model_source)
-    if existing_model is None:
-        epochs = 1 if debug else 30
-        model.train(
-            data=str(artifacts_dir / "dataset" / "data.yaml"),
-            epochs=epochs,
-            patience=10,
-            imgsz=960,
-            project=str(artifacts_dir),
-            name="train",
-            exist_ok=True,
-            device="cuda:0" if torch.cuda.is_available() else "cpu",
-            batch=8 if not debug else 4,
-            workers=2,
-            lr0=0.01,
-        )
-        best_model_path = artifacts_dir / "train" / "weights" / "best.pt"
-        if not best_model_path.exists():
-            best_model_path = artifacts_dir / "train" / "weights" / "last.pt"
-        save_model_path.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(best_model_path, save_model_path / "model.pt")
-    else:
-        best_model_path = existing_model
+    epochs = 1 if debug else 30
+    model.train(
+        data=str(artifacts_dir / "dataset" / "data.yaml"),
+        epochs=epochs,
+        patience=10,
+        imgsz=960,
+        project=str(artifacts_dir),
+        name="train",
+        exist_ok=True,
+        device="cuda:0" if torch.cuda.is_available() else "cpu",
+        batch=8 if not debug else 4,
+        workers=2,
+        lr0=0.01,
+    )
+    best_model_path = artifacts_dir / "train" / "weights" / "best.pt"
+    if not best_model_path.exists():
+        best_model_path = artifacts_dir / "train" / "weights" / "last.pt"
+    save_model_path.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(best_model_path, save_model_path / "model.pt")
     return best_model_path, artifacts_dir, mappings
 
 
