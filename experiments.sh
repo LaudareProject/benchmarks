@@ -43,6 +43,7 @@ validate_data_dir() {
 while [[ $# -gt 0 ]]; do
     case $1 in
         --debug)
+            set -e
             DEBUG_FLAG="--debug"
             shift
             ;;
