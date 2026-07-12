@@ -8,6 +8,60 @@ Faster-RCNN) through a standardized interface that allows seamless integration o
 It uses COCO-based annotations for representing the ground-truth data and generates the necessary
 splits in a reproducible way.
 
+## Pipeline Benchmarking
+
+### Overview
+
+End-to-end pipeline evaluation: layout detection → crop extraction → OCR/OMR recognition.
+
+### Usage
+
+```bash
+# Pipeline: layout framework + text framework (both required)
+uv run python3 -m benchmarking.run_pipeline_benchmark \
+  --framework yolo+trocr \
+  --model-name yolov8n+large \
+  --data-dir data/I-Ct_91 \
+  --fold 0
+
+# E2E: single framework, text tasks only (no layout evaluation)
+uv run python3 -m benchmarking.run_pipeline_benchmark \
+  --framework paddleocr_vl_e2e \
+  --data-dir data/I-Ct_91
+```
+
+### Architecture
+
+**Pipeline (2-fw mode)**: `--framework fw1+fw2 --model-name m1+m2` (m2 optional → default)
+1. Stage 1: Layout (`fw1`) trains on GT, predicts regions → PageXML
+2. Convert PageXML → COCO JSON (predicted bboxes per task)
+3. Stage 2a: OCR (`fw2`) trains on GT crops, tests on predicted crops
+4. Stage 2b: OMR (`fw2`) trains on GT crops, tests on predicted crops
+5. Evaluate: layout (Stage 1 PageXML vs GT), OCR/OMR (Stage 2 text vs GT)
+
+**E2E (1-fw mode)**: `--framework fw_e2e`—no layout, OCR/OMR only.
+
+### Key details
+
+- **Isolation**: Pipeline predictions go to `pipeline_{fw1}+{fw2}__{fw_task_model}/predictions/` (separate from standalone runs)
+- **Weights reuse**: `save_model_path` shared; trained weights are cached across pipeline/standalone
+- **Ground-truth matching**: OCR/OMR train on GT, test on predicted regions; evaluation still uses original GT JSON for metrics
+- **Region selection**: TextLine elements preferred from PageXML; falls back to all regions if absent
+- **Empty results**: handled gracefully (zero annotations → test skip)
+
+### Flags
+
+- `--task layout`/`ocr`/`omr`: restrict to single stage (omit for all applicable)
+- `--enable-pretrain`: pre-train on synthetic data before fine-tuning
+- `--sequential-step`: sequential learning within pipeline
+- All other flags from `run_single_fold_benchmark.py` supported
+
+### Output
+
+Each stage emits:
+- `{stage}_evaluation.json`: metrics (AP for layout, WER/CER for text)
+- `predictions/`: PageXML (layout) or `.pred.txt` (text)
+
 ## Add a Custom Dataset
 
 ### Dataset Structure Requirements

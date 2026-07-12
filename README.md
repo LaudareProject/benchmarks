@@ -49,6 +49,26 @@ Install system dependencies:
 
 You can also run more specific experiments (see the Help file) and/or add your own framework.
 
+### End-to-End Pipeline Benchmarking
+
+Run full-pipeline evaluation (layout → crop → OCR/OMR) with:
+
+```bash
+# Pipeline mode: layout_fw + text_fw, optional text_model
+uv run python3 -m benchmarking.run_pipeline_benchmark \
+  --framework yolo+trocr \
+  --model-name yolov8n+large \
+  --data-dir data/I-Ct_91 \
+  --fold 0 --edition diplomatic
+
+# E2E mode: single framework, evaluate text tasks only
+uv run python3 -m benchmarking.run_pipeline_benchmark \
+  --framework paddleocr_vl_e2e \
+  --data-dir data/I-Ct_91
+```
+
+**Pipeline mode** stages layout detection, converts PageXML predictions → COCO JSON, runs OCR/OMR on predicted regions, evaluates all three tasks. Results go to `results/{exp_id}/pipeline_{layout_fw}+{text_fw}__{fw_task_model}/`. **E2E mode** runs OCR/OMR without layout. Use `--task layout` / `--task ocr` / `--task omr` to restrict stages. Reuses trained weights across standalone/pipeline runs.
+
 3. **Review Results**:
     - Benchmark results for the single fold run will be stored in subdirectories under `benchmarking/results/diplomatic/fold_test_0/`.
     - Log files for each tool and task will also be available.
