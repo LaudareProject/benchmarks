@@ -25,6 +25,14 @@
       "large": "microsoft/trocr-large-handwritten"
     }
   },
+  "dtrocr": {
+    "ocr": {
+      "default": "paper_dtrocr"
+    },
+    "omr": {
+      "default": "paper_dtrocr"
+    }
+  },
   "detr": {
     "layout": {
       "default": "facebook/detr-resnet-50"
@@ -60,10 +68,10 @@
   },
   "vlt": {
     "ocr": {
-      "default": "microsoft/trocr-small-handwritten"
+      "default": "paper_vlt"
     },
     "omr": {
-      "default": "microsoft/trocr-small-handwritten"
+      "default": "paper_vlt"
     }
   },
   "bgk": {
