@@ -764,6 +764,8 @@ def _write_yolo_label(sample: StaffSample, label_dir: Path, label_to_index: Dict
 def _prepare_yolo_split(samples: Sequence[StaffSample], split_dir: Path, label_to_index: Dict[str, int]) -> Dict[str, StaffSample]:
     image_dir = split_dir / "images"
     label_dir = split_dir / "labels"
+    image_dir.mkdir(parents=True, exist_ok=True)
+    label_dir.mkdir(parents=True, exist_ok=True)
     mapping: Dict[str, StaffSample] = {}
     for sample in samples:
         image_path, crop = _save_yolo_crop(sample, image_dir)
@@ -782,9 +784,10 @@ def _prepare_yolo_dataset(
     dataset_dir = artifacts_dir / "dataset"
     detector_labels = [label for label in labels if label != "background"]
     detector_label_to_index = {label: idx for idx, label in enumerate(detector_labels)}
+    val_split_samples = val_samples if val_samples else train_samples
     mappings = {
         "train": _prepare_yolo_split(train_samples, dataset_dir / "train", detector_label_to_index),
-        "val": _prepare_yolo_split(val_samples, dataset_dir / "val", detector_label_to_index),
+        "val": _prepare_yolo_split(val_split_samples, dataset_dir / "val", detector_label_to_index),
         "test": _prepare_yolo_split(test_samples, dataset_dir / "test", detector_label_to_index),
     }
     yaml_path = dataset_dir / "data.yaml"
