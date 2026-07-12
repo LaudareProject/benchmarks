@@ -5,8 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11, <3.12"
 dependencies = [
+  "albumentations>=2.0.8",
   "augraphy>=8.2.6",
   "datasets>=5.0.0",
+  "dtrocr",
   "fastwer>=0.1.3",
   "jinja2>=3.1.4",
   "lxml>=5.3.2",
@@ -15,6 +17,7 @@ dependencies = [
   "pycocotools>=2.0.11",
   "pymupdf>=1.26.3",
   "pyyaml>=6.0.2",
+  "rapidfuzz>=3.14.5",
   "requests>=2.32.3",
   "requests-cache>=1.2.1",
   "scikit-learn>=1.8.0",
@@ -30,6 +33,7 @@ dependencies = [
 [tool.uv.sources]
 fastwer = { git = "https://github.com/00sapo/fastwer.git", rev = "9cc6bd33bfa2f0912f04f87eb29cb9816da0bf99" }
 augraphy = { git = "https://github.com/sparkfish/augraphy" }
+dtrocr = { git = "https://github.com/00sapo/DTrOCR.git", rev = "0849214fa1e87fe8397882c80966d9c763e16585" }
 
 [dependency-groups]
 dev = ["ipdb>=0.13.13", "notebook>=7.3.3", "py-spy>=0.4.0"]
