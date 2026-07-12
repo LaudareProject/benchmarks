@@ -14,11 +14,11 @@ EXPERIMENT_ID = os.environ.get("LAUDARE_EXPERIMENT_ID", "default")
 def get_frameworks_for_task(task):
     """Returns a list of frameworks applicable to a given task."""
     if task == "layout":
-        return ["kraken", "faster_rcnn", "yolo", "detr"]
+        return ["detr", "faster_rcnn", "yolo", "doclayout_yolo"]
     elif task == "ocr":
-        return ["kraken", "calamari", "trocr"]
+        return ["kraken", "calamari", "trocr", "paddleocr_vl", "vlt"]
     elif task == "omr":
-        return ["kraken", "calamari", "trocr", "bgk"]
+        return ["kraken", "calamari", "trocr", "paddleocr_vl", "vlt", "bgk"]
     return []
 
 
@@ -208,7 +208,19 @@ def main():
         "--framework",
         type=str,
         required=True,
-        choices=["kraken", "calamari", "faster_rcnn", "yolo", "trocr", "detr", "bgk", "all"],
+        choices=[
+            "kraken",
+            "calamari",
+            "faster_rcnn",
+            "yolo",
+            "doclayout_yolo",
+            "trocr",
+            "paddleocr_vl",
+            "vlt",
+            "detr",
+            "bgk",
+            "all",
+        ],
     )
     parser.add_argument(
         "--task", type=str, required=True, choices=["ocr", "omr", "layout"]

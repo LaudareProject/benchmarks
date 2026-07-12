@@ -61,6 +61,10 @@ FRAMEWORK_DISPLAY_NAMES = {
     "trocr_ocr_large": "TrOCR-Large",
     "trocr_omr_small": "TrOCR-Small",
     "trocr_omr_large": "TrOCR-Large",
+    "paddleocr_vl_ocr_default": "PaddleOCR-VL",
+    "paddleocr_vl_omr_default": "PaddleOCR-VL",
+    "vlt_ocr_default": "VLT",
+    "vlt_omr_default": "VLT",
     "bgk_omr_default": "BGK-OMR (Calamari)",
     "bgk_omr_kraken": "BGK-OMR (Kraken)",
     "bgk_omr_trocr_large": "BGK-OMR (TrOCR-Large)",
@@ -70,6 +74,8 @@ FRAMEWORK_DISPLAY_NAMES = {
     "faster_rcnn_layout_mobilenet": "Faster R-CNN (MobileNet)",
     "faster_rcnn_layout_resnet50": "Faster R-CNN (ResNet-50)",
     "detr_layout_default": "DETR",
+    "doclayout_yolo_layout_default": "DocLayout-YOLO",
+    "doclayout_yolo_layout_official": "DocLayout-YOLO (official)",
 }
 
 

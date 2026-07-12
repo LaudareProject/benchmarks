@@ -47,6 +47,10 @@ COLORS = {
     "magenta": "#DC267F",
     "orange": "#FE6100",
     "yellow": "#FFB000",
+    "green": "#4DAF4A",
+    "teal": "#00A6A6",
+    "red": "#E41A1C",
+    "cyan": "#00BFA5",
 }
 
 # Publication-ready display names for frameworks
@@ -59,6 +63,12 @@ FRAMEWORK_DISPLAY_NAMES = {
     "bgk_omr_default": "BGK-OMR (Calamari)",
     "bgk_omr_kraken": "BGK-OMR (Kraken)",
     "bgk_omr_trocr_large": "BGK-OMR (TrOCR-Large)",
+    "paddleocr_vl_ocr_default": "PaddleOCR-VL",
+    "paddleocr_vl_omr_default": "PaddleOCR-VL",
+    "vlt_ocr_default": "VLT",
+    "vlt_omr_default": "VLT",
+    "doclayout_yolo_layout_default": "DocLayout-YOLO",
+    "doclayout_yolo_layout_official": "DocLayout-YOLO (official)",
     # Pretrained variants
     "trocr_small_pretrained": "TrOCR-Small (pretrained)",
     "trocr_large_pretrained": "TrOCR-Large (pretrained)",
@@ -80,6 +90,10 @@ FRAMEWORK_COLORS = {
     "trocr_large": COLORS["purple"],
     "calamari": COLORS["magenta"],
     "kraken": COLORS["orange"],
+    "paddleocr_vl_ocr_default": COLORS["green"],
+    "paddleocr_vl_omr_default": COLORS["green"],
+    "vlt_ocr_default": COLORS["cyan"],
+    "vlt_omr_default": COLORS["cyan"],
     "bgk_omr_default": COLORS["green"],
     "bgk_omr_kraken": COLORS["teal"],
     "bgk_omr_trocr_large": COLORS["red"],
@@ -90,6 +104,8 @@ FRAMEWORK_COLORS = {
     "faster_rcnn_layout_mobilenet": COLORS["magenta"],
     "faster_rcnn_layout_resnet50": COLORS["orange"],
     "detr": COLORS["yellow"],
+    "doclayout_yolo_layout_default": COLORS["teal"],
+    "doclayout_yolo_layout_official": COLORS["teal"],
 }
 
 # Metric display names with proper formatting
