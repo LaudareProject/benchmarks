@@ -486,8 +486,8 @@ wheels = [
 
 [[package]]
 name = "dtrocr"
-version = "0.1.1"
-source = { git = "https://github.com/00sapo/DTrOCR.git?rev=68967e1b76f45fec18cde4db469152f833d228e1#68967e1b76f45fec18cde4db469152f833d228e1" }
+version = "0.1.4"
+source = { git = "https://github.com/00sapo/DTrOCR.git?rev=f9d298937ebf369c1177d5a939bad826f818cb58#f9d298937ebf369c1177d5a939bad826f818cb58" }
 dependencies = [
     { name = "pillow" },
     { name = "torch" },
@@ -1091,7 +1091,7 @@ requires-dist = [
     { name = "albumentations", specifier = ">=2.0.8" },
     { name = "augraphy", git = "https://github.com/sparkfish/augraphy" },
     { name = "datasets", specifier = ">=5.0.0" },
-    { name = "dtrocr", git = "https://github.com/00sapo/DTrOCR.git?rev=68967e1b76f45fec18cde4db469152f833d228e1" },
+    { name = "dtrocr", git = "https://github.com/00sapo/DTrOCR.git?rev=f9d298937ebf369c1177d5a939bad826f818cb58" },
     { name = "fastwer", git = "https://github.com/00sapo/fastwer.git?rev=9cc6bd33bfa2f0912f04f87eb29cb9816da0bf99" },
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "lxml", specifier = ">=5.3.2" },

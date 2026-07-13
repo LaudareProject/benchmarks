@@ -33,7 +33,7 @@ dependencies = [
 [tool.uv.sources]
 fastwer = { git = "https://github.com/00sapo/fastwer.git", rev = "9cc6bd33bfa2f0912f04f87eb29cb9816da0bf99" }
 augraphy = { git = "https://github.com/sparkfish/augraphy" }
-dtrocr = { git = "https://github.com/00sapo/DTrOCR.git", rev = "68967e1b76f45fec18cde4db469152f833d228e1" }
+dtrocr = { git = "https://github.com/00sapo/DTrOCR.git", rev = "f9d298937ebf369c1177d5a939bad826f818cb58" }
 
 [dependency-groups]
 dev = ["ipdb>=0.13.13", "notebook>=7.3.3", "py-spy>=0.4.0"]

@@ -15,6 +15,7 @@ from ..utils import load_image_stems_from_json, save_text_predictions
 
 try:
     from dtrocr.config import DTrOCRConfig
+    from dtrocr.data import DTrOCRProcessorOutput
     from dtrocr.model import DTrOCRLMHeadModel
     from dtrocr.processor import DTrOCRProcessor
 except ImportError as exc:
@@ -22,11 +23,22 @@ except ImportError as exc:
         "DTrOCR is not installed. Run `uv sync` and execute benchmarks via `uv run` so the pinned git dependency is available."
     ) from exc
 
+
 MAX_TARGET_LENGTH = 128
 DEFAULT_BATCH_SIZE = 8
 DEFAULT_EPOCHS = 10
 DEFAULT_LR = 5.0e-5
 DEFAULT_WEIGHT_DECAY = 1.0e-4
+
+
+def _encode_sample(processor, image: Image.Image, text: str, max_target_length: int) -> dict[str, torch.Tensor]:
+    encoded = processor.encode_sample(image, text, max_target_length)
+    return {
+        "pixel_values": encoded.pixel_values,
+        "input_ids": encoded.input_ids.long(),
+        "attention_mask": encoded.attention_mask.long(),
+        "labels": encoded.labels.long(),
+    }
 
 
 class DTrOCRDataset(Dataset):
@@ -64,21 +76,12 @@ class DTrOCRDataset(Dataset):
         w = min(full_image.shape[1] - x, w + 2 * margin)
         h = min(full_image.shape[0] - y, h + 2 * margin)
         line_image = cv2.cvtColor(full_image[y:y + h, x:x + w], cv2.COLOR_BGR2RGB)
-        encoding = self.processor(
-            images=Image.fromarray(line_image),
-            texts=text,
-            padding="max_length",
-            max_length=self.max_target_length,
-            truncation=True,
-            return_tensors="pt",
-            return_labels=True,
+        return _encode_sample(
+            self.processor,
+            Image.fromarray(line_image),
+            text,
+            self.max_target_length,
         )
-        return {
-            "pixel_values": encoding["pixel_values"].squeeze(0),
-            "input_ids": torch.tensor(encoding["input_ids"]).squeeze(0),
-            "attention_mask": torch.tensor(encoding["attention_mask"]).squeeze(0),
-            "labels": torch.tensor(encoding["labels"]).squeeze(0),
-        }
 
 
 class DTrOCRTrainer:
@@ -89,7 +92,10 @@ class DTrOCRTrainer:
         path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
         torch.save(self.model.state_dict(), path / "model.pt")
-        (path / "model_config.json").write_text(json.dumps(self.model.config.__dict__, ensure_ascii=False, indent=2), encoding="utf-8")
+        (path / "model_config.json").write_text(
+            json.dumps(self.model.config.to_dict(), ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
 
 
 def _collate_batch(features):
@@ -111,6 +117,10 @@ def _resolve_epochs(args, adaptation_mode: bool) -> int:
     return max(1, base // 2) if adaptation_mode else base
 
 
+def _generation_inputs(moved: dict[str, torch.Tensor], processor) -> DTrOCRProcessorOutput:
+    return processor.build_generation_inputs(moved["pixel_values"])
+
+
 def _evaluate(model, processor, dataset, device, batch_size) -> tuple[float, float, float]:
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=0, collate_fn=_collate_batch)
     losses: list[float] = []
@@ -124,12 +134,9 @@ def _evaluate(model, processor, dataset, device, batch_size) -> tuple[float, flo
             if outputs.loss is not None:
                 losses.append(float(outputs.loss.detach().cpu()))
             generated = model.generate(
-                inputs={
-                    "pixel_values": moved["pixel_values"],
-                    "input_ids": moved["input_ids"][:, :1],
-                    "attention_mask": moved["attention_mask"][:, :1],
-                },
+                inputs=_generation_inputs(moved, processor),
                 processor=processor,
+                num_beams=4,
             )
             predictions.extend(processor.tokeniser.batch_decode(generated.detach().cpu(), skip_special_tokens=True))
             references.extend(processor.tokeniser.batch_decode(batch["labels"], skip_special_tokens=True))
@@ -146,14 +153,14 @@ def load_model(model_identifier, load_model_path):
         model_to_load = Path(load_model_path)
         print(f"   Fine-tuning from checkpoint: {model_to_load}")
         payload = json.loads((model_to_load / "model_config.json").read_text(encoding="utf-8"))
-        config = DTrOCRConfig(**payload)
-        processor = DTrOCRProcessor(config)
+        config = DTrOCRConfig.from_dict(payload)
+        processor = DTrOCRProcessor(config, add_bos_token=True, add_eos_token=True)
         model = DTrOCRLMHeadModel(config)
         model.load_state_dict(torch.load(model_to_load / "model.pt", map_location="cpu"))
     else:
         print(f"   Loading base model preset: {model_identifier}")
         config = DTrOCRConfig()
-        processor = DTrOCRProcessor(config)
+        processor = DTrOCRProcessor(config, add_bos_token=True, add_eos_token=True)
         model = DTrOCRLMHeadModel(config)
     model.to(device)
     return model, processor, device
@@ -216,12 +223,9 @@ def predict(args, model, processor, output_dir: Path, test_json):
         for batch in dataloader:
             moved = {key: value.to(device) for key, value in batch.items()}
             generated = model.generate(
-                inputs={
-                    "pixel_values": moved["pixel_values"],
-                    "input_ids": moved["input_ids"][:, :1],
-                    "attention_mask": moved["attention_mask"][:, :1],
-                },
+                inputs=_generation_inputs(moved, processor),
                 processor=processor,
+                num_beams=4,
             )
             pred_str = processor.tokeniser.batch_decode(generated.detach().cpu(), skip_special_tokens=True)
             for i, prediction in enumerate(pred_str):
