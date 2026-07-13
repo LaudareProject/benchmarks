@@ -215,6 +215,7 @@ def main():
             "yolo",
             "doclayout_yolo",
             "trocr",
+            "dtrocr",
             "paddleocr_vl",
             "vlt",
             "detr",

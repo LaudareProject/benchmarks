@@ -95,6 +95,16 @@ def _ensure_tensors(inputs) -> dict[str, torch.Tensor]:
     return output
 
 
+def _resolve_shortest_edge(processor) -> int:
+    image_processor = processor.image_processor
+    shortest_edge = getattr(image_processor, "min_pixels", None)
+    if shortest_edge is None:
+        shortest_edge = getattr(getattr(image_processor, "size", None), "shortest_edge", None)
+    if shortest_edge is None:
+        raise AttributeError("Could not resolve PaddleOCR-VL shortest_edge from processor.image_processor")
+    return int(shortest_edge)
+
+
 def _prepare_inputs(processor, image: Image.Image, prompt: str, target_text: Optional[str] = None):
     messages = [
         {
@@ -122,7 +132,7 @@ def _prepare_inputs(processor, image: Image.Image, prompt: str, target_text: Opt
         return_tensors="pt",
         images_kwargs={
             "size": {
-                "shortest_edge": processor.image_processor.min_pixels,
+                "shortest_edge": _resolve_shortest_edge(processor),
                 "longest_edge": MAX_PIXELS,
             }
         },
@@ -192,6 +202,7 @@ class PaddleOCRVLTrainDataset(Dataset):
         return {
             "input_ids": full_inputs["input_ids"].squeeze(0).long(),
             "attention_mask": full_inputs["attention_mask"].squeeze(0).long(),
+            "mm_token_type_ids": full_inputs["mm_token_type_ids"].squeeze(0).long(),
             "pixel_values": full_inputs["pixel_values"].float(),
             "image_grid_thw": full_inputs["image_grid_thw"].reshape(-1, 3).long(),
             "labels": labels,
@@ -231,6 +242,7 @@ class PaddleOCRVLPredictDataset(Dataset):
         return {
             "input_ids": inputs["input_ids"].squeeze(0).long(),
             "attention_mask": inputs["attention_mask"].squeeze(0).long(),
+            "mm_token_type_ids": inputs["mm_token_type_ids"].squeeze(0).long(),
             "pixel_values": inputs["pixel_values"].float(),
             "image_grid_thw": inputs["image_grid_thw"].reshape(-1, 3).long(),
             "image_stem": sample["image_stem"],
@@ -251,6 +263,7 @@ class PaddleOCRVLCollator:
         labels = []
         pixel_values = []
         image_grid_thw = []
+        mm_token_type_ids = []
         image_stems = []
 
         for feature in features:
@@ -264,10 +277,17 @@ class PaddleOCRVLCollator:
                 (pad_len,), dtype=feature["attention_mask"].dtype
             )
 
+            mm_token_type_pad = torch.zeros(
+                (pad_len,), dtype=feature["mm_token_type_ids"].dtype
+            )
+
             if self.pad_side == "left":
                 input_ids.append(torch.cat([input_id_pad, feature["input_ids"]], dim=0))
                 attention_masks.append(
                     torch.cat([attention_pad, feature["attention_mask"]], dim=0)
+                )
+                mm_token_type_ids.append(
+                    torch.cat([mm_token_type_pad, feature["mm_token_type_ids"]], dim=0)
                 )
                 if self.with_labels:
                     label_pad = torch.full((pad_len,), -100, dtype=feature["labels"].dtype)
@@ -276,6 +296,9 @@ class PaddleOCRVLCollator:
                 input_ids.append(torch.cat([feature["input_ids"], input_id_pad], dim=0))
                 attention_masks.append(
                     torch.cat([feature["attention_mask"], attention_pad], dim=0)
+                )
+                mm_token_type_ids.append(
+                    torch.cat([feature["mm_token_type_ids"], mm_token_type_pad], dim=0)
                 )
                 if self.with_labels:
                     label_pad = torch.full((pad_len,), -100, dtype=feature["labels"].dtype)
@@ -289,6 +312,7 @@ class PaddleOCRVLCollator:
         batch = {
             "input_ids": torch.stack(input_ids, dim=0),
             "attention_mask": torch.stack(attention_masks, dim=0),
+            "mm_token_type_ids": torch.stack(mm_token_type_ids, dim=0),
             "pixel_values": torch.cat(pixel_values, dim=0),
             "image_grid_thw": torch.cat(image_grid_thw, dim=0),
         }
