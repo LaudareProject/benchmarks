@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import re
 import shutil
 import tempfile
+from collections import Counter
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
+import matplotlib.pyplot as plt
+import seaborn as sns
 import numpy as np
 import torch
 import yaml
@@ -139,6 +144,7 @@ def _load_coco(json_path: Path) -> Dict:
     return json.loads(json_path.read_text(encoding="utf-8"))
 
 
+
 def _pitch_to_value(token: str) -> int:
     match = PITCH_RE.fullmatch(token)
     if match is None:
@@ -249,27 +255,24 @@ def _annotation_center(bbox: Sequence[float]) -> Tuple[float, float]:
 def _resolve_annotation_source(split_json: Path) -> Dict:
     data = _load_coco(split_json)
     categories = {cat["id"]: cat["name"] for cat in data.get("categories", [])}
-    present = {categories.get(ann["category_id"]) for ann in data.get("annotations", [])}
-    if {"staff", "neume", "clef", "custos", "musicDelimiter"}.issubset(present):
+    sym_cats = {"neume", "clef", "custos", "musicDelimiter"}
+    sym_present = any(categories.get(ann.get("category_id")) in sym_cats for ann in data.get("annotations", []))
+    if sym_present:
         return data
-    master_json = None
+    gt_json = None
     for parent in split_json.parents:
         candidate = parent / "gt.json"
         if candidate.exists():
-            master_json = candidate
+            gt_json = candidate
             break
-    if master_json is None:
+    if gt_json is None:
         return data
-    master = _load_coco(master_json)
+    master = _load_coco(gt_json)
     image_ids = {img["id"] for img in data.get("images", [])}
-    image_ids.update(ann["image_id"] for ann in data.get("annotations", []))
-    file_names = {img["file_name"] for img in data.get("images", [])}
-    master["images"] = [
-        img for img in master.get("images", [])
-        if img["id"] in image_ids or img.get("file_name") in file_names
-    ]
+    master["images"] = [img for img in master.get("images", []) if img["id"] in image_ids]
     master_ids = {img["id"] for img in master["images"]}
     master["annotations"] = [ann for ann in master.get("annotations", []) if ann["image_id"] in master_ids]
+    master["categories"] = master.get("categories", data.get("categories", []))
     return master
 
 
@@ -303,15 +306,16 @@ def build_staff_samples(split_json: Path, data_root: Path) -> List[StaffSample]:
                 category_name = categories.get(ann["category_id"])
                 if category_name not in SYMBOL_CATEGORY_NAMES:
                     continue
-                description = (ann.get("description") or "").strip()
-                if not description:
-                    continue
+                description = (ann.get("description") or ann.get("text") or "").strip()
                 center = _annotation_center(ann["bbox"])
                 if not _center_in_bbox(center, staff_ann["bbox"]):
                     continue
                 label = _label_from_annotation(category_name, description)
                 if label is None:
-                    continue
+                    if category_name in {"custos", "musicDelimiter"}:
+                        label = "custos" if category_name == "custos" else "delimiter_1"
+                    else:
+                        continue
                 ax, ay, aw, ah = ann["bbox"]
                 symbols.append(
                     SymbolAnnotation(
@@ -320,8 +324,7 @@ def build_staff_samples(split_json: Path, data_root: Path) -> List[StaffSample]:
                         bbox=(ax - left, ay - top, aw, ah),
                     )
                 )
-            if symbols:
-                samples.append(
+            samples.append(
                     StaffSample(
                         image_path=image_path,
                         image_stem=image_stem,
@@ -738,7 +741,12 @@ def _model_path(path: Optional[Path]) -> Optional[Path]:
 def _save_yolo_crop(sample: StaffSample, image_dir: Path) -> Tuple[Path, Image.Image]:
     image_dir.mkdir(parents=True, exist_ok=True)
     image_path = image_dir / f"{sample.image_stem}_staff{sample.staff_index:02d}.png"
+    src = sample.image_path
+    if not src.exists():
+        raise FileNotFoundError(f"Source image not found: {src}")
     crop = _load_crop(sample).convert("RGB")
+    if crop.width == 0 or crop.height == 0:
+        raise ValueError(f"Degenerate crop (0-size) for {sample.image_stem} staff {sample.staff_index}: box={sample.crop_box}")
     crop.save(image_path)
     return image_path, crop
 
@@ -748,28 +756,60 @@ def _write_yolo_label(sample: StaffSample, label_dir: Path, label_to_index: Dict
     label_path = label_dir / f"{sample.image_stem}_staff{sample.staff_index:02d}.txt"
     width, height = crop_size
     lines: List[str] = []
+    max_width = max(width, 1)
+    max_height = max(height, 1)
     for symbol in sample.symbols:
         if symbol.label not in label_to_index:
             continue
         x, y, w, h = symbol.bbox
-        cx = (x + w / 2.0) / max(width, 1)
-        cy = (y + h / 2.0) / max(height, 1)
-        nw = w / max(width, 1)
-        nh = h / max(height, 1)
+        x1 = min(max(x, 0.0), float(width))
+        y1 = min(max(y, 0.0), float(height))
+        x2 = min(max(x + w, 0.0), float(width))
+        y2 = min(max(y + h, 0.0), float(height))
+        if x2 <= x1 or y2 <= y1:
+            continue
+        cx = ((x1 + x2) / 2.0) / max_width
+        cy = ((y1 + y2) / 2.0) / max_height
+        nw = (x2 - x1) / max_width
+        nh = (y2 - y1) / max_height
         lines.append(f"{label_to_index[symbol.label]} {cx:.6f} {cy:.6f} {nw:.6f} {nh:.6f}")
     label_path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def _prepare_yolo_split(samples: Sequence[StaffSample], split_dir: Path, label_to_index: Dict[str, int]) -> Dict[str, StaffSample]:
-    image_dir = split_dir / "images"
-    label_dir = split_dir / "labels"
+def _write_label_distribution_plot(samples: Sequence[StaffSample], labels: Sequence[str], plot_path: Path) -> None:
+    counts = Counter(symbol.label for sample in samples for symbol in sample.symbols if symbol.label in labels and symbol.label != "background")
+    xs = [label for label in labels if label != "background"]
+    ys = [counts.get(label, 0) for label in xs]
+    plot_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(max(8, len(xs) * 0.45), 4.5))
+    sns.barplot(x=xs, y=ys, ax=ax, color="#4C78A8")
+    ax.set_title("BGK YOLO label distribution")
+    ax.set_xlabel("label")
+    ax.set_ylabel("count")
+    ax.tick_params(axis="x", rotation=45)
+    for tick, value in zip(ax.patches, ys):
+        ax.text(tick.get_x() + tick.get_width() / 2.0, tick.get_height(), str(value), ha="center", va="bottom", fontsize=8)
+    fig.tight_layout()
+    fig.savefig(plot_path, dpi=200)
+    plt.close(fig)
+
+
+def _prepare_yolo_split(samples: Sequence[StaffSample], images_dir: Path, labels_dir: Path, label_to_index: Dict[str, int]) -> Dict[str, StaffSample]:
+    image_dir = images_dir
+    label_dir = labels_dir
     image_dir.mkdir(parents=True, exist_ok=True)
     label_dir.mkdir(parents=True, exist_ok=True)
     mapping: Dict[str, StaffSample] = {}
-    for sample in samples:
+
+    def _process(sample: StaffSample) -> Tuple[str, StaffSample]:
         image_path, crop = _save_yolo_crop(sample, image_dir)
         _write_yolo_label(sample, label_dir, label_to_index, crop.size)
-        mapping[image_path.name] = sample
+        return image_path.name, sample
+
+    max_workers = min(8, max(1, len(samples)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for image_name, sample in executor.map(_process, samples):
+            mapping[image_name] = sample
     return mapping
 
 
@@ -778,30 +818,77 @@ def _prepare_yolo_dataset(
     val_samples: Sequence[StaffSample],
     test_samples: Sequence[StaffSample],
     labels: Sequence[str],
+    cache_root: Path,
+    cache_key: str,
 ) -> Tuple[Path, Dict[str, Dict[str, StaffSample]]]:
-    artifacts_dir = Path(tempfile.mkdtemp(prefix="bgk_yolo_artifacts_"))
-    dataset_dir = artifacts_dir / "dataset"
+    dataset_dir = cache_root / cache_key
     detector_labels = [label for label in labels if label != "background"]
     detector_label_to_index = {label: idx for idx, label in enumerate(detector_labels)}
     val_split_samples = val_samples if val_samples else train_samples
-    mappings = {
-        "train": _prepare_yolo_split(train_samples, dataset_dir / "train", detector_label_to_index),
-        "val": _prepare_yolo_split(val_split_samples, dataset_dir / "val", detector_label_to_index),
-        "test": _prepare_yolo_split(test_samples, dataset_dir / "test", detector_label_to_index),
-    }
     yaml_path = dataset_dir / "data.yaml"
-    yaml_path.write_text(
-        yaml.safe_dump(
-            {
-                "path": str(dataset_dir.resolve()),
-                "train": "train/images",
-                "val": "val/images",
-                "names": {idx: label for idx, label in enumerate(detector_labels)},
+    if not yaml_path.exists():
+        mappings = {
+            "train": _prepare_yolo_split(train_samples, dataset_dir / "images" / "train", dataset_dir / "labels" / "train", detector_label_to_index),
+            "val": _prepare_yolo_split(val_split_samples, dataset_dir / "images" / "val", dataset_dir / "labels" / "val", detector_label_to_index),
+            "test": _prepare_yolo_split(test_samples, dataset_dir / "images" / "test", dataset_dir / "labels" / "test", detector_label_to_index),
+        }
+        _write_label_distribution_plot(train_samples + list(val_split_samples) + list(test_samples), detector_labels, dataset_dir.parent / "label_distribution.png")
+        yaml_path.parent.mkdir(parents=True, exist_ok=True)
+        yaml_path.write_text(
+            yaml.safe_dump(
+                {
+                    "path": str(dataset_dir.resolve()),
+                    "train": "images/train",
+                    "val": "images/val",
+                    "names": {idx: label for idx, label in enumerate(detector_labels)},
+                }
+            ),
+            encoding="utf-8",
+        )
+    else:
+        _validate_yolo_cache(dataset_dir, train_samples, val_split_samples, test_samples)
+        if not yaml_path.exists():
+            # cache was invalidated; regenerate
+            mappings = {}
+            for split_name, split_samples, split_key in [
+                ("train", train_samples, "train"),
+                ("val", val_split_samples, "val"),
+                ("test", test_samples, "test"),
+            ]:
+                mp = _prepare_yolo_split(split_samples, dataset_dir / "images" / split_key, dataset_dir / "labels" / split_key, detector_label_to_index)
+                mappings[split_name] = mp
+            _write_label_distribution_plot(train_samples + list(val_split_samples) + list(test_samples), detector_labels, dataset_dir.parent / "label_distribution.png")
+            yaml_path.parent.mkdir(parents=True, exist_ok=True)
+            yaml_path.write_text(yaml.safe_dump({"path": str(dataset_dir.resolve()), "train": "images/train", "val": "images/val", "names": {idx: label for idx, label in enumerate(detector_labels)}}), encoding="utf-8")
+        else:
+            mappings = {
+                "train": {f"{s.image_stem}_staff{s.staff_index:02d}.png": s for s in train_samples},
+                "val": {f"{s.image_stem}_staff{s.staff_index:02d}.png": s for s in val_split_samples},
+                "test": {f"{s.image_stem}_staff{s.staff_index:02d}.png": s for s in test_samples},
             }
-        ),
-        encoding="utf-8",
-    )
-    return artifacts_dir, mappings
+    return dataset_dir, mappings
+
+
+def _validate_yolo_cache(dataset_dir: Path, *sample_lists: Sequence[StaffSample]) -> None:
+    for samples in sample_lists:
+        for s in samples:
+            fname = f"{s.image_stem}_staff{s.staff_index:02d}.png"
+            img_dir = dataset_dir / "images"
+            if not img_dir.exists():
+                shutil.rmtree(dataset_dir, ignore_errors=True)
+                return
+            found = False
+            for subdir in ("train", "val", "test"):
+                fp = img_dir / subdir / fname
+                if fp.exists():
+                    found = True
+                    if fp.stat().st_size < 100:
+                        shutil.rmtree(dataset_dir, ignore_errors=True)
+                        return
+                    break
+            if not found:
+                shutil.rmtree(dataset_dir, ignore_errors=True)
+                return
 
 
 def _train_yolo_model(
@@ -809,22 +896,23 @@ def _train_yolo_model(
     val_samples: Sequence[StaffSample],
     test_samples: Sequence[StaffSample],
     labels: Sequence[str],
+    cache_key: str,
     save_model_path: Path,
     load_model_path: Optional[Path],
     model_identifier: str,
     debug: bool,
 ) -> Tuple[Path, Path, Dict[str, Dict[str, StaffSample]]]:
-    artifacts_dir, mappings = _prepare_yolo_dataset(train_samples, val_samples, test_samples, labels)
+    dataset_dir, mappings = _prepare_yolo_dataset(train_samples, val_samples, test_samples, labels, save_model_path.parent / "bgk_yolo_cache", cache_key)
     existing_model = _model_path(load_model_path)
     model_source = str(existing_model) if existing_model else model_identifier
     model = YOLO(model_source)
     epochs = 1 if debug else 30
     model.train(
-        data=str(artifacts_dir / "dataset" / "data.yaml"),
+        data=str(dataset_dir / "data.yaml"),
         epochs=epochs,
         patience=10,
         imgsz=960,
-        project=str(artifacts_dir),
+        project=str(save_model_path.parent),
         name="train",
         exist_ok=True,
         device="cuda:0" if torch.cuda.is_available() else "cpu",
@@ -832,12 +920,12 @@ def _train_yolo_model(
         workers=2,
         lr0=0.01,
     )
-    best_model_path = artifacts_dir / "train" / "weights" / "best.pt"
+    best_model_path = save_model_path.parent / "train" / "weights" / "best.pt"
     if not best_model_path.exists():
-        best_model_path = artifacts_dir / "train" / "weights" / "last.pt"
+        best_model_path = save_model_path.parent / "train" / "weights" / "last.pt"
     save_model_path.mkdir(parents=True, exist_ok=True)
     shutil.copy2(best_model_path, save_model_path / "model.pt")
-    return best_model_path, artifacts_dir, mappings
+    return best_model_path, dataset_dir, mappings
 
 
 def _predict_symbols_yolo(
@@ -936,33 +1024,38 @@ def _train_model(
 
 def train_test_bgk(
     args,
+    is_train_test_mode,
+    is_sequential,
+    output_dir: Path,
     train_json: Optional[Path],
     val_json: Optional[Path],
     test_json: Optional[Path],
-    output_dir: Path,
     save_model_path: Path,
     load_model_path: Optional[Path],
     model_identifier: str = "yolov8n.pt",
 ) -> None:
-    data_root = Path(args.data_dir) if getattr(args, "data_dir", None) else Path("data")
+    train_root = Path(args.data_dir or args.train_dir)
+    test_root = Path(args.data_dir or args.test_dir)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if train_json is None or val_json is None:
         raise ValueError("bgk requires train_json and val_json")
 
-    train_samples = build_staff_samples(Path(train_json), data_root)
-    val_samples = build_staff_samples(Path(val_json), data_root)
-    test_samples = build_staff_samples(Path(test_json), data_root) if test_json else []
+    train_samples = build_staff_samples(Path(train_json), train_root)
+    val_samples = build_staff_samples(Path(val_json), train_root)
+    test_samples = build_staff_samples(Path(test_json), test_root) if test_json else []
     expected_test_stems = load_image_stems_from_json(Path(test_json)) if test_json else []
     labels, label_to_index, index_to_label = build_label_space([*train_samples, *val_samples])
     print(f"🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)} labels={len(labels)}")
 
     detector_labels = [label for label in labels if label != "background"]
-    best_model_path, artifacts_dir, mappings = _train_yolo_model(
+    cache_key = hashlib.sha1("|".join(map(str, [train_json, val_json, test_json, train_root, test_root, *labels])).encode("utf-8")).hexdigest()[:16]
+    best_model_path, dataset_dir, mappings = _train_yolo_model(
         train_samples=train_samples,
         val_samples=val_samples,
         test_samples=test_samples,
         labels=labels,
+        cache_key=cache_key,
         save_model_path=save_model_path,
         load_model_path=Path(load_model_path) if load_model_path else None,
         model_identifier=model_identifier,
@@ -975,7 +1068,7 @@ def train_test_bgk(
     previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
     test_image_map = mappings["test"]
     for image_name, sample in sorted(test_image_map.items(), key=lambda item: (item[1].image_stem, item[1].staff_index)):
-        image_path = artifacts_dir / "dataset" / "test" / "images" / image_name
+        image_path = dataset_dir / "images" / "test" / image_name
         baseline, uncertain = _predict_symbols_yolo(yolo_model, detector_labels, image_path)
         tokens = _postprocess_staff(baseline, uncertain, previous_clef_by_page[sample.image_stem], sample.dsl)
         decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef_by_page[sample.image_stem], neume_templates)
@@ -984,4 +1077,3 @@ def train_test_bgk(
             token.description for token in decoded_tokens if token.description
         )
     _write_predictions(expected_test_stems, page_texts, output_dir)
-    shutil.rmtree(artifacts_dir, ignore_errors=True)
