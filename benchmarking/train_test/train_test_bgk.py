@@ -294,18 +294,55 @@ def build_neume_templates(samples: Sequence[StaffSample]) -> Dict[str, Tuple[flo
     return templates
 
 
-def _normalized_overlap(a: PredictedSymbol, b: PredictedSymbol, dsl: float) -> bool:
-    scale = {
+def build_family_scales(samples: Sequence[StaffSample]) -> Dict[str, Tuple[float, float]]:
+    default_scales = {
         "neume": (0.4, 0.4),
         "custos": (0.35, 0.35),
         "delimiter": (0.12, 1.0),
         "clef_c": (0.6, 1.6),
         "clef_f": (0.8, 1.6),
     }
+    sizes_by_family: Dict[str, List[Tuple[float, float]]] = defaultdict(list)
+    for sample in samples:
+        inv_dsl = 1.0 / max(sample.dsl, 1e-6)
+        for symbol in sample.symbols:
+            family = _label_family(symbol.label)
+            _, _, w, h = symbol.bbox
+            if w <= 0.0 or h <= 0.0:
+                continue
+            sizes_by_family[family].append((w * inv_dsl / 2.0, h * inv_dsl / 2.0))
+
+    scales = dict(default_scales)
+    for family, sizes in sizes_by_family.items():
+        widths = [size[0] for size in sizes]
+        heights = [size[1] for size in sizes]
+        scales[family] = (float(np.median(widths)), float(np.median(heights)))
+    return scales
+
+
+def _bbox_overlap(a: Tuple[float, float, float, float], b: Tuple[float, float, float, float]) -> bool:
+    ax, ay, aw, ah = a
+    bx, by, bw, bh = b
+    return not (
+        ax + aw < bx
+        or bx + bw < ax
+        or ay + ah < by
+        or by + bh < ay
+    )
+
+
+def _normalized_overlap(
+    a: PredictedSymbol,
+    b: PredictedSymbol,
+    dsl: float,
+    family_scales: Dict[str, Tuple[float, float]],
+) -> bool:
+    if not _bbox_overlap(a.bbox, b.bbox):
+        return False
     ax, ay = a.center
     bx, by = b.center
-    aw, ah = scale.get(_label_family(a.label), (0.4, 0.4))
-    bw, bh = scale.get(_label_family(b.label), (0.4, 0.4))
+    aw, ah = family_scales.get(_label_family(a.label), (0.4, 0.4))
+    bw, bh = family_scales.get(_label_family(b.label), (0.4, 0.4))
     a_box = (ax - dsl * aw, ay - dsl * ah, ax + dsl * aw, ay + dsl * ah)
     b_box = (bx - dsl * bw, by - dsl * bh, bx + dsl * bw, by + dsl * bh)
     return not (
@@ -316,12 +353,16 @@ def _normalized_overlap(a: PredictedSymbol, b: PredictedSymbol, dsl: float) -> b
     )
 
 
-def _remove_overlaps(symbols: List[PredictedSymbol], dsl: float) -> List[PredictedSymbol]:
+def _remove_overlaps(
+    symbols: List[PredictedSymbol],
+    dsl: float,
+    family_scales: Dict[str, Tuple[float, float]],
+) -> List[PredictedSymbol]:
     result: List[PredictedSymbol] = []
     for symbol in sorted(symbols, key=lambda item: (-item.confidence, item.center[0])):
         keep = True
         for kept in result:
-            if _normalized_overlap(symbol, kept, dsl):
+            if _normalized_overlap(symbol, kept, dsl, family_scales):
                 if symbol.label.startswith("clef") and not kept.label.startswith("clef"):
                     result.remove(kept)
                     break
@@ -336,8 +377,9 @@ def _remove_overlaps(symbols: List[PredictedSymbol], dsl: float) -> List[Predict
 def _postprocess_staff(
     symbols: List[PredictedSymbol],
     dsl: float,
+    family_scales: Dict[str, Tuple[float, float]],
 ) -> List[PredictedSymbol]:
-    cleaned = _remove_overlaps(symbols, dsl)
+    cleaned = _remove_overlaps(symbols, dsl, family_scales)
     tokens: List[PredictedSymbol] = []
     last_delimiter = False
     for symbol in cleaned:
@@ -660,13 +702,14 @@ def train_test_bgk(
     yolo_model = YOLO(str(best_model_path))
 
     neume_templates = build_neume_templates(train_samples)
+    family_scales = build_family_scales(train_samples)
     page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
     previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
     test_image_map = mappings["test"]
     for image_name, sample in sorted(test_image_map.items(), key=lambda item: (item[1].image_stem, item[1].staff_index)):
         image_path = dataset_dir / "images" / "test" / image_name
         predictions = _predict_symbols_yolo(yolo_model, detector_labels, image_path)
-        tokens = _postprocess_staff(predictions, sample.dsl)
+        tokens = _postprocess_staff(predictions, sample.dsl, family_scales)
         decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef_by_page[sample.image_stem], neume_templates)
         previous_clef_by_page[sample.image_stem] = current_clef
         page_texts[sample.image_stem][sample.staff_index] = " ".join(
