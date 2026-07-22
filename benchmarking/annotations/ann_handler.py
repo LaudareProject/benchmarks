@@ -382,8 +382,9 @@ def convert_and_write_coco_anns(
         return data
 
     # Text line is category 6, Music line is 5
+    # OMR needs staff plus symbol/layout categories used by BGK.
     ocr_data = filter_data([6])
-    omr_data = filter_data([5])
+    omr_data = filter_data([1, 2, 3, 5, 9])
     ocmr_data = filter_data([5, 6])
     layout_data = filter_data(layout_categories)  # layout_categories is [5, 6]
 
