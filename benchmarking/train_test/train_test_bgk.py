@@ -31,7 +31,7 @@ FIXED_IMAGE_HEIGHT = 80
 NOTE_ORDER = "CDEFGAB"
 PITCH_RE = re.compile(r"([A-G])(\d+)")
 CLEF_RE = re.compile(r"^K([CF])(\d+)$")
-N_STAFF_LINES = 5
+N_STAFF_LINES = 4
 
 
 @dataclass
@@ -69,8 +69,13 @@ class ClefState:
 
 
 def _default_clef_state(sample: StaffSample) -> ClefState:
+    # according to Laudare annotations, default clef is KC2 = C clef on the second staff line
     _, _, _, staff_height = sample.staff_box
-    return ClefState(description="KC2", center_y=staff_height * 3.0 / 5.0)
+    # KC2 = C clef on the second staff line; convert that line number to a 0-based index.
+    line_index = max(0, min(N_STAFF_LINES - 1, N_STAFF_LINES - 2))
+    # One clef line step = staff height divided by the number of staff lines.
+    line_spacing = staff_height / float(N_STAFF_LINES)
+    return ClefState(description="KC2", center_y=line_index * line_spacing)
 
 
 def _load_coco(json_path: Path) -> Dict:
