@@ -608,26 +608,18 @@ def _prepare_yolo_dataset(
 
 
 def _train_yolo_model(
-    train_samples: Sequence[StaffSample],
-    val_samples: Sequence[StaffSample],
-    test_samples: Sequence[StaffSample],
-    labels: Sequence[str],
-    cache_key: str,
-    save_model_path: Path,
-    load_model_path: Optional[Path],
-    model_identifier: str,
+    model: YOLO,
+    dataset_dir: Path,
+    artifacts_dir: Path,
     debug: bool,
-) -> Tuple[Path, Path, Dict[str, Dict[str, StaffSample]]]:
-    dataset_dir, mappings = _prepare_yolo_dataset(train_samples, val_samples, test_samples, labels, save_model_path.parent / "bgk_yolo_cache", cache_key)
-    model_source = str(load_model_path) if load_model_path else model_identifier
-    model = YOLO(model_source)
+) -> Path:
     epochs = 1 if debug else 30
     model.train(
         data=str(dataset_dir / "data.yaml"),
         epochs=epochs,
         patience=10,
         imgsz=960,
-        project=str(save_model_path.parent),
+        project=str(artifacts_dir),
         name="train",
         exist_ok=True,
         device="cuda:0" if torch.cuda.is_available() else "cpu",
@@ -635,10 +627,18 @@ def _train_yolo_model(
         workers=2,
         lr0=0.01,
     )
-    best_model_path = save_model_path.parent / "train" / "weights" / "best.pt"
-    save_model_path.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(best_model_path, save_model_path / "model.pt")
-    return best_model_path, dataset_dir, mappings
+    return artifacts_dir / "train" / "weights" / "best.pt"
+
+
+def _save_model(best_model_path: Path, save_model_path: Path) -> None:
+    old_save_model_path = None
+    if save_model_path.suffix != ".pt":
+        old_save_model_path = save_model_path
+        save_model_path = save_model_path.with_suffix(".pt")
+    save_model_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(best_model_path, save_model_path)
+    if old_save_model_path:
+        shutil.copy2(best_model_path, old_save_model_path)
 
 
 def _predict_symbols_yolo(
@@ -699,36 +699,65 @@ def train_test_bgk(
     labels, _, _ = build_label_space([*train_samples, *val_samples])
     print(f"🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)} labels={len(labels)}")
 
+    artifacts_dir = Path(tempfile.mkdtemp(prefix="bgk_artifacts_"))
+    yolo_data_dir = artifacts_dir / "yolo_data"
+
+    if yolo_data_dir.exists():
+        shutil.rmtree(yolo_data_dir)
+
     detector_labels = [label for label in labels if label != "background"]
     cache_key = hashlib.sha1("|".join(map(str, [train_json, val_json, test_json, train_root, test_root, *labels])).encode("utf-8")).hexdigest()[:16]
-    best_model_path, dataset_dir, mappings = _train_yolo_model(
-        train_samples=train_samples,
-        val_samples=val_samples,
-        test_samples=test_samples,
-        labels=labels,
-        cache_key=cache_key,
-        save_model_path=save_model_path,
-        load_model_path=Path(load_model_path) if load_model_path else None,
-        model_identifier=model_identifier,
-        debug=getattr(args, "debug", False),
-    )
-    yolo_model = YOLO(str(best_model_path))
 
-    carry_clef_between_staves = args.edition == "editorial"
-    neume_templates = build_neume_templates(train_samples, carry_clef_between_staves)
-    family_scales = build_family_scales(train_samples)
-    page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
-    previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
-    test_image_map = mappings["test"]
-    for image_name, sample in sorted(test_image_map.items(), key=lambda item: (item[1].image_stem, item[1].staff_index)):
-        image_path = dataset_dir / "images" / "test" / image_name
-        predictions = _predict_symbols_yolo(yolo_model, detector_labels, image_path)
-        tokens = _postprocess_staff(predictions, sample.dsl, family_scales)
-        previous_clef = previous_clef_by_page[sample.image_stem] if carry_clef_between_staves else None
-        decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef, neume_templates)
-        if carry_clef_between_staves:
-            previous_clef_by_page[sample.image_stem] = current_clef
-        page_texts[sample.image_stem][sample.staff_index] = " ".join(
-            token.description for token in decoded_tokens if token.description
-        )
-    _write_predictions(expected_test_stems, page_texts, output_dir)
+    print("📦 Preparing data in YOLO format...")
+    dataset_dir, mappings = _prepare_yolo_dataset(
+        train_samples,
+        val_samples,
+        test_samples,
+        labels,
+        yolo_data_dir,
+        cache_key,
+    )
+
+    if load_model_path:
+        if Path(load_model_path).suffix != ".pt":
+            load_model_path = Path(load_model_path).with_suffix(".pt")
+    model = YOLO(load_model_path if load_model_path else model_identifier)
+
+    print("🚀 Training YOLO model...")
+    best_model_path = _train_yolo_model(
+        model,
+        dataset_dir,
+        artifacts_dir,
+        getattr(args, "debug", False),
+    )
+
+    if best_model_path is None:
+        return
+
+    _save_model(best_model_path, save_model_path)
+
+    try:
+        if test_json is not None:
+            print("✍️  Generating predictions...")
+            yolo_model = YOLO(str(best_model_path))
+
+            carry_clef_between_staves = args.edition == "editorial"
+            neume_templates = build_neume_templates(train_samples, carry_clef_between_staves)
+            family_scales = build_family_scales(train_samples)
+            page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
+            previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
+            test_image_map = mappings["test"]
+            for image_name, sample in sorted(test_image_map.items(), key=lambda item: (item[1].image_stem, item[1].staff_index)):
+                image_path = dataset_dir / "images" / "test" / image_name
+                predictions = _predict_symbols_yolo(yolo_model, detector_labels, image_path)
+                tokens = _postprocess_staff(predictions, sample.dsl, family_scales)
+                previous_clef = previous_clef_by_page[sample.image_stem] if carry_clef_between_staves else None
+                decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef, neume_templates)
+                if carry_clef_between_staves:
+                    previous_clef_by_page[sample.image_stem] = current_clef
+                page_texts[sample.image_stem][sample.staff_index] = " ".join(
+                    token.description for token in decoded_tokens if token.description
+                )
+            _write_predictions(expected_test_stems, page_texts, output_dir)
+    finally:
+        shutil.rmtree(artifacts_dir)
