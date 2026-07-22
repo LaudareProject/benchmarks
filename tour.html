@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Codebase Tour</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #fafafa;
+    padding: 2rem;
+  }
+  .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  h1 { font-size: 2em; margin: 1.5rem 0 0.5rem; color: #222; border-bottom: 3px solid #007acc; padding-bottom: 0.5rem; }
+  h2 { font-size: 1.6em; margin: 1.5rem 0 0.5rem; color: #444; }
+  h3 { font-size: 1.3em; margin: 1.2rem 0 0.3rem; color: #555; }
+  h4, h5, h6 { margin: 1rem 0 0.3rem; }
+  p { margin: 0.8rem 0; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.95em; }
+  pre {
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #666;
+    font-style: italic;
+  }
+  ul, ol { margin: 1rem 0 1rem 2rem; }
+  li { margin: 0.3rem 0; }
+  a { color: #007acc; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+  }
+  th { background: #f5f5f5; font-weight: bold; }
+  tr:nth-child(even) { background: #fafafa; }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 5px;
+  }
+  .step {
+    background: #f0f8ff;
+    border-left: 4px solid #007acc;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 3px;
+  }
+  .coverage {
+    background: #fffacd;
+    border-left: 4px solid #ffa500;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 3px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .code-excerpt {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
+  hr { margin: 2rem 0; border: none; border-top: 2px solid #ddd; }
+  .toc {
+    background: #f0f0f0;
+    padding: 1.5rem;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+  }
+  .toc h2 { margin-top: 0; }
+  .toc ul { margin-left: 1.5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Codebase Tour</h1>
+<p><strong>Mode:</strong> scientific (<code>[sci]</code>)</p>
+<p><strong>Project:</strong> Laudare benchmark framework — Python evaluation harness for historical document layout/OCR/OMR, focused here on the BGK-OMR path.</p>
+<h2>Technologies</h2>
+<ul><li><code>torch</code> — tensor backend and GPU runtime for model execution.</li><li><code>ultralytics</code> — YOLO training/inference engine used as the perceptual front end.</li><li><code>numpy</code> — numeric aggregation for pitch-template estimation.</li><li><code>Pillow</code> — image IO and crop extraction for staff-level samples.</li><li><code>pyyaml</code> — writes YOLO dataset manifests for reproducible training.</li><li><code>matplotlib</code> + <code>seaborn</code> — inspect class imbalance through label-distribution plots.</li></ul>
+<div class="mermaid">
+graph TD
+  A[COCO split JSON] --&gt; B[build_staff_samples]
+  B --&gt; C[staff crops + contour labels]
+  C --&gt; D[_prepare_yolo_dataset]
+  D --&gt; E[_train_yolo_model]
+  E --&gt; F[_predict_symbols_yolo]
+  F --&gt; G[_postprocess_staff]
+  G --&gt; H[_decode_staff]
+  H --&gt; I[_write_predictions]
+</div>
+<h2>Entry point</h2>
+<p><code>benchmarking/run_single_fold_benchmark.py</code> dynamically imports <code>benchmarking.train_test.train_test_bgk.train_test_bgk</code> when <code>--framework bgk --task omr</code> is selected. The tour below follows the internal execution of that function.</p>
+<h2>Step 1: Experimental scope, imports, and latent variables</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 1–36</p>
+<pre><code>5.3%</code></pre>
+<pre><code class="language-python">from __future__ import annotations
+
+import hashlib
+import json
+import re
+import shutil
+import tempfile
+from collections import Counter
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Optional, Sequence, Tuple
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import torch
+import yaml
+from PIL import Image
+from ultralytics import YOLO
+
+from ..ultralytics_monkey_patch import apply_ultralytics_monkey_patch
+from ..utils import load_image_stems_from_json, save_text_predictions
+
+apply_ultralytics_monkey_patch()
+
+SYMBOL_CATEGORY_NAMES = {&quot;neume&quot;, &quot;clef&quot;, &quot;custos&quot;, &quot;musicDelimiter&quot;}
+BASE_LABELS = [&quot;background&quot;, &quot;clef_c&quot;, &quot;clef_f&quot;, &quot;custos&quot;, &quot;delimiter_1&quot;, &quot;delimiter_2&quot;]
+FIXED_IMAGE_HEIGHT = 80
+NOTE_ORDER = &quot;CDEFGAB&quot;
+PITCH_RE = re.compile(r&quot;([A-G])(\d+)&quot;)
+CLEF_RE = re.compile(r&quot;^K([CF])(\d+)$&quot;)
+N_STAFF_LINES = 5</code></pre>
+<p><strong>What it does:</strong> [sci] This header fixes the observable world of the model: staff crops are normalized to a common height, chant pitch is encoded on a seven-step alphabet, and clef/neume/delimiter categories define the sufficient statistics the rest of the pipeline tries to recover. In scientific terms, these constants operationalize the paper adaptation: they specify what information is treated as invariant across manuscripts and what information must be estimated from data.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 36/678 = 5.3%
+██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 2: Core data structures</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 37–71</p>
+<pre><code>10.5%</code></pre>
+<pre><code class="language-python">@dataclass
+class SymbolAnnotation:
+    label: str
+    description: str
+    bbox: Tuple[float, float, float, float]
+
+
+@dataclass
+class StaffSample:
+    image_path: Path
+    image_stem: str
+    staff_index: int
+    crop_box: Tuple[int, int, int, int]
+    staff_box: Tuple[float, float, float, float]
+    dsl: float
+    symbols: List[SymbolAnnotation]
+
+
+@dataclass
+class PredictedSymbol:
+    label: str
+    description: str
+    bbox: Tuple[float, float, float, float]
+    center: Tuple[float, float]
+    confidence: float
+    source: str
+
+
+@dataclass
+class ClefState:
+    description: str
+    center_y: float</code></pre>
+<p><strong>What it does:</strong> [sci] These dataclasses are the pipeline’s experimental units. <code>StaffSample</code> is the analysis sample, <code>SymbolAnnotation</code> is the annotated supervision signal, <code>PredictedSymbol</code> is the detector output, and <code>ClefState</code> carries the latent musical context needed to decode interval geometry into pitch strings. This separation matters because training is local to staff crops, while evaluation is ultimately page-level transcription.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 71/678 = 10.5%
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 3: Pitch parsing and contour extraction</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 72–108</p>
+<pre><code>15.9%</code></pre>
+<pre><code class="language-python">def _load_coco(json_path: Path) -&gt; Dict:
+    return json.loads(json_path.read_text(encoding=&quot;utf-8&quot;))
+
+
+
+def _pitch_to_value(token: str) -&gt; int:
+    match = PITCH_RE.fullmatch(token)
+    if match is None:
+        raise ValueError(f&quot;Invalid pitch token: {token}&quot;)
+    note, octave = match.groups()
+    return int(octave) * 7 + NOTE_ORDER.index(note)
+
+
+def _value_to_pitch(value: int) -&gt; str:
+    octave, note_index = divmod(value, len(NOTE_ORDER))
+    return f&quot;{NOTE_ORDER[note_index]}{octave}&quot;
+
+
+def _extract_pitch_tokens(description: str) -&gt; List[str]:
+    return [match.group(0) for match in PITCH_RE.finditer(description)]
+
+
+def _contour_from_pitches(pitches: Sequence[str]) -&gt; str:
+    if len(pitches) &lt;= 1:
+        return &quot;&quot;
+    values = [_pitch_to_value(token) for token in pitches]
+    contour = []
+    for current, nxt in zip(values, values[1:]):
+        if nxt &gt; current:
+            contour.append(&quot;u&quot;)
+        elif nxt &lt; current:
+            contour.append(&quot;d&quot;)
+        else:
+            contour.append(&quot;s&quot;)
+    return &quot;&quot;.join(contour)</code></pre>
+<p><strong>What it does:</strong> [sci] This block converts symbolic chant text into an ordinal pitch space, then compresses multi-note neumes into contour strings such as ascent, descent, or repetition. The theoretical purpose is dimensionality reduction: instead of memorizing every literal token sequence, the detector learns reusable melodic shape classes that can be re-instantiated later from geometric position plus clef context.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 108/678 = 15.9%
+██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 4: Label naming and ordering rules</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 109–140</p>
+<pre><code>20.6%</code></pre>
+<pre><code class="language-python">def _neume_label(count: int, contour: str) -&gt; str:
+    return f&quot;neume_{count}&quot; if not contour else f&quot;neume_{count}_{contour}&quot;
+
+
+def _neume_size(label: str) -&gt; int:
+    parts = label.split(&quot;_&quot;)
+    if len(parts) &lt; 2 or parts[0] != &quot;neume&quot;:
+        raise ValueError(f&quot;Invalid neume label: {label}&quot;)
+    return int(parts[1])
+
+
+def _neume_contour(label: str) -&gt; str:
+    parts = label.split(&quot;_&quot;, 2)
+    return parts[2] if len(parts) == 3 else &quot;&quot;
+
+
+def _label_sort_key(label: str) -&gt; Tuple[int, int, str]:
+    if label in BASE_LABELS:
+        return (0, BASE_LABELS.index(label), &quot;&quot;)
+    if label.startswith(&quot;neume_&quot;):
+        return (1, _neume_size(label), _neume_contour(label))
+    return (2, 0, label)
+
+
+def _label_family(label: str) -&gt; str:
+    if label.startswith(&quot;neume_&quot;):
+        return &quot;neume&quot;
+    if label.startswith(&quot;delimiter_&quot;):
+        return &quot;delimiter&quot;
+    return label</code></pre>
+<p><strong>What it does:</strong> [sci] These helpers define the taxonomy the detector will optimize against. By sorting base symbols before contour-specific neumes and collapsing labels into morphological families, the code imposes an interpretable class structure that supports later overlap pruning and analysis of error modes, especially when rare long-neume classes have low statistical power.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 140/678 = 20.6%
+████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 5: Annotation-to-label conversion</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 141–171</p>
+<pre><code>25.2%</code></pre>
+<pre><code class="language-python">def _label_from_annotation(category_name: str, description: str) -&gt; Optional[str]:
+    if category_name == &quot;neume&quot;:
+        pitches = _extract_pitch_tokens(description)
+        if not pitches:
+            return None
+        return _neume_label(len(pitches), _contour_from_pitches(pitches))
+    if category_name == &quot;custos&quot;:
+        return &quot;custos&quot;
+    if category_name == &quot;musicDelimiter&quot;:
+        return &quot;delimiter_2&quot; if description.count(&quot;/&quot;) &gt;= 2 else &quot;delimiter_1&quot;
+    if category_name == &quot;clef&quot;:
+        if description.startswith(&quot;KC&quot;):
+            return &quot;clef_c&quot;
+        if description.startswith(&quot;KF&quot;):
+            return &quot;clef_f&quot;
+        return None
+    return None
+
+
+def _center_in_bbox(center: Tuple[float, float], bbox: Sequence[float]) -&gt; bool:
+    x, y, w, h = bbox
+    cx, cy = center
+    return x &lt;= cx &lt;= x + w and y &lt;= cy &lt;= y + h
+
+
+def _annotation_center(bbox: Sequence[float]) -&gt; Tuple[float, float]:
+    x, y, w, h = bbox
+    return x + w / 2.0, y + h / 2.0</code></pre>
+<p><strong>What it does:</strong> [sci] This is the observation model from Laudare annotations to BGK classes. It translates descriptive ground truth into a compact medieval-OMR ontology and uses bounding-box centers as the assignment statistic, implicitly assuming that staff membership is better approximated by symbol centroids than by full-box overlap for dense notation.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 171/678 = 25.2%
+██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 6: Page → staff sample extraction: crop geometry</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 172–200</p>
+<pre><code>29.5%</code></pre>
+<pre><code class="language-python">def build_staff_samples(split_json: Path, data_root: Path) -&gt; List[StaffSample]:
+    data = _load_coco(split_json)
+    images = {img[&quot;id&quot;]: img for img in data.get(&quot;images&quot;, [])}
+    categories = {cat[&quot;id&quot;]: cat[&quot;name&quot;] for cat in data.get(&quot;categories&quot;, [])}
+    anns_by_image: Dict[int, List[Dict]] = defaultdict(list)
+    for ann in data.get(&quot;annotations&quot;, []):
+        anns_by_image[ann[&quot;image_id&quot;]].append(ann)
+
+    samples: List[StaffSample] = []
+    for image_id, image in images.items():
+        image_path = data_root / image[&quot;file_name&quot;]
+        image_stem = Path(image[&quot;file_name&quot;]).stem
+        staff_anns = [ann for ann in anns_by_image[image_id] if categories.get(ann[&quot;category_id&quot;]) == &quot;staff&quot;]
+        staff_anns.sort(key=lambda ann: (ann[&quot;bbox&quot;][1], ann[&quot;bbox&quot;][0]))
+        page_anns = anns_by_image[image_id]
+        for staff_index, staff_ann in enumerate(staff_anns):
+            x, y, w, h = staff_ann[&quot;bbox&quot;]
+            dsl = max(8.0, h / 4.0)
+            margin_y = int(max(1, round(dsl)))
+            margin_right = int(max(1, round(dsl)))
+            margin_left = int(max(1, round(4 * dsl)))
+            left = max(0, int(round(x - margin_left)))
+            top = max(0, int(round(y - margin_y)))
+            right = int(round(x + w + margin_right))
+            bottom = int(round(y + h + margin_y))
+            symbols: List[SymbolAnnotation] = []
+            for ann in page_anns:
+                category_name = categories.get(ann[&quot;category_id&quot;])
+                if category_name not in SYMBOL_CATEGORY_NAMES:</code></pre>
+<p><strong>What it does:</strong> [sci] This first half of <code>build_staff_samples</code> turns page-level COCO annotations into per-staff training samples. The asymmetric margins are not cosmetic: the enlarged left context encodes the prior that clefs and entry symbols cluster near the staff start, which reduces truncation risk for the very symbols that anchor later pitch reconstruction.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 200/678 = 29.5%
+████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 7: Page → staff sample extraction: symbol assignment</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 201–230</p>
+<pre><code>33.9%</code></pre>
+<pre><code class="language-python">                    continue
+                description = (ann.get(&quot;description&quot;) or ann.get(&quot;text&quot;) or &quot;&quot;).strip()
+                center = _annotation_center(ann[&quot;bbox&quot;])
+                if not _center_in_bbox(center, staff_ann[&quot;bbox&quot;]):
+                    continue
+                label = _label_from_annotation(category_name, description)
+                if label is None:
+                    continue
+                ax, ay, aw, ah = ann[&quot;bbox&quot;]
+                symbols.append(
+                    SymbolAnnotation(
+                        label=label,
+                        description=description,
+                        bbox=(ax - left, ay - top, aw, ah),
+                    )
+                )
+            samples.append(
+                    StaffSample(
+                        image_path=image_path,
+                        image_stem=image_stem,
+                        staff_index=staff_index,
+                        crop_box=(left, top, right, bottom),
+                        staff_box=(x - left, y - top, w, h),
+                        dsl=dsl,
+                        symbols=symbols,
+                    )
+                )
+    return samples</code></pre>
+<p><strong>What it does:</strong> [sci] The second half collects only symbols whose centers lie inside a staff and rewrites their boxes into crop-local coordinates. This produces conditionally independent staff-level examples for the detector, a strong modeling assumption that trades global page context for cleaner supervision and higher effective sample size during training.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 230/678 = 33.9%
+██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 8: Label space and geometric primitives</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 231–269</p>
+<pre><code>39.7%</code></pre>
+<pre><code class="language-python">def build_label_space(samples: Sequence[StaffSample]) -&gt; Tuple[List[str], Dict[str, int], Dict[int, str]]:
+    neume_labels = sorted(
+        {
+            symbol.label
+            for sample in samples
+            for symbol in sample.symbols
+            if symbol.label.startswith(&quot;neume_&quot;)
+        },
+        key=_label_sort_key,
+    )
+    labels = [*BASE_LABELS, *neume_labels]
+    label_to_index = {label: idx for idx, label in enumerate(labels)}
+    index_to_label = {idx: label for label, idx in label_to_index.items()}
+    return labels, label_to_index, index_to_label
+
+
+def _load_crop(sample: StaffSample) -&gt; Image.Image:
+    image = Image.open(sample.image_path).convert(&quot;L&quot;)
+    return image.crop(sample.crop_box)
+
+
+
+def _symbol_center_from_annotation(symbol: SymbolAnnotation) -&gt; Tuple[float, float]:
+    x, y, w, h = symbol.bbox
+    return x + w / 2.0, y + h / 2.0
+
+
+def _staff_pitch_step(sample: StaffSample) -&gt; float:
+    return max(sample.staff_box[3] / (N_STAFF_LINES * 2.0), 1e-6)
+
+
+def _clef_pitch_value(description: str) -&gt; int:
+    match = CLEF_RE.fullmatch(description)
+    if match is None:
+        raise ValueError(f&quot;Invalid clef token: {description}&quot;)
+    kind, _ = match.groups()
+    return _pitch_to_value(&quot;C4&quot; if kind == &quot;C&quot; else &quot;F3&quot;)</code></pre>
+<p><strong>What it does:</strong> [sci] These functions build the empirical class vocabulary from observed neume forms, load grayscale crops, and define the geometric scale relating vertical displacement to pitch steps. The key scientific move is to estimate pitch on a normalized lattice tied to staff height, making transcriptions comparable across manuscripts with different absolute resolution.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 269/678 = 39.7%
+████████████████░░░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 9: Neume template estimation from training data</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 270–299</p>
+<pre><code>44.1%</code></pre>
+<pre><code class="language-python">def build_neume_templates(samples: Sequence[StaffSample]) -&gt; Dict[str, Tuple[float, ...]]:
+    offsets_by_label: Dict[str, List[Tuple[float, ...]]] = defaultdict(list)
+    previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
+    ordered_samples = sorted(samples, key=lambda sample: (sample.image_stem, sample.staff_index))
+    for sample in ordered_samples:
+        current_clef = previous_clef_by_page[sample.image_stem]
+        for symbol in sorted(sample.symbols, key=lambda item: _symbol_center_from_annotation(item)[0]):
+            _, center_y = _symbol_center_from_annotation(symbol)
+            if symbol.label.startswith(&quot;clef&quot;):
+                current_clef = ClefState(description=symbol.description, center_y=center_y)
+                continue
+            if current_clef is None or not symbol.label.startswith(&quot;neume_&quot;):
+                continue
+            pitches = _extract_pitch_tokens(symbol.description)
+            if len(pitches) != _neume_size(symbol.label):
+                continue
+            anchor = _clef_pitch_value(current_clef.description) + (current_clef.center_y - center_y) / _staff_pitch_step(sample)
+            offsets_by_label[symbol.label].append(tuple(_pitch_to_value(pitch) - anchor for pitch in pitches))
+        previous_clef_by_page[sample.image_stem] = current_clef
+
+    templates: Dict[str, Tuple[float, ...]] = {}
+    for label, examples in offsets_by_label.items():
+        count = _neume_size(label)
+        templates[label] = tuple(
+            float(np.mean([example[idx] for example in examples]))
+            for idx in range(count)
+        )
+    return templates</code></pre>
+<p><strong>What it does:</strong> [sci] <code>build_neume_templates</code> learns mean within-neume pitch offsets conditioned on label and clef. This is the paper’s background-knowledge core in statistical form: detector outputs identify symbol shape, while a training-set average over aligned examples supplies the expected internal interval structure for each contour class.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 299/678 = 44.1%
+██████████████████░░░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 10: Overlap model and non-max suppression logic</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 300–338</p>
+<pre><code>49.9%</code></pre>
+<pre><code class="language-python">def _normalized_overlap(a: PredictedSymbol, b: PredictedSymbol, dsl: float) -&gt; bool:
+    scale = {
+        &quot;neume&quot;: (0.4, 0.4),
+        &quot;custos&quot;: (0.35, 0.35),
+        &quot;delimiter&quot;: (0.12, 1.0),
+        &quot;clef_c&quot;: (0.6, 1.6),
+        &quot;clef_f&quot;: (0.8, 1.6),
+    }
+    ax, ay = a.center
+    bx, by = b.center
+    aw, ah = scale.get(_label_family(a.label), (0.4, 0.4))
+    bw, bh = scale.get(_label_family(b.label), (0.4, 0.4))
+    a_box = (ax - dsl * aw, ay - dsl * ah, ax + dsl * aw, ay + dsl * ah)
+    b_box = (bx - dsl * bw, by - dsl * bh, bx + dsl * bw, by + dsl * bh)
+    return not (
+        a_box[2] &lt; b_box[0]
+        or b_box[2] &lt; a_box[0]
+        or a_box[3] &lt; b_box[1]
+        or b_box[3] &lt; a_box[1]
+    )
+
+
+def _remove_overlaps(symbols: List[PredictedSymbol], dsl: float) -&gt; List[PredictedSymbol]:
+    result: List[PredictedSymbol] = []
+    for symbol in sorted(symbols, key=lambda item: (-item.confidence, item.center[0])):
+        keep = True
+        for kept in result:
+            if _normalized_overlap(symbol, kept, dsl):
+                if symbol.label.startswith(&quot;clef&quot;) and not kept.label.startswith(&quot;clef&quot;):
+                    result.remove(kept)
+                    break
+                keep = False
+                break
+        if keep:
+            result.append(symbol)
+    return sorted(result, key=lambda item: item.center[0])</code></pre>
+<p><strong>What it does:</strong> [sci] This block is the detector-output cleanup layer. <code>_normalized_overlap()</code> does not compare raw predicted boxes; it converts each symbol into an idealized family-specific acceptance region centered at the symbol center and scaled by <code>dsl</code>. Neumes and custos get compact square windows, delimiters get very thin horizontal windows, and clefs get much taller windows because their semantics depend on vertical extent over the staff. Two predictions are considered mutually incompatible when these normalized windows intersect.</p>
+<p><strong>Why it is written this way:</strong> [sci] Raw YOLO boxes are not reliable semantic objects here. The same medieval symbol can be boxed too wide, too narrow, or vertically shifted depending on crop context and training scarcity. The code therefore replaces detector geometry with music-aware geometry: the center is treated as the trustworthy statistic, while the allowed influence region is injected by prior knowledge. This is effectively a domain-specific NMS operating in staff units rather than pixels, so it transfers across manuscript resolutions and staff sizes.</p>
+<p><strong>Code details:</strong> [sci]</p>
+<ul><li><code>_label_family()</code> collapses many concrete labels into broad geometric families; the overlap rule works at the family level because suppression depends more on shape role than on exact contour class.</li><li><code>_normalized_overlap()</code> builds <code>(x1, y1, x2, y2)</code> windows around each symbol center using multipliers like <code>0.12×dsl</code> for delimiters and <code>1.6×dsl</code> vertically for clefs. The asymmetry reflects symbol morphology: delimiters are narrow separators, clefs are vertically informative anchors.</li><li><code>_remove_overlaps()</code> sorts by <code>(-confidence, x)</code> so high-confidence symbols are considered first, with left-to-right order as the tie-breaker. This preserves reading order when scores are equal.</li><li>When an overlap is found, the default policy is greedy rejection of the new candidate. The single exception is <code>clef</code> versus non-clef: if a new clef overlaps a kept non-clef, the kept symbol is removed and the clef survives. This is a deliberate semantic priority rule because a wrong or missing clef corrupts every downstream pitch interpretation, whereas a wrong neume usually damages only one local token.</li><li>The final <code>sorted(..., key=center_x)</code> restores reading order after confidence-based pruning, because decoding later assumes monotone left-to-right traversal.</li></ul>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 338/678 = 49.9%
+████████████████████░░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 11: Delimiter-aware postprocessing</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 339–358</p>
+<pre><code>52.8%</code></pre>
+<pre><code class="language-python">def _postprocess_staff(
+    symbols: List[PredictedSymbol],
+    dsl: float,
+) -&gt; List[PredictedSymbol]:
+    cleaned = _remove_overlaps(symbols, dsl)
+    tokens: List[PredictedSymbol] = []
+    last_delimiter = False
+    for symbol in cleaned:
+        if _label_family(symbol.label) == &quot;delimiter&quot;:
+            if last_delimiter and tokens:
+                tokens[-1] = symbol
+            else:
+                tokens.append(symbol)
+            last_delimiter = True
+            continue
+        last_delimiter = False
+        tokens.append(symbol)
+    return tokens</code></pre>
+<p><strong>What it does:</strong> [sci] After overlap pruning, the code collapses repeated adjacent delimiters into a single token. The effect is to lower variance in a symbol type that carries structural rather than melodic information, preventing visually fragmented separators from being over-counted in downstream transcription strings.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 358/678 = 52.8%
+█████████████████████░░░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 12: Clef and symbol decoding primitives</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 359–393</p>
+<pre><code>58.0%</code></pre>
+<pre><code class="language-python">def _estimate_clef_line(symbol: PredictedSymbol, sample: StaffSample) -&gt; int:
+    _, staff_top, _, staff_height = sample.staff_box
+    line_spacing = max(staff_height / float(N_STAFF_LINES), 1e-6)
+    k = min(range(N_STAFF_LINES), key=lambda i: abs(symbol.center[1] - (staff_top + i * line_spacing)))
+    return max(1, min(4, N_STAFF_LINES - k))
+
+
+def _symbol_anchor_value(symbol: PredictedSymbol, clef: ClefState, sample: StaffSample) -&gt; float:
+    return _clef_pitch_value(clef.description) + (clef.center_y - symbol.center[1]) / _staff_pitch_step(sample)
+
+
+def _decode_symbol_description(
+    symbol: PredictedSymbol,
+    sample: StaffSample,
+    current_clef: Optional[ClefState],
+    neume_templates: Dict[str, Tuple[float, ...]],
+) -&gt; str:
+    if symbol.label == &quot;delimiter_1&quot;:
+        return &quot;/&quot;
+    if symbol.label == &quot;delimiter_2&quot;:
+        return &quot;//&quot;
+    if symbol.label.startswith(&quot;clef&quot;):
+        line = _estimate_clef_line(symbol, sample)
+        return f&quot;K{&#x27;C&#x27; if symbol.label == &#x27;clef_c&#x27; else &#x27;F&#x27;}{line}&quot;
+    if current_clef is None:
+        return &quot;&quot;
+    anchor = _symbol_anchor_value(symbol, current_clef, sample)
+    if symbol.label == &quot;custos&quot;:
+        return _value_to_pitch(int(round(anchor)))
+    if symbol.label.startswith(&quot;neume_&quot;):
+        notes = [_value_to_pitch(int(round(anchor + offset))) for offset in neume_templates[symbol.label]]
+        return f&quot;({&#x27; &#x27;.join(notes)})&quot;
+    return &quot;&quot;</code></pre>
+<p><strong>What it does:</strong> [sci] This block is the semantic decoder. It receives cleaned symbol hypotheses and turns them into chant tokens by combining three ingredients: symbol class, staff-relative vertical geometry, and the currently active clef. <code>_estimate_clef_line()</code> quantizes a detected clef to one of the four legal line numbers; <code>_symbol_anchor_value()</code> converts a symbol’s vertical position into a pitch index relative to that clef; <code>_decode_symbol_description()</code> then maps each family to its textual representation: <code>/</code>, <code>//</code>, <code>KCn</code>/<code>KFn</code>, a single custos pitch, or a multi-note neume string.</p>
+<p><strong>Why it is written this way:</strong> [sci] Detection alone only says “there is a neume-like blob here.” Medieval OMR needs a second stage that explains what that blob means musically. The code follows a compact causal model: clef fixes the pitch reference, vertical displacement fixes the anchor pitch, and the learned neume template fixes the internal interval pattern. This factorization is the core BGK idea in executable form: recover semantics by injecting notation knowledge after vision, instead of asking the detector to memorize full symbolic strings directly.</p>
+<p><strong>Code details:</strong> [sci]</p>
+<ul><li><code>_estimate_clef_line()</code> uses <code>sample.staff_box</code> to compute equally spaced staff-line hypotheses, then snaps the clef center to the nearest one. The returned value is clamped to <code>1..4</code>, matching the output notation contract even though the drawing grid is represented with <code>N_STAFF_LINES=5</code> positions.</li><li><code>_symbol_anchor_value()</code> computes a continuous pitch coordinate, not an immediate discrete label. It starts from <code>_clef_pitch_value(clef.description)</code> and adds a signed vertical offset divided by <code>_staff_pitch_step(sample)</code>. This is important because geometric evidence is continuous; discretization is postponed until token writing.</li><li><code>_decode_symbol_description()</code> branches by symbol family:</li><li>delimiters are direct string constants;</li><li>clefs become <code>KC{line}</code> or <code>KF{line}</code> after line estimation;</li><li>if no <code>current_clef</code> exists, melodic symbols return an empty string, meaning the code refuses to hallucinate pitch without reference context;</li><li><code>custos</code> emits one pitch by rounding the anchor;</li><li><code>neume_*</code> emits a parenthesized note list by adding the learned offsets from <code>neume_templates[label]</code> to the anchor and rounding each resulting pitch.</li><li>The use of <code>neume_templates[symbol.label]</code> means contour classes are not decorative labels. Each class indexes a learned interval prototype, so a <code>neume_3_uds</code> and a <code>neume_3_dsu</code> can share a visual category family size yet decode to different melodic sequences.</li><li>The repeated <code>round → _value_to_pitch()</code> pattern is where continuous geometry becomes discrete chant notation. That conversion is delayed until the latest possible point to keep the intermediate representation stable under small detector shifts.</li></ul>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 393/678 = 58.0%
+███████████████████████░░░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 13: Staff-level sequential decoding</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 394–420</p>
+<pre><code>61.9%</code></pre>
+<pre><code class="language-python">def _decode_staff(
+    symbols: Sequence[PredictedSymbol],
+    sample: StaffSample,
+    previous_clef: Optional[ClefState],
+    neume_templates: Dict[str, Tuple[float, ...]],
+) -&gt; Tuple[List[PredictedSymbol], Optional[ClefState]]:
+    decoded: List[PredictedSymbol] = []
+    current_clef = previous_clef
+    for symbol in sorted(symbols, key=lambda item: item.center[0]):
+        description = _decode_symbol_description(symbol, sample, current_clef, neume_templates)
+        if not description:
+            continue
+        decoded_symbol = PredictedSymbol(
+            label=symbol.label,
+            description=description,
+            bbox=symbol.bbox,
+            center=symbol.center,
+            confidence=symbol.confidence,
+            source=symbol.source,
+        )
+        decoded.append(decoded_symbol)
+        if decoded_symbol.label.startswith(&quot;clef&quot;):
+            current_clef = ClefState(description=decoded_symbol.description, center_y=decoded_symbol.center[1])
+    return decoded, current_clef</code></pre>
+<p><strong>What it does:</strong> [sci] <code>_decode_staff</code> processes symbols left-to-right while propagating clef state. This creates a causal model over the staff: each decoded clef updates the local pitch reference for subsequent symbols, mirroring how human readers use context and making page transcription sensitive to symbol order rather than just symbol inventory.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 420/678 = 61.9%
+█████████████████████████░░░░░░░░░░░░░░░</code></pre>
+<h2>Step 14: Page-level output serialization and crop export</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 421–456</p>
+<pre><code>67.3%</code></pre>
+<pre><code class="language-python">def _write_predictions(expected_stems: Sequence[str], texts: Dict[str, Dict[int, str]], output_dir: Path) -&gt; None:
+    seen = set()
+    ordered_stems = []
+    for stem in expected_stems:
+        if stem not in seen:
+            ordered_stems.append(stem)
+            seen.add(stem)
+    for stem in texts:
+        if stem not in seen:
+            ordered_stems.append(stem)
+            seen.add(stem)
+
+    for image_stem in ordered_stems:
+        staff_texts = texts.get(image_stem, {})
+        text = &quot; &quot;.join(
+            value.strip()
+            for _, value in sorted(staff_texts.items())
+            if value and value.strip()
+        ).strip()
+        save_text_predictions(image_stem, text, output_dir)
+
+
+
+def _save_yolo_crop(sample: StaffSample, image_dir: Path) -&gt; Tuple[Path, Image.Image]:
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / f&quot;{sample.image_stem}_staff{sample.staff_index:02d}.png&quot;
+    src = sample.image_path
+    if not src.exists():
+        raise FileNotFoundError(f&quot;Source image not found: {src}&quot;)
+    crop = _load_crop(sample).convert(&quot;RGB&quot;)
+    if crop.width == 0 or crop.height == 0:
+        raise ValueError(f&quot;Degenerate crop (0-size) for {sample.image_stem} staff {sample.staff_index}: box={sample.crop_box}&quot;)
+    crop.save(image_path)
+    return image_path, crop</code></pre>
+<p><strong>What it does:</strong> [sci] This section implements two boundary operations between the music model and the benchmark framework. <code>_write_predictions()</code> takes decoded per-staff texts, groups them by page stem, orders them deterministically, concatenates non-empty staff strings with spaces, and writes one <code>{image_stem}.pred.txt</code> file per page. <code>_save_yolo_crop()</code> materializes the actual detector input images by cropping each <code>StaffSample</code> from the source page, converting it to RGB, checking for degenerate geometry, and saving it under a stable <code>stem_staffNN.png</code> name.</p>
+<p><strong>Why it is written this way:</strong> [sci] The detector trains and predicts on staff crops because that is the natural local unit for chant reading, but the benchmark evaluates page-level textual outputs. Without an explicit aggregation layer, the experiment would be irreproducible: the same local predictions could map to different page strings depending on incidental iteration order or missing empty pages. Likewise, detector dataset construction must serialize crops with stable names so image files, label files, and later predictions all refer to the same latent sample identity.</p>
+<p><strong>Code details:</strong> [sci]</p>
+<ul><li><code>_write_predictions()</code> first builds <code>ordered_stems</code> from <code>expected_stems</code>, then appends any extra keys found in <code>texts</code>. This matters because the benchmark expects every requested page stem to exist, including pages with empty predictions; the function therefore preserves the external evaluation contract before considering opportunistic extra outputs.</li><li>Staff texts are stored as <code>Dict[str, Dict[int, str]]</code>, i.e. page stem → staff index → decoded string. The inner <code>sorted(staff_texts.items())</code> is crucial: it reconstructs the reading order by numeric staff index rather than by hash/dictionary insertion order.</li><li><code>value.strip()</code> filtering drops blank or whitespace-only staff outputs. That prevents undecodable staves from injecting spurious separators into page text.</li><li><code>_save_yolo_crop()</code> does not trust the source data blindly. It verifies that the source page image exists, performs the crop through <code>_load_crop(sample)</code> so crop logic stays centralized, converts to RGB because YOLO expects color images, and raises on zero-width/zero-height crops. This turns annotation/crop errors into explicit failures during dataset materialization instead of silent bad training data.</li><li>The file name pattern <code>f"{sample.image_stem}_staff{sample.staff_index:02d}.png"</code> is an identity scheme: it ties crop export, YOLO label export, dataset split mappings, and test-time lookup back to the same sample without separate manifest files.</li></ul>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 456/678 = 67.3%
+███████████████████████████░░░░░░░░░░░░░</code></pre>
+<h2>Step 15: YOLO supervision targets</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 457–481</p>
+<pre><code>70.9%</code></pre>
+<pre><code class="language-python">def _write_yolo_label(sample: StaffSample, label_dir: Path, label_to_index: Dict[str, int], crop_size: Tuple[int, int]) -&gt; None:
+    label_dir.mkdir(parents=True, exist_ok=True)
+    label_path = label_dir / f&quot;{sample.image_stem}_staff{sample.staff_index:02d}.txt&quot;
+    width, height = crop_size
+    lines: List[str] = []
+    max_width = max(width, 1)
+    max_height = max(height, 1)
+    for symbol in sample.symbols:
+        if symbol.label not in label_to_index:
+            continue
+        x, y, w, h = symbol.bbox
+        x1 = min(max(x, 0.0), float(width))
+        y1 = min(max(y, 0.0), float(height))
+        x2 = min(max(x + w, 0.0), float(width))
+        y2 = min(max(y + h, 0.0), float(height))
+        if x2 &lt;= x1 or y2 &lt;= y1:
+            continue
+        cx = ((x1 + x2) / 2.0) / max_width
+        cy = ((y1 + y2) / 2.0) / max_height
+        nw = (x2 - x1) / max_width
+        nh = (y2 - y1) / max_height
+        lines.append(f&quot;{label_to_index[symbol.label]} {cx:.6f} {cy:.6f} {nw:.6f} {nh:.6f}&quot;)
+    label_path.write_text(&quot;\n&quot;.join(lines), encoding=&quot;utf-8&quot;)</code></pre>
+<p><strong>What it does:</strong> [sci] <code>_write_yolo_label()</code> converts each crop-local <code>SymbolAnnotation</code> into one YOLO row: <code>class_id center_x center_y width height</code>, all normalized to <code>[0,1]</code> with respect to the saved crop. It iterates over the staff symbols, discards labels outside the active vocabulary, clips every box to the crop boundaries, rejects empty boxes, computes normalized center/size values, and writes the result into the paired <code>stem_staffNN.txt</code> file.</p>
+<p><strong>Why it is written this way:</strong> [sci] YOLO training requires a very specific supervision geometry: every object must be expressed relative to the image actually seen by the detector, not the original page. Because BGK first remaps page annotations into crop-local coordinates, this function is the final consistency checkpoint that turns symbolic staff annotations into detector-ready labels. The clipping and degeneracy checks are especially important in manuscript data, where imperfect staff assignment or edge-touching symbols can otherwise produce negative widths, out-of-range centers, or zero-area targets that poison optimization.</p>
+<p><strong>Code details:</strong> [sci]</p>
+<ul><li><code>max_width = max(width, 1)</code> and the analogous height guard prevent division by zero if a malformed crop somehow reaches this stage. The code still prefers to fail earlier, but this keeps normalization numerically defined.</li><li>For each symbol, <code>(x, y, w, h)</code> is converted into clipped corners <code>(x1, y1, x2, y2)</code> using nested <code>min(max(...))</code> bounds. This is not cosmetic: crop-local boxes may partially lie outside the crop after upstream assignment, especially near staff borders.</li><li><code>if x2 <= x1 or y2 <= y1: continue</code> removes degenerate boxes after clipping. Such boxes would correspond to zero visible support in the crop and should not become training targets.</li><li><code>cx</code>, <code>cy</code>, <code>nw</code>, <code>nh</code> are then computed in the exact format YOLO expects: normalized center coordinates and normalized size. The representation is translation- and scale-relative to the crop, which lets one model train over heterogeneous manuscript resolutions.</li><li>The output row uses <code>label_to_index[symbol.label]</code>, so detector classes are not hard-coded. The class space is data-driven from <code>build_label_space()</code>, enabling the same export logic to support whatever contour-aware neume inventory the current split actually contains.</li><li>Writing one <code>.txt</code> per crop with the same basename as the image file is what allows Ultralytics’ standard dataset loader to work without extra adapters.</li></ul>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 481/678 = 70.9%
+████████████████████████████░░░░░░░░░░░░</code></pre>
+<h2>Step 16: Exploratory class-balance diagnostics</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 482–518</p>
+<pre><code>76.4%</code></pre>
+<pre><code class="language-python">def _write_label_distribution_plot(samples: Sequence[StaffSample], labels: Sequence[str], plot_path: Path) -&gt; None:
+    counts = Counter(symbol.label for sample in samples for symbol in sample.symbols if symbol.label in labels and symbol.label != &quot;background&quot;)
+    xs = [label for label in labels if label != &quot;background&quot;]
+    ys = [counts.get(label, 0) for label in xs]
+    plot_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(max(8, len(xs) * 0.45), 4.5))
+    sns.barplot(x=xs, y=ys, ax=ax, color=&quot;#4C78A8&quot;)
+    ax.set_title(&quot;BGK YOLO label distribution&quot;)
+    ax.set_xlabel(&quot;label&quot;)
+    ax.set_ylabel(&quot;count&quot;)
+    ax.tick_params(axis=&quot;x&quot;, rotation=45)
+    for tick, value in zip(ax.patches, ys):
+        ax.text(tick.get_x() + tick.get_width() / 2.0, tick.get_height(), str(value), ha=&quot;center&quot;, va=&quot;bottom&quot;, fontsize=8)
+    fig.tight_layout()
+    fig.savefig(plot_path, dpi=200)
+    plt.close(fig)
+
+
+def _prepare_yolo_split(samples: Sequence[StaffSample], images_dir: Path, labels_dir: Path, label_to_index: Dict[str, int]) -&gt; Dict[str, StaffSample]:
+    image_dir = images_dir
+    label_dir = labels_dir
+    image_dir.mkdir(parents=True, exist_ok=True)
+    label_dir.mkdir(parents=True, exist_ok=True)
+    mapping: Dict[str, StaffSample] = {}
+
+    def _process(sample: StaffSample) -&gt; Tuple[str, StaffSample]:
+        image_path, crop = _save_yolo_crop(sample, image_dir)
+        _write_yolo_label(sample, label_dir, label_to_index, crop.size)
+        return image_path.name, sample
+
+    max_workers = min(8, max(1, len(samples)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for image_name, sample in executor.map(_process, samples):
+            mapping[image_name] = sample
+    return mapping</code></pre>
+<p><strong>What it does:</strong> [sci] This section quantifies label prevalence and parallelizes crop/label materialization for one split. The plot is more than bookkeeping: for contour-aware OMR, severe long-tail imbalance changes effective power across neume classes, so visualizing counts is a direct check on whether later metric shifts are plausibly data-limited rather than architecture-limited.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 518/678 = 76.4%
+███████████████████████████████░░░░░░░░░</code></pre>
+<h2>Step 17: YOLO dataset assembly and cache determinism</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 519–557</p>
+<pre><code>82.2%</code></pre>
+<pre><code class="language-python">def _prepare_yolo_dataset(
+    train_samples: Sequence[StaffSample],
+    val_samples: Sequence[StaffSample],
+    test_samples: Sequence[StaffSample],
+    labels: Sequence[str],
+    cache_root: Path,
+    cache_key: str,
+) -&gt; Tuple[Path, Dict[str, Dict[str, StaffSample]]]:
+    dataset_dir = cache_root / cache_key
+    detector_labels = [label for label in labels if label != &quot;background&quot;]
+    detector_label_to_index = {label: idx for idx, label in enumerate(detector_labels)}
+    val_split_samples = val_samples
+    yaml_path = dataset_dir / &quot;data.yaml&quot;
+    if not yaml_path.exists():
+        _prepare_yolo_split(train_samples, dataset_dir / &quot;images&quot; / &quot;train&quot;, dataset_dir / &quot;labels&quot; / &quot;train&quot;, detector_label_to_index)
+        _prepare_yolo_split(val_split_samples, dataset_dir / &quot;images&quot; / &quot;val&quot;, dataset_dir / &quot;labels&quot; / &quot;val&quot;, detector_label_to_index)
+        _prepare_yolo_split(test_samples, dataset_dir / &quot;images&quot; / &quot;test&quot;, dataset_dir / &quot;labels&quot; / &quot;test&quot;, detector_label_to_index)
+        _write_label_distribution_plot(train_samples + list(val_split_samples) + list(test_samples), detector_labels, dataset_dir.parent / &quot;label_distribution.png&quot;)
+        yaml_path.parent.mkdir(parents=True, exist_ok=True)
+        yaml_path.write_text(
+            yaml.safe_dump(
+                {
+                    &quot;path&quot;: str(dataset_dir.resolve()),
+                    &quot;train&quot;: &quot;images/train&quot;,
+                    &quot;val&quot;: &quot;images/val&quot;,
+                    &quot;names&quot;: {idx: label for idx, label in enumerate(detector_labels)},
+                }
+            ),
+            encoding=&quot;utf-8&quot;,
+        )
+    mappings = {
+        &quot;train&quot;: {f&quot;{s.image_stem}_staff{s.staff_index:02d}.png&quot;: s for s in train_samples},
+        &quot;val&quot;: {f&quot;{s.image_stem}_staff{s.staff_index:02d}.png&quot;: s for s in val_split_samples},
+        &quot;test&quot;: {f&quot;{s.image_stem}_staff{s.staff_index:02d}.png&quot;: s for s in test_samples},
+    }
+    return dataset_dir, mappings</code></pre>
+<p><strong>What it does:</strong> [sci] <code>_prepare_yolo_dataset</code> freezes train, validation, and test splits into a cached detector dataset keyed by the dataset signature. This supports reproducible experimentation by making the exact supervision state recoverable, an important safeguard when manuscript benchmarks are small and sensitive to even minor split drift.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 557/678 = 82.2%
+█████████████████████████████████░░░░░░░</code></pre>
+<h2>Step 18: YOLO training wrapper</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 558–591</p>
+<pre><code>87.2%</code></pre>
+<pre><code class="language-python">def _train_yolo_model(
+    train_samples: Sequence[StaffSample],
+    val_samples: Sequence[StaffSample],
+    test_samples: Sequence[StaffSample],
+    labels: Sequence[str],
+    cache_key: str,
+    save_model_path: Path,
+    load_model_path: Optional[Path],
+    model_identifier: str,
+    debug: bool,
+) -&gt; Tuple[Path, Path, Dict[str, Dict[str, StaffSample]]]:
+    dataset_dir, mappings = _prepare_yolo_dataset(train_samples, val_samples, test_samples, labels, save_model_path.parent / &quot;bgk_yolo_cache&quot;, cache_key)
+    model_source = str(load_model_path) if load_model_path else model_identifier
+    model = YOLO(model_source)
+    epochs = 1 if debug else 30
+    model.train(
+        data=str(dataset_dir / &quot;data.yaml&quot;),
+        epochs=epochs,
+        patience=10,
+        imgsz=960,
+        project=str(save_model_path.parent),
+        name=&quot;train&quot;,
+        exist_ok=True,
+        device=&quot;cuda:0&quot; if torch.cuda.is_available() else &quot;cpu&quot;,
+        batch=8 if not debug else 4,
+        workers=2,
+        lr0=0.01,
+    )
+    best_model_path = save_model_path.parent / &quot;train&quot; / &quot;weights&quot; / &quot;best.pt&quot;
+    save_model_path.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(best_model_path, save_model_path / &quot;model.pt&quot;)
+    return best_model_path, dataset_dir, mappings</code></pre>
+<p><strong>What it does:</strong> [sci] <code>_train_yolo_model</code> is the estimation stage for symbol detection. It binds the adapted BGK task to a generic detector with fixed image size, patience, batch size, and learning rate, effectively treating YOLO as the low-level perceptual front end while leaving musical structure to later symbolic decoding.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 591/678 = 87.2%
+███████████████████████████████████░░░░░</code></pre>
+<h2>Step 19: Detector output → symbol hypotheses</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 592–624</p>
+<pre><code>92.0%</code></pre>
+<pre><code class="language-python">def _predict_symbols_yolo(
+    model: YOLO,
+    detector_labels: Sequence[str],
+    image_path: Path,
+) -&gt; List[PredictedSymbol]:
+    results = model.predict(
+        source=str(image_path),
+        conf=0.05,
+        iou=0.5,
+        device=&quot;cuda:0&quot; if torch.cuda.is_available() else &quot;cpu&quot;,
+        verbose=False,
+    )
+    predictions: List[PredictedSymbol] = []
+    for box in results[0].boxes:
+        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+        conf = float(box.conf[0].item())
+        class_idx = int(box.cls[0].item())
+        if class_idx &lt; 0 or class_idx &gt;= len(detector_labels):
+            continue
+        label = detector_labels[class_idx]
+        pred = PredictedSymbol(
+            label=label,
+            description=&quot;&quot;,
+            bbox=(float(x1), float(y1), float(x2 - x1), float(y2 - y1)),
+            center=(float((x1 + x2) / 2.0), float((y1 + y2) / 2.0)),
+            confidence=conf,
+            source=&quot;yolo&quot;,
+        )
+        predictions.append(pred)
+    return predictions</code></pre>
+<p><strong>What it does:</strong> [sci] This inference block transforms raw boxes into typed symbol hypotheses without extra fallback logic. The low confidence threshold maximizes recall at the detection stage, consistent with a pipeline design where musical postprocessing is expected to filter some false positives more safely than missing a clef or neume can be recovered later.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 624/678 = 92.0%
+█████████████████████████████████████░░░</code></pre>
+<h2>Step 20: Benchmark entrypoint: data assembly and training</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 625–651</p>
+<pre><code>96.0%</code></pre>
+<pre><code class="language-python">def train_test_bgk(
+    args,
+    is_train_test_mode,
+    is_sequential,
+    output_dir: Path,
+    train_json: Optional[Path],
+    val_json: Optional[Path],
+    test_json: Optional[Path],
+    save_model_path: Path,
+    load_model_path: Optional[Path],
+    model_identifier: str = &quot;yolov8n.pt&quot;,
+) -&gt; None:
+    train_root = Path(args.data_dir or args.train_dir)
+    test_root = Path(args.data_dir or args.test_dir)
+
+    if train_json is None or val_json is None:
+        raise ValueError(&quot;bgk requires train_json and val_json&quot;)
+
+    train_samples = build_staff_samples(Path(train_json), train_root)
+    val_samples = build_staff_samples(Path(val_json), train_root)
+    test_samples = build_staff_samples(Path(test_json), test_root) if test_json else []
+    expected_test_stems = load_image_stems_from_json(Path(test_json)) if test_json else []
+    labels, _, _ = build_label_space([*train_samples, *val_samples])
+    print(f&quot;🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)} labels={len(labels)}&quot;)
+
+    detector_labels = [label for label in labels if label != &quot;background&quot;]
+    cache_key = hashlib.sha1(&quot;|&quot;.join(map(str, [train_json, val_json, test_json, train_root, test_root, *labels])).encode(&quot;utf-8&quot;)).hexdigest()[:16]</code></pre>
+<p><strong>What it does:</strong> [sci] The first half of <code>train_test_bgk</code> is the experiment orchestrator: it resolves dataset roots, enforces the presence of train/validation annotations, constructs staff samples, builds the observed label space, and trains the detector. In study-design terms, this is where the manuscript split becomes a measurable learning problem with a fixed supervision schema.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 651/678 = 96.0%
+██████████████████████████████████████░░</code></pre>
+<h2>Step 21: Benchmark entrypoint: test-time decoding and writing</h2>
+<p><strong>File:</strong> <code>benchmarking/train_test/train_test_bgk.py</code> lines 652–678</p>
+<pre><code>100.0%</code></pre>
+<pre><code class="language-python">    best_model_path, dataset_dir, mappings = _train_yolo_model(
+        train_samples=train_samples,
+        val_samples=val_samples,
+        test_samples=test_samples,
+        labels=labels,
+        cache_key=cache_key,
+        save_model_path=save_model_path,
+        load_model_path=Path(load_model_path) if load_model_path else None,
+        model_identifier=model_identifier,
+        debug=getattr(args, &quot;debug&quot;, False),
+    )
+    yolo_model = YOLO(str(best_model_path))
+
+    neume_templates = build_neume_templates(train_samples)
+    page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
+    previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
+    test_image_map = mappings[&quot;test&quot;]
+    for image_name, sample in sorted(test_image_map.items(), key=lambda item: (item[1].image_stem, item[1].staff_index)):
+        image_path = dataset_dir / &quot;images&quot; / &quot;test&quot; / image_name
+        predictions = _predict_symbols_yolo(yolo_model, detector_labels, image_path)
+        tokens = _postprocess_staff(predictions, sample.dsl)
+        decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef_by_page[sample.image_stem], neume_templates)
+        previous_clef_by_page[sample.image_stem] = current_clef
+        page_texts[sample.image_stem][sample.staff_index] = &quot; &quot;.join(
+            token.description for token in decoded_tokens if token.description
+        )
+    _write_predictions(expected_test_stems, page_texts, output_dir)</code></pre>
+<p><strong>What it does:</strong> [sci] The final block runs staff-level detection on the test set, carries clef state across staves within a page, decodes symbols into chant text, and writes benchmark-format predictions. This is the scientific endpoint of the BGK adaptation: local visual detections are converted into page-level symbolic sequences that can be compared directly with ground truth through CER/NER-style evaluation.</p>
+<p><strong>Coverage:</strong></p>
+<pre><code>files 1/1 = 100.0%
+lines 678/678 = 100.0%
+████████████████████████████████████████</code></pre>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

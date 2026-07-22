@@ -187,13 +187,10 @@ def build_staff_samples(split_json: Path, data_root: Path) -> List[StaffSample]:
         for staff_index, staff_ann in enumerate(staff_anns):
             x, y, w, h = staff_ann["bbox"]
             dsl = max(8.0, h / 4.0)
-            margin_y = int(max(1, round(dsl)))
-            margin_right = int(max(1, round(dsl)))
-            margin_left = int(max(1, round(4 * dsl)))
-            left = max(0, int(round(x - margin_left)))
-            top = max(0, int(round(y - margin_y)))
-            right = int(round(x + w + margin_right))
-            bottom = int(round(y + h + margin_y))
+            left = max(0, int(round(x)))
+            top = max(0, int(round(y)))
+            right = int(round(x + w))
+            bottom = int(round(y + h))
             symbols: List[SymbolAnnotation] = []
             for ann in page_anns:
                 category_name = categories.get(ann["category_id"])
@@ -220,7 +217,7 @@ def build_staff_samples(split_json: Path, data_root: Path) -> List[StaffSample]:
                         image_stem=image_stem,
                         staff_index=staff_index,
                         crop_box=(left, top, right, bottom),
-                        staff_box=(x - left, y - top, w, h),
+                        staff_box=(0.0, 0.0, w, h),
                         dsl=dsl,
                         symbols=symbols,
                     )
