@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Tuple, List, Optional
+from typing import Dict, Tuple, List, Optional
 
 try:
     import torch
@@ -107,6 +107,37 @@ def get_adaptive_num_workers(json_file: Path, image_root: Path) -> int:
         return 8
 
 
+TASK_CATEGORY_IDS = {"ocr": {6}, "omr": {5}, "ocmr": {5, 6}}
+
+
+def infer_task_from_json_path(json_file: Path) -> Optional[str]:
+    stem = Path(json_file).stem.lower()
+    for task in TASK_CATEGORY_IDS:
+        if stem == task or stem.startswith(f"{task}_"):
+            return task
+    return None
+
+
+def load_ocmr_annotations_and_image_map(
+    json_file: Path,
+    task: Optional[str] = None,
+) -> Tuple[List[dict], Dict[int, dict]]:
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    task = task or infer_task_from_json_path(json_file)
+    annotations = data.get("annotations", [])
+    if task not in TASK_CATEGORY_IDS:
+        images = data.get("images", [])
+        return annotations, {img["id"]: img for img in images}
+
+    category_ids = TASK_CATEGORY_IDS[task]
+    annotations = [ann for ann in annotations if ann.get("category_id") in category_ids]
+    referenced_image_ids = {ann["image_id"] for ann in annotations if "image_id" in ann}
+    images = [img for img in data.get("images", []) if img.get("id") in referenced_image_ids]
+    return annotations, {img["id"]: img for img in images}
+
+
 def path_json2pagexml(
     json_file: Path, task: str, edition: str, data_dir: Path
 ) -> List[Path]:
@@ -114,15 +145,10 @@ def path_json2pagexml(
     if not json_file.exists():
         return []
 
-    with open(json_file, "r") as f:
-        data = json.load(f)
+    annotations, image_id_to_info = load_ocmr_annotations_and_image_map(json_file, task)
 
     xml_files = []
     seen_files = set()
-
-    image_id_to_filename = {
-        img["id"]: img["file_name"] for img in data.get("images", [])
-    }
 
     original_pagexml_dir = (
         data_dir
@@ -130,19 +156,19 @@ def path_json2pagexml(
         / "processed_splits"
         / f"pagexml_all_{edition}_{task}"
     )
-    # We need to iterate through annotations to ensure we only include images that are actually used.
-    for ann in data.get("annotations", []):
+    for ann in annotations:
         image_id = ann.get("image_id")
-        if image_id in image_id_to_filename:
-            img_filename = image_id_to_filename[image_id]
-            img_name = Path(img_filename).stem
-            xml_file = original_pagexml_dir / f"{img_name}.xml"
+        image_info = image_id_to_info.get(image_id)
+        if image_info is None:
+            continue
+        img_name = Path(image_info["file_name"]).stem
+        xml_file = original_pagexml_dir / f"{img_name}.xml"
 
-            if xml_file.exists() and xml_file not in seen_files:
-                xml_files.append(xml_file)
-                seen_files.add(xml_file)
-            elif not xml_file.exists():
-                print(f"Warning: XML file does not exist: {xml_file}")
+        if xml_file.exists() and xml_file not in seen_files:
+            xml_files.append(xml_file)
+            seen_files.add(xml_file)
+        elif not xml_file.exists():
+            print(f"Warning: XML file does not exist: {xml_file}")
 
     return xml_files
 

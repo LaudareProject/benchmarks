@@ -23,7 +23,7 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import ConcatDataset, DataLoader, Dataset
 
 from ..evaluation import calculate_wer_cer
-from ..utils import load_image_stems_from_json, save_text_predictions
+from ..utils import load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
 
 IMAGE_HEIGHT = 128
 MAX_TARGET_LENGTH = 128
@@ -169,7 +169,8 @@ class VLTProcessor:
             p = Path(json_path)
             if not p.exists():
                 continue
-            for ann in json.loads(p.read_text(encoding="utf-8")).get("annotations", []):
+            annotations, _ = load_ocmr_annotations_and_image_map(p)
+            for ann in annotations:
                 characters.update((ann.get("description") or ann.get("text") or "").strip())
         return cls(VLTTokenizer(characters), image_height=image_height)
 
@@ -220,9 +221,7 @@ class VLTDataset(Dataset):
 
         annotations, image_map = [], {}
         if json_file is not None:
-            data = json.loads(Path(json_file).read_text(encoding="utf-8"))
-            annotations = data.get("annotations", [])
-            image_map = {img["id"]: img for img in data.get("images", [])}
+            annotations, image_map = load_ocmr_annotations_and_image_map(Path(json_file))
         if debug:
             annotations = annotations[:5]
 

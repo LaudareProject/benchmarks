@@ -11,7 +11,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 
 from ..evaluation import calculate_wer_cer
-from ..utils import load_image_stems_from_json, save_text_predictions
+from ..utils import load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
 
 try:
     from dtrocr.config import DTrOCRConfig
@@ -49,9 +49,7 @@ class DTrOCRDataset(Dataset):
         self.max_target_length = max_target_length
         self.debug = debug
         if self.json_file is not None:
-            data = json.loads(self.json_file.read_text(encoding="utf-8"))
-            self.annotations = data["annotations"]
-            self.image_id_to_info = {img["id"]: img for img in data["images"]}
+            self.annotations, self.image_id_to_info = load_ocmr_annotations_and_image_map(self.json_file)
         else:
             self.annotations = []
             self.image_id_to_info = {}

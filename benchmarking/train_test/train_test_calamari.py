@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 
 import cv2
 
-from ..utils import get_adaptive_batch_size, get_adaptive_num_workers
+from ..utils import get_adaptive_batch_size, get_adaptive_num_workers, load_ocmr_annotations_and_image_map
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CALAMARI_TRAIN_EXEC = PROJECT_ROOT / ".venv-calamari" / "bin" / "calamari-train"
@@ -68,13 +68,11 @@ def _create_calamari_gt_files(
 
 
 def _load_json_data(json_file: Path, image_root: Path) -> tuple[List, Dict]:
-    with open(json_file, "r") as f:
-        data = json.load(f)
-
+    annotations, image_map = load_ocmr_annotations_and_image_map(json_file)
     image_id_to_path = {
-        img["id"]: image_root / img["file_name"] for img in data.get("images", [])
+        image_id: image_root / img["file_name"] for image_id, img in image_map.items()
     }
-    return data.get("annotations", []), image_id_to_path
+    return annotations, image_id_to_path
 
 
 def prepare_calamari_data(

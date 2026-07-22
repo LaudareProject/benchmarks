@@ -24,6 +24,7 @@ from ..utils import (
     get_augment_policy,
     get_adaptive_batch_size,
     get_adaptive_num_workers,
+    load_ocmr_annotations_and_image_map,
 )
 
 
@@ -146,10 +147,7 @@ class TrOCRDataset(Dataset):
             self.annotations = annotations_to_use
             self.image_id_to_info = image_id_map
         elif self.json_file is not None:
-            with open(self.json_file, "r") as f:
-                data = json.load(f)
-            self.annotations = data["annotations"]
-            self.image_id_to_info = {img["id"]: img for img in data["images"]}
+            self.annotations, self.image_id_to_info = load_ocmr_annotations_and_image_map(self.json_file)
         else:
             self.annotations = []
             self.image_id_to_info = {}

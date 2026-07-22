@@ -24,6 +24,7 @@ from transformers import (
 from ..utils import (
     get_adaptive_num_workers,
     load_image_stems_from_json,
+    load_ocmr_annotations_and_image_map,
     save_text_predictions,
     get_augment_policy,
 )
@@ -49,11 +50,9 @@ def _get_dtype() -> torch.dtype:
 
 
 def _load_annotations(json_path: Path, debug: bool):
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    annotations = data["annotations"][:5] if debug else data["annotations"]
-    image_map = {image["id"]: image for image in data["images"]}
+    annotations, image_map = load_ocmr_annotations_and_image_map(json_path)
+    if debug:
+        annotations = annotations[:5]
     return annotations, image_map
 
 
