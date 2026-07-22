@@ -68,6 +68,10 @@ class ClefState:
     center_y: float
 
 
+def _default_clef_state(sample: StaffSample) -> ClefState:
+    _, _, _, staff_height = sample.staff_box
+    return ClefState(description="KC2", center_y=staff_height * 3.0 / 5.0)
+
 
 def _load_coco(json_path: Path) -> Dict:
     return json.loads(json_path.read_text(encoding="utf-8"))
@@ -264,12 +268,15 @@ def _clef_pitch_value(description: str) -> int:
     return _pitch_to_value("C4" if kind == "C" else "F3")
 
 
-def build_neume_templates(samples: Sequence[StaffSample]) -> Dict[str, Tuple[float, ...]]:
+def build_neume_templates(
+    samples: Sequence[StaffSample],
+    carry_clef_between_staves: bool,
+) -> Dict[str, Tuple[float, ...]]:
     offsets_by_label: Dict[str, List[Tuple[float, ...]]] = defaultdict(list)
     previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
     ordered_samples = sorted(samples, key=lambda sample: (sample.image_stem, sample.staff_index))
     for sample in ordered_samples:
-        current_clef = previous_clef_by_page[sample.image_stem]
+        current_clef = previous_clef_by_page[sample.image_stem] if carry_clef_between_staves else None
         for symbol in sorted(sample.symbols, key=lambda item: _symbol_center_from_annotation(item)[0]):
             _, center_y = _symbol_center_from_annotation(symbol)
             if symbol.label.startswith("clef"):
@@ -282,7 +289,8 @@ def build_neume_templates(samples: Sequence[StaffSample]) -> Dict[str, Tuple[flo
                 continue
             anchor = _clef_pitch_value(current_clef.description) + (current_clef.center_y - center_y) / _staff_pitch_step(sample)
             offsets_by_label[symbol.label].append(tuple(_pitch_to_value(pitch) - anchor for pitch in pitches))
-        previous_clef_by_page[sample.image_stem] = current_clef
+        if carry_clef_between_staves:
+            previous_clef_by_page[sample.image_stem] = current_clef
 
     templates: Dict[str, Tuple[float, ...]] = {}
     for label, examples in offsets_by_label.items():
@@ -437,7 +445,7 @@ def _decode_staff(
     neume_templates: Dict[str, Tuple[float, ...]],
 ) -> Tuple[List[PredictedSymbol], Optional[ClefState]]:
     decoded: List[PredictedSymbol] = []
-    current_clef = previous_clef
+    current_clef = previous_clef or _default_clef_state(sample)
     for symbol in sorted(symbols, key=lambda item: item.center[0]):
         description = _decode_symbol_description(symbol, sample, current_clef, neume_templates)
         if not description:
@@ -701,7 +709,8 @@ def train_test_bgk(
     )
     yolo_model = YOLO(str(best_model_path))
 
-    neume_templates = build_neume_templates(train_samples)
+    carry_clef_between_staves = args.edition == "editorial"
+    neume_templates = build_neume_templates(train_samples, carry_clef_between_staves)
     family_scales = build_family_scales(train_samples)
     page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
     previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
@@ -710,8 +719,10 @@ def train_test_bgk(
         image_path = dataset_dir / "images" / "test" / image_name
         predictions = _predict_symbols_yolo(yolo_model, detector_labels, image_path)
         tokens = _postprocess_staff(predictions, sample.dsl, family_scales)
-        decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef_by_page[sample.image_stem], neume_templates)
-        previous_clef_by_page[sample.image_stem] = current_clef
+        previous_clef = previous_clef_by_page[sample.image_stem] if carry_clef_between_staves else None
+        decoded_tokens, current_clef = _decode_staff(tokens, sample, previous_clef, neume_templates)
+        if carry_clef_between_staves:
+            previous_clef_by_page[sample.image_stem] = current_clef
         page_texts[sample.image_stem][sample.staff_index] = " ".join(
             token.description for token in decoded_tokens if token.description
         )
