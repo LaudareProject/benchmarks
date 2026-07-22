@@ -438,7 +438,10 @@ def _decode_symbol_description(
     if symbol.label == "custos":
         return _value_to_pitch(int(round(anchor)))
     if symbol.label.startswith("neume_"):
-        notes = [_value_to_pitch(int(round(anchor + offset))) for offset in neume_templates[symbol.label]]
+        template = neume_templates.get(symbol.label)
+        if template is None:
+            return ""
+        notes = [_value_to_pitch(int(round(anchor + offset))) for offset in template]
         return f"({' '.join(notes)})"
     return ""
 
@@ -742,7 +745,7 @@ def train_test_bgk(
             yolo_model = YOLO(str(best_model_path))
 
             carry_clef_between_staves = args.edition == "editorial"
-            neume_templates = build_neume_templates(train_samples, carry_clef_between_staves)
+            neume_templates = build_neume_templates([*train_samples, *val_samples], carry_clef_between_staves)
             family_scales = build_family_scales(train_samples)
             page_texts: Dict[str, Dict[int, str]] = defaultdict(dict)
             previous_clef_by_page: Dict[str, Optional[ClefState]] = defaultdict(lambda: None)
