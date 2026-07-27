@@ -125,10 +125,17 @@ def train(args, yolo_data_dir, model, artifacts_dir, train_json, image_root):
 
 
 def predict(
-    args, best_model_path, yolo_data_dir, id_cat_map, categories, output_dir, test_json
+    args,
+    best_model_path,
+    yolo_data_dir,
+    id_cat_map,
+    categories,
+    output_dir,
+    test_json,
+    model_class=YOLO,
 ):
     output_dir.mkdir(parents=True, exist_ok=True)
-    model = YOLO(best_model_path)
+    model = model_class(best_model_path)
 
     device_str = "cuda:0" if torch.cuda.is_available() else "cpu"
 

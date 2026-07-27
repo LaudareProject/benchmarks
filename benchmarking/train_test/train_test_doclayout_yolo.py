@@ -6,8 +6,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
+from doclayout_yolo import YOLOv10
 from huggingface_hub import hf_hub_download
-from ultralytics import YOLO
 
 from .train_test_yolo import make_datasets, predict, save_model, train
 
@@ -53,7 +53,7 @@ def train_test_doclayout_yolo(
         model_source = _resolve_model_identifier(model_identifier)
 
     print(f"   Loading weights from: {model_source}")
-    model = YOLO(model_source)
+    model = YOLOv10(model_source)
 
     print("🚀 Training DocLayout-YOLO model...")
     image_root = args.data_dir or args.train_dir
@@ -77,6 +77,7 @@ def train_test_doclayout_yolo(
             categories,
             output_dir,
             test_json,
+            model_class=YOLOv10,
         )
 
     shutil.rmtree(artifacts_dir)

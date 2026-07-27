@@ -52,8 +52,7 @@
   },
   "doclayout_yolo": {
     "layout": {
-      "default": "neuralshift/doc-layout-yolov8n::weights/best.pt",
-      "official": "juliozhao/DocLayout-YOLO-DocLayNet-Docsynth300K_pretrained::doclayout_yolo_doclaynet_imgsz1120_docsynth_pretrain.pt"
+      "default": "juliozhao/DocLayout-YOLO-DocLayNet-Docsynth300K_pretrained::doclayout_yolo_doclaynet_imgsz1120_docsynth_pretrain.pt"
     }
   },
   "paddleocr_vl": {
@@ -76,8 +75,7 @@
   },
   "bgk": {
     "omr": {
-      "default": "yolov8s.pt",
-      "tiny": "yolov8n.pt"
+      "default": "yolov8s.pt"
     }
   }
 }
