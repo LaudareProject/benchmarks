@@ -11,7 +11,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 
 from ..evaluation import calculate_wer_cer
-from ..utils import load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
+from ..utils import get_augment_policy, load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
 
 try:
     from dtrocr.config import DTrOCRConfig
@@ -42,12 +42,13 @@ def _encode_sample(processor, image: Image.Image, text: str, max_target_length: 
 
 
 class DTrOCRDataset(Dataset):
-    def __init__(self, json_file, data_dir, processor, max_target_length=MAX_TARGET_LENGTH, debug=False):
+    def __init__(self, json_file, data_dir, processor, max_target_length=MAX_TARGET_LENGTH, debug=False, augment_transform=None):
         self.json_file = Path(json_file) if json_file else None
         self.data_dir = Path(data_dir)
         self.processor = processor
         self.max_target_length = max_target_length
         self.debug = debug
+        self.augment_transform = augment_transform
         if self.json_file is not None:
             self.annotations, self.image_id_to_info = load_ocmr_annotations_and_image_map(self.json_file)
         else:
@@ -73,10 +74,12 @@ class DTrOCRDataset(Dataset):
         y = max(0, y - margin)
         w = min(full_image.shape[1] - x, w + 2 * margin)
         h = min(full_image.shape[0] - y, h + 2 * margin)
-        line_image = cv2.cvtColor(full_image[y:y + h, x:x + w], cv2.COLOR_BGR2RGB)
+        line_image = Image.fromarray(cv2.cvtColor(full_image[y:y + h, x:x + w], cv2.COLOR_BGR2RGB))
+        if self.augment_transform:
+            line_image = self.augment_transform(line_image)
         return _encode_sample(
             self.processor,
-            Image.fromarray(line_image),
+            line_image,
             text,
             self.max_target_length,
         )
@@ -244,7 +247,10 @@ def train_test_dtrocr(args, is_train_test_mode, is_sequential, output_dir, train
     adaptation_mode = bool(load_model_path and Path(load_model_path).exists())
     print(f"📦 Loading DTrOCR model ({model_identifier})...")
     model, processor, device = load_model(model_identifier, load_model_path)
-    train_dataset = DTrOCRDataset(train_json, args.data_dir or args.train_dir, processor, debug=args.debug)
+    augment_transform = get_augment_policy() if args.augment else None
+    if augment_transform is not None:
+        print("   💪 Augmentation enabled (TrivialAugmentWide).")
+    train_dataset = DTrOCRDataset(train_json, args.data_dir or args.train_dir, processor, debug=args.debug, augment_transform=augment_transform)
     val_dataset = DTrOCRDataset(val_json, args.data_dir or args.train_dir, processor, debug=args.debug)
     print(f"🚀 Training on {device}...")
     trainer, artifacts_path = train(args, model, processor, train_dataset, val_dataset, adaptation_mode=adaptation_mode)

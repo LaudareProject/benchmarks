@@ -22,6 +22,7 @@ from ultralytics import YOLO
 
 from ..ultralytics_monkey_patch import apply_ultralytics_monkey_patch
 from ..utils import load_image_stems_from_json, save_text_predictions
+from .train_test_yolo import train as train_yolo
 
 apply_ultralytics_monkey_patch()
 
@@ -610,29 +611,6 @@ def _prepare_yolo_dataset(
 
 
 
-def _train_yolo_model(
-    model: YOLO,
-    dataset_dir: Path,
-    artifacts_dir: Path,
-    debug: bool,
-) -> Path:
-    epochs = 1 if debug else 30
-    model.train(
-        data=str(dataset_dir / "data.yaml"),
-        epochs=epochs,
-        patience=10,
-        imgsz=960,
-        project=str(artifacts_dir),
-        name="train",
-        exist_ok=True,
-        device="cuda:0" if torch.cuda.is_available() else "cpu",
-        batch=8 if not debug else 4,
-        workers=2,
-        lr0=0.01,
-    )
-    return artifacts_dir / "train" / "weights" / "best.pt"
-
-
 def _save_model(best_model_path: Path, save_model_path: Path) -> None:
     old_save_model_path = None
     if save_model_path.suffix != ".pt":
@@ -727,11 +705,13 @@ def train_test_bgk(
     model = YOLO(load_model_path if load_model_path else model_identifier)
 
     print("🚀 Training YOLO model...")
-    best_model_path = _train_yolo_model(
-        model,
+    best_model_path = train_yolo(
+        args,
         dataset_dir,
+        model,
         artifacts_dir,
-        getattr(args, "debug", False),
+        Path(train_json),
+        train_root,
     )
 
     if best_model_path is None:

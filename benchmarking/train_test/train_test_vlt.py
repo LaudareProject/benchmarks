@@ -1,4 +1,10 @@
-"""Training and prediction script for a faithful VLT OCR/OMR recognizer."""
+"""
+Training and prediction script for a faithful VLT OCR/OMR recognizer.
+
+References:
+[1] K. Barrere, Y. Soullard, A. Lemaitre, and B. Coüasnon, “Training transformer architectures on few annotated data: an application to historical handwritten text recognition,” Int. J. Doc. Anal. Recognit. (IJDAR), vol. 27, no. 4, pp. 553–566, Dec. 2024, doi: 10.1007/s10032-023-00459-2.
+[2] K. Barrere, Y. Soullard, A. Lemaitre, and B. Coüasnon, “A light transformer-based architecture for handwritten text recognition,” in Document Analysis Systems, S. Uchida, E. Barney, and V. Eglin, Eds., Cham: Springer International Publishing, 2022, pp. 275–290. doi: 10.1007/978-3-031-06555-2_19.
+"""
 
 from __future__ import annotations
 
@@ -6,38 +12,36 @@ import copy
 import json
 import math
 import os
-import random
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
-import albumentations as A
 import cv2
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from PIL import Image
 from rapidfuzz.distance import Levenshtein as _Lev
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import ConcatDataset, DataLoader, Dataset
 
 from ..evaluation import calculate_wer_cer
-from ..utils import load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
+from ..utils import get_augment_policy, load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
 
 IMAGE_HEIGHT = 128
 MAX_TARGET_LENGTH = 128
 MAX_NEW_TOKENS = 128
 TTA_ROUNDS = 60
 PREDICTION_FILTER_THRESHOLD = 0.75
-AUGMENT_PROBABILITY = 0.2
 LOSS_LAMBDA = 0.5
 WARMUP_STEPS = 4000
 MAX_LR = 0.01
 GENERIC_MAX_EPOCHS = 200
 STEP2_EPOCHS = 10
 ADAPTATION_MAX_EPOCHS = 50
-DEFAULT_CONV_CHANNELS = (32, 64, 96, 128, 256)
+DEFAULT_CONV_CHANNELS = (8, 16, 32, 64, 128)
 DEFAULT_NUM_ENCODER_LAYERS = 4
 DEFAULT_NUM_DECODER_LAYERS = 2
 DEFAULT_HIDDEN_SIZE = 256
@@ -175,35 +179,6 @@ class VLTProcessor:
         return cls(VLTTokenizer(characters), image_height=image_height)
 
 
-def _random_pad(image: np.ndarray, p: float = AUGMENT_PROBABILITY) -> np.ndarray:
-    if random.random() >= p:
-        return image
-    h, w = image.shape[:2]
-    return cv2.copyMakeBorder(
-        image,
-        random.randint(0, max(1, int(0.05 * h))), random.randint(0, max(1, int(0.05 * h))),
-        random.randint(0, max(1, int(0.08 * w))), random.randint(0, max(1, int(0.08 * w))),
-        borderType=cv2.BORDER_REPLICATE,
-    )
-
-
-class PaperVLTAugment:
-    def __init__(self, p: float = AUGMENT_PROBABILITY):
-        self._p = p
-        self._tf = A.Compose([
-            A.OneOf([
-                A.Morphological(scale=(2, 3), operation="dilation"),
-                A.Morphological(scale=(2, 3), operation="erosion"),
-            ], p=p),
-            A.ElasticTransform(alpha=4.0, sigma=2.0, p=p),
-            A.Perspective(scale=(0.05, 0.1), p=p),
-            A.GaussNoise(std_range=(8 / 255, 8 / 255), mean_range=(0, 0), p=p),
-        ])
-
-    def __call__(self, image: np.ndarray) -> np.ndarray:
-        return _random_pad(self._tf(image=image)["image"], p=self._p)
-
-
 class VLTDataset(Dataset):
     def __init__(
         self,
@@ -211,7 +186,7 @@ class VLTDataset(Dataset):
         data_dir: str | Path,
         processor: VLTProcessor,
         debug: bool = False,
-        augment_transform: PaperVLTAugment | None = None,
+        augment_transform=None,
         tta_rounds: int = 1,
     ):
         self.data_dir = Path(data_dir)
@@ -227,6 +202,9 @@ class VLTDataset(Dataset):
 
         self.base_samples: list[dict] = []
         for sid, ann in enumerate(annotations):
+            bbox = ann.get("bbox", [])
+            if len(bbox) != 4 or float(bbox[2]) * float(bbox[3]) < 4:
+                continue
             img_info = image_map.get(ann.get("image_id"))
             if img_info is None:
                 continue
@@ -255,9 +233,8 @@ class VLTDataset(Dataset):
         if img is None:
             raise FileNotFoundError(f"Could not read: {self.data_dir / img_info['file_name']}")
         x, y, w, h = [int(v) for v in ann["bbox"]]
-        m = 8
-        x, y = max(0, x - m), max(0, y - m)
-        w, h = min(img.shape[1] - x, w + 2 * m), min(img.shape[0] - y, h + 2 * m)
+        x, y = max(0, x), max(0, y)
+        w, h = min(img.shape[1] - x, w), min(img.shape[0] - y, h)
         return cv2.cvtColor(img[y:y + h, x:x + w], cv2.COLOR_BGR2RGB)
 
     def _resize(self, image: np.ndarray) -> tuple[torch.Tensor, int]:
@@ -265,7 +242,7 @@ class VLTDataset(Dataset):
         if h <= 0 or w <= 0:
             raise ValueError("Invalid crop dimensions")
         th = self.processor.image_height
-        tw = max(4, int(round(w * th / h)))
+        tw = max(46, int(round(w * th / h)))
         resized = cv2.resize(image, (tw, th), interpolation=cv2.INTER_LINEAR)
         return torch.from_numpy(resized).permute(2, 0, 1).float() / 255.0, tw
 
@@ -273,7 +250,7 @@ class VLTDataset(Dataset):
         s = self.samples[idx]
         image = self._load_and_crop(s)
         if self.augment_transform is not None and s.get("apply_augment", False):
-            image = self.augment_transform(image)
+            image = np.asarray(self.augment_transform(Image.fromarray(image)))
         pixel_values, image_width = self._resize(image)
         ctc_ids = self.processor.tokenizer.encode_ctc(s["text"])
         return {
@@ -364,19 +341,26 @@ class PaperVLTModel(nn.Module):
         conv_layers: list[nn.Module] = []
         in_ch = 3
         for i, out_ch in enumerate(config.conv_channels):
-            conv_layers += [nn.Conv2d(in_ch, out_ch, 3, padding=1), nn.LeakyReLU(0.2, inplace=True), SpatialLayerNorm(out_ch)]
+            kernel_size = (4, 2) if i == len(config.conv_channels) - 1 else 3
+            conv_layers += [nn.Conv2d(in_ch, out_ch, kernel_size), nn.LeakyReLU(0.2, inplace=True), SpatialLayerNorm(out_ch)]
             if i < 3:
                 conv_layers.append(nn.MaxPool2d(2, 2))
             conv_layers.append(nn.Dropout(config.conv_dropout))
             in_ch = out_ch
         self.conv_backbone = nn.Sequential(*conv_layers)
+        self.collapse = nn.Sequential(
+            nn.Conv2d(config.conv_channels[-1], config.conv_channels[-1], (9, 1)),
+            nn.LeakyReLU(0.2, inplace=True),
+            SpatialLayerNorm(config.conv_channels[-1]),
+        )
+        self.input_projection = nn.Linear(config.conv_channels[-1], config.hidden_size)
 
         enc_layer = nn.TransformerEncoderLayer(config.hidden_size, config.num_heads, config.ff_dim,
-                                               config.transformer_dropout, "relu", batch_first=True, norm_first=True)
+                                               config.transformer_dropout, "relu", batch_first=True, norm_first=False)
         self.encoder = nn.TransformerEncoder(enc_layer, num_layers=config.num_encoder_layers)
 
         dec_layer = nn.TransformerDecoderLayer(config.hidden_size, config.num_heads, config.ff_dim,
-                                               config.transformer_dropout, "relu", batch_first=True, norm_first=True)
+                                               config.transformer_dropout, "relu", batch_first=True, norm_first=False)
         self.decoder = nn.TransformerDecoder(dec_layer, num_layers=config.num_decoder_layers)
         self.token_embedding = nn.Embedding(seq_vocab_size, config.hidden_size)
         self.encoder_positional = SinusoidalPositionalEncoding(config.hidden_size)
@@ -408,10 +392,14 @@ class PaperVLTModel(nn.Module):
 
     @staticmethod
     def reduced_lengths(image_widths: torch.Tensor) -> torch.Tensor:
-        return torch.div(image_widths, 8, rounding_mode="floor").clamp_min(1)
+        lengths = image_widths
+        for _ in range(3):
+            lengths = torch.div(lengths - 2, 2, rounding_mode="floor")
+        return (lengths - 3).clamp_min(1)
 
     def _encode(self, pixel_values: torch.Tensor, image_widths: torch.Tensor):
-        features = self.conv_backbone(pixel_values).mean(dim=2).transpose(1, 2)
+        features = self.collapse(self.conv_backbone(pixel_values)).squeeze(2).transpose(1, 2)
+        features = self.input_projection(features)
         features = self.encoder_positional(features)
         reduced = self.reduced_lengths(image_widths).to(features.device)
         mask = torch.arange(features.size(1), device=features.device).unsqueeze(0) >= reduced.unsqueeze(1)
@@ -677,7 +665,7 @@ def save_model(model: PaperVLTModel, processor: VLTProcessor, save_model_path) -
 def predict(args, model: PaperVLTModel, processor: VLTProcessor, output_dir: Path, test_json) -> None:
     tta = 1 if args.debug else TTA_ROUNDS
     dataset = VLTDataset(test_json, args.data_dir or args.test_dir, processor, debug=args.debug,
-                         augment_transform=PaperVLTAugment() if tta > 1 else None, tta_rounds=tta)
+                         augment_transform=get_augment_policy() if tta > 1 else None, tta_rounds=tta)
     loader = DataLoader(dataset, batch_size=_resolve_batch_size(args), shuffle=False,
                         num_workers=0, collate_fn=VLTPredictCollator())
     expected_stems = load_image_stems_from_json(Path(test_json))
@@ -714,7 +702,9 @@ def train_test_vlt(args, is_train_test_mode, is_sequential, output_dir,
 
     print(f"📦 Loading VLT ({model_identifier})...")
     model, processor, device = load_model(model_identifier, load_model_path, processor=processor)
-    aug = PaperVLTAugment()
+    aug = get_augment_policy() if args.augment else None
+    if aug is not None:
+        print("   💪 Augmentation enabled (TrivialAugmentWide).")
     train_ds = VLTDataset(train_json, args.data_dir or args.train_dir, processor, debug=args.debug, augment_transform=aug)
     val_ds = VLTDataset(val_json, args.data_dir or args.train_dir, processor, debug=args.debug)
 
