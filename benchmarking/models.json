@@ -46,8 +46,8 @@
   },
   "yolo": {
     "layout": {
-      "yolov8s": "yolov8s",
-      "yolov8n": "yolov8n"
+      "yolov8s": "yolo26s",
+      "yolov8n": "yolo26m"
     }
   },
   "doclayout_yolo": {
@@ -75,7 +75,7 @@
   },
   "bgk": {
     "omr": {
-      "default": "yolov8s.pt"
+      "default": "yolo26s.pt"
     }
   }
 }
