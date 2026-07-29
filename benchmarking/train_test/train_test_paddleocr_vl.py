@@ -143,10 +143,12 @@ def _prepare_inputs(processor, image: Image.Image, prompt: str, target_text: Opt
         tokenize=True,
         return_dict=True,
         return_tensors="pt",
-        images_kwargs={
-            "size": {
-                "shortest_edge": _resolve_shortest_edge(processor),
-                "longest_edge": MAX_PIXELS,
+        processor_kwargs={
+            "images_kwargs": {
+                "size": {
+                    "shortest_edge": _resolve_shortest_edge(processor),
+                    "longest_edge": MAX_PIXELS,
+                }
             }
         },
     )
