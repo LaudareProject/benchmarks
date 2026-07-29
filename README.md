@@ -49,6 +49,42 @@ Install system dependencies:
 
 You can also run more specific experiments (see the Help file) and/or add your own framework.
 
+### Remote tmux testing
+
+`remote_test.sh` runs the configured experiment in a new window of the only existing tmux session on a remote host, then streams its stdout and stderr locally. Configure the target in `pyproject.toml`:
+
+```toml
+[tool.remote_test]
+host = "gpuseeweb"
+directory = "LaudareBenchmarks"
+command = "~/.local/bin/mise exec uv -- ./experiments.sh data/I-Ct_91 --device cuda:1 --debug"
+```
+
+The remote host must have exactly one tmux session and a checkout at `directory`. Start and poll an experiment with:
+
+```bash
+./remote_test.sh
+```
+
+Polling stops after 60 seconds by default, while the tmux job continues. Resume output-only polling without launching another job:
+
+```bash
+./remote_test.sh --poll
+```
+
+Set a different polling duration in seconds when needed:
+
+```bash
+REMOTE_TEST_POLL_TIMEOUT=300 ./remote_test.sh --poll
+```
+
+Before running a remote experiment, validate the scripts locally:
+
+```bash
+bash -n remote_test.sh remote_test.remote.sh
+./remote_test.sh --poll
+```
+
 ### End-to-End Pipeline Benchmarking
 
 Run full-pipeline evaluation (layout → crop → OCR/OMR) with:

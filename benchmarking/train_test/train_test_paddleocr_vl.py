@@ -468,10 +468,7 @@ def train(args, model, processor, train_dataset, val_dataset):
     # Avoid selecting checkpoints on an unstable, near-empty validation split.
     has_sufficient_val_data = len(val_dataset) >= MIN_VAL_SAMPLES
     if not has_sufficient_val_data:
-        print(
-            f"⚠️  Validation set too small ({len(
-                val_dataset)} samples), disabling validation"
-        )
+        print(f"⚠️  Validation set too small ({len(val_dataset)} samples), disabling validation")
 
     dtype = _get_dtype()
     # Retain the paper's Stage-2 epochs/LR endpoints where local hardware permits.
@@ -581,8 +578,7 @@ def predict(args, model, processor, device, output_dir, test_json):
                 ).strip()
                 image_predictions[image_stem].append(prediction)
                 if args.debug:
-                    print(f"   [batch {batch_idx}] {
-                          image_stem}: {prediction[:80]}")
+                    print(f"   [batch {batch_idx}] {image_stem}: {prediction[:80]}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     # The benchmark expects one text file per page; annotation order defines concatenation.
