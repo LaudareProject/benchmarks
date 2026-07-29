@@ -49,42 +49,6 @@ Install system dependencies:
 
 You can also run more specific experiments (see the Help file) and/or add your own framework.
 
-### Remote tmux testing
-
-`remote_test.sh` runs the configured experiment in a new window of the only existing tmux session on a remote host, then streams its stdout and stderr locally. Configure the target in `pyproject.toml`:
-
-```toml
-[tool.remote_test]
-host = "gpuseeweb"
-directory = "LaudareBenchmarks"
-command = "~/.local/bin/mise exec uv -- ./experiments.sh data/I-Ct_91 --device cuda:1 --debug"
-```
-
-The remote host must have exactly one tmux session and a checkout at `directory`. Start and poll an experiment with:
-
-```bash
-./remote_test.sh
-```
-
-Polling stops after 60 seconds by default, while the tmux job continues. Resume output-only polling without launching another job:
-
-```bash
-./remote_test.sh --poll
-```
-
-Set a different polling duration in seconds when needed:
-
-```bash
-REMOTE_TEST_POLL_TIMEOUT=300 ./remote_test.sh --poll
-```
-
-Before running a remote experiment, validate the scripts locally:
-
-```bash
-bash -n remote_test.sh remote_test.remote.sh
-./remote_test.sh --poll
-```
-
 ### End-to-End Pipeline Benchmarking
 
 Run full-pipeline evaluation (layout → crop → OCR/OMR) with:
@@ -195,12 +159,12 @@ def train_test_yourmodel(
     model = train_your_model(train_json, val_json, model)
 
     save_your_model_function(model, save_model_path)
-    
+
     if test_json is not None:
       # then load the best model and run predictions on the test set
       # see below for the standardized output formats
       test_predictions = predict_your_model(test_json, model)
-      
+
       # save predictions in the given directory with the proper naming scheme
       # you can use annotations.ann_handler.create_new_pagexml_file(...) to easily create
       # PageXML files
@@ -220,7 +184,7 @@ Here is an example of our COCO-style JSON format:
     {
       "id": 5,                    // Unique image identifier
       "width": 2083,              // Image dimensions
-      "height": 2717, 
+      "height": 2717,
       "file_name": "c003r.png"    // Relative path from image-root
     }
   ],
@@ -277,7 +241,7 @@ Add to `benchmarking/models.json`:
 "yourmodel": {
   "ocr": {
     "small": "yourmodel-small-ocr",
-    "base": "yourmodel-base-ocr", 
+    "base": "yourmodel-base-ocr",
     "large": "yourmodel-large-ocr"
   },
   "omr": {
@@ -291,7 +255,43 @@ Add to `benchmarking/models.json`:
 
 ### Testing Your Implementation
 
-See the file `./test.sh` for the commands I used to test the implemented frameworks.
+`remote_test.sh` runs the configured experiment in a new window of the only existing tmux session on
+a remote host, then streams its stdout and stderr locally. Configure the target in `pyproject.toml`:
+
+```toml
+[tool.remote_test]
+host = "gpuseeweb"
+directory = "LaudareBenchmarks"
+command = "~/.local/bin/mise exec uv -- ./experiments.sh data/I-Ct_91 --device cuda:1 --debug"
+```
+
+The remote host must have exactly one tmux session and a checkout at `directory`. Start and poll an
+experiment with:
+
+```bash
+./remote_test.sh
+```
+
+Polling stops after 60 seconds by default, while the tmux job continues. Resume output-only polling
+without launching another job:
+
+```bash
+./remote_test.sh --poll
+```
+
+Set a different polling duration in seconds when needed:
+
+```bash
+REMOTE_TEST_POLL_TIMEOUT=300 ./remote_test.sh --poll
+```
+
+Before running a remote experiment, validate the scripts locally:
+
+```bash
+bash -n remote_test.sh remote_test.remote.sh
+./remote_test.sh --poll
+```
+
 
 ## Credits
 
