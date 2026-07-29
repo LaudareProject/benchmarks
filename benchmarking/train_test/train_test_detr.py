@@ -11,7 +11,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision.transforms.v2 import functional as F
-from torchvision.tv_tensors import BoundingBoxFormat
+from torchvision.tv_tensors import BoundingBoxFormat, BoundingBoxes
 from transformers import (
     DetrForObjectDetection,
     DetrImageProcessor,
@@ -80,44 +80,40 @@ class DetrCocoDataset(Dataset):
         image = Image.open(img_path).convert("RGB")
 
         annotations = self.image_annotations[image_id]
-
-        if self.transforms and annotations:
-            boxes = [ann["bbox"] for ann in annotations]
-            boxes = F.convert_bounding_box_format(
-                torch.tensor(boxes),
-                old_format=BoundingBoxFormat.XYWH,
-                new_format=BoundingBoxFormat.XYXY,
-            )
-            labels = [self.cat_id_map[ann["category_id"]] for ann in annotations]
-
-            tv_target = {
-                "boxes": boxes,
-                "labels": torch.tensor(labels, dtype=torch.int64),
-            }
-
+        boxes = F.convert_bounding_box_format(
+            torch.tensor([ann["bbox"] for ann in annotations]),
+            old_format=BoundingBoxFormat.XYWH,
+            new_format=BoundingBoxFormat.XYXY,
+        )
+        tv_target = {
+            "boxes": BoundingBoxes(
+                boxes,
+                format=BoundingBoxFormat.XYXY,
+                canvas_size=(image_info["height"], image_info["width"]),
+            ),
+            "labels": torch.tensor(
+                [self.cat_id_map[ann["category_id"]] for ann in annotations],
+                dtype=torch.int64,
+            ),
+        }
+        if self.transforms:
             image, tv_target = self.transforms(image, tv_target)
 
-            aug_boxes = F.convert_bounding_box_format(
-                tv_target["boxes"],
-                old_format=BoundingBoxFormat.XYXY,
-                new_format=BoundingBoxFormat.XYWH,
-            )
-            for i, ann in enumerate(annotations):
-                ann["bbox"] = aug_boxes[i].tolist()
-
-        # Format annotations for DetrImageProcessor
+        aug_boxes = F.convert_bounding_box_format(
+            tv_target["boxes"], new_format=BoundingBoxFormat.XYWH
+        )
         target = {
             "image_id": image_id,
             "annotations": [
                 {
                     "image_id": image_id,
-                    "category_id": self.cat_id_map[ann["category_id"]],
-                    "bbox": ann["bbox"],
-                    "area": ann["bbox"][2] * ann["bbox"][3],
+                    "category_id": label.item(),
+                    "bbox": box.tolist(),
+                    "area": box[2].item() * box[3].item(),
                     "iscrowd": 0,
-                    "id": ann.get("id", idx),
+                    "id": annotations[i].get("id", idx),
                 }
-                for ann in annotations
+                for i, (box, label) in enumerate(zip(aug_boxes, tv_target["labels"]))
             ],
         }
 
@@ -361,10 +357,9 @@ def make_datasets(args, train_json, val_json, test_json, image_processor):
     cat_id_to_label = {cat["id"]: i for i, cat in enumerate(categories)}
     label_to_cat_id = {v: k for k, v in cat_id_to_label.items()}
 
-    train_transforms = None
+    train_transforms = get_augment_policy(args.task, "transform", args.augment)
     if args.augment:
-        print("   💪 Augmentation enabled.")
-        train_transforms = get_augment_policy()
+        print("   💪 Standard layout augmentation enabled.")
 
     train_dataset = DetrCocoDataset(
         train_json,

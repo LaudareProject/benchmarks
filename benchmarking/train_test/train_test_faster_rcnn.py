@@ -15,9 +15,10 @@ from torchvision.models.detection import (
     fasterrcnn_resnet50_fpn,
 )
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from torchvision.tv_tensors import BoundingBoxFormat, BoundingBoxes
 
 from ..annotations.ann_handler import create_new_pagexml_file
-from ..utils import get_transforms, get_adaptive_batch_size, get_adaptive_num_workers
+from ..utils import get_augment_policy, get_adaptive_batch_size, get_adaptive_num_workers
 
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10):
@@ -108,12 +109,17 @@ class CocoLayoutDataset(Dataset):
             labels.append(self.cat_id_map[ann["category_id"]])
 
         target = {
-            "boxes": torch.as_tensor(boxes, dtype=torch.float32),
+            "boxes": BoundingBoxes(
+                torch.as_tensor(boxes, dtype=torch.float32),
+                format=BoundingBoxFormat.XYXY,
+                canvas_size=(image.height, image.width),
+            ),
             "labels": torch.as_tensor(labels, dtype=torch.int64),
         }
 
         if self.transforms:
             image, target = self.transforms(image, target)
+        target["boxes"] = target["boxes"].as_subclass(torch.Tensor)
 
         return image, target
 
@@ -244,7 +250,8 @@ def make_datasets(args, train_json, val_json, test_json):
     num_classes = len(train_data["categories"]) + 1
 
     # Get transformations
-    train_transforms, eval_transforms = get_transforms(augment=args.augment)
+    train_transforms = get_augment_policy(args.task, "transform", args.augment)
+    eval_transforms = get_augment_policy(args.task, "transform", False)
 
     # Calculate adaptive parameters with LR scaling
     train_json_path = Path(train_json)

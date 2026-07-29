@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import re
@@ -705,8 +706,10 @@ def train_test_bgk(
     model = YOLO(load_model_path if load_model_path else model_identifier)
 
     print("🚀 Training YOLO model...")
+    yolo_args = copy.copy(args)
+    yolo_args.task = "layout"
     best_model_path = train_yolo(
-        args,
+        yolo_args,
         dataset_dir,
         model,
         artifacts_dir,

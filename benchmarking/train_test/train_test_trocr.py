@@ -429,7 +429,7 @@ def make_datasets(args, train_json, val_json, test_json, processor):
     augment_transform = None
     if args.augment:
         print("   💪 Augmentation enabled.")
-        augment_transform = get_augment_policy()
+        augment_transform = get_augment_policy(args.task, enabled=True)
 
     train_dataset = TrOCRDataset(
         train_json,

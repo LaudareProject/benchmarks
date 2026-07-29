@@ -665,7 +665,7 @@ def save_model(model: PaperVLTModel, processor: VLTProcessor, save_model_path) -
 def predict(args, model: PaperVLTModel, processor: VLTProcessor, output_dir: Path, test_json) -> None:
     tta = 1 if args.debug else TTA_ROUNDS
     dataset = VLTDataset(test_json, args.data_dir or args.test_dir, processor, debug=args.debug,
-                         augment_transform=get_augment_policy() if tta > 1 else None, tta_rounds=tta)
+                         augment_transform=get_augment_policy(args.task, enabled=True) if tta > 1 else None, tta_rounds=tta)
     loader = DataLoader(dataset, batch_size=_resolve_batch_size(args), shuffle=False,
                         num_workers=0, collate_fn=VLTPredictCollator())
     expected_stems = load_image_stems_from_json(Path(test_json))
@@ -702,9 +702,9 @@ def train_test_vlt(args, is_train_test_mode, is_sequential, output_dir,
 
     print(f"📦 Loading VLT ({model_identifier})...")
     model, processor, device = load_model(model_identifier, load_model_path, processor=processor)
-    aug = get_augment_policy() if args.augment else None
+    aug = get_augment_policy(args.task, enabled=True) if args.augment else None
     if aug is not None:
-        print("   💪 Augmentation enabled (TrivialAugmentWide).")
+        print("   💪 Augmentation enabled.")
     train_ds = VLTDataset(train_json, args.data_dir or args.train_dir, processor, debug=args.debug, augment_transform=aug)
     val_ds = VLTDataset(val_json, args.data_dir or args.train_dir, processor, debug=args.debug)
 

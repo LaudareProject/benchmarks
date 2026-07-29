@@ -226,52 +226,74 @@ def get_json_paths(
         raise ValueError("Unable to determine data paths")
 
 
-def get_augment_policy(type: str = "transform"):
-    """
-    Returns the TrivialAugmentWide transform policy for PIL images.
-    This is suitable for tasks where the image is processed further
-    by another library (e.g., Hugging Face processors) after augmentation.
-    """
+def get_augment_policy(task: Optional[str] = None, type: str = "transform", enabled: bool = True):
+    """Return the standard augmentation policy for a task."""
+    if not enabled:
+        return None
+
+    if task == "layout":
+        if type == "str":
+            return LAYOUT_AUGMENTATION.copy()
+        if not TORCH_AVAILABLE:
+            raise ImportError("PyTorch not available for transform-based augmentation")
+        return get_transforms(augment=True)[0]
+
     if not TORCH_AVAILABLE:
         if type == "str":
             return "trivialaugment"
         raise ImportError("PyTorch not available for transform-based augmentation")
 
     if type == "transform":
-        return T.TrivialAugmentWide()  # for usual torchvision pipelines
+        return T.TrivialAugmentWide()
     elif type == "str":
-        return "trivialaugment"  # for ultralytics (yolo)
+        return "trivialaugment"
     else:
         raise ValueError("type must be 'transform' or 'str'")
 
 
+LAYOUT_AUGMENTATION = {
+    "hsv_h": 0.015,
+    "hsv_s": 0.7,
+    "hsv_v": 0.4,
+    "degrees": 0.0,
+    "translate": 0.1,
+    "scale": 0.5,
+    "shear": 0.0,
+    "perspective": 0.0,
+    "flipud": 0.0,
+    "fliplr": 0.5,
+    "mosaic": 1.0,
+    "mixup": 0.0,
+    "copy_paste": 0.0,
+}
+
+
+def get_layout_augmentation(task: str, enabled: bool) -> dict:
+    if task != "layout":
+        return {}
+    if enabled:
+        return LAYOUT_AUGMENTATION.copy()
+    return {key: 0.0 for key in LAYOUT_AUGMENTATION}
+
+
 def get_transforms(augment=False):
-    """
-    Returns a pair of transforms for object detection models that require
-    tensor conversion and handle bounding boxes.
-
-    Args:
-        augment (bool): Whether to include augmentation in the training transform.
-
-    Returns:
-        tuple: A pair of (train_transform, eval_transform).
-    """
+    """Return bbox-aware YOLO-style transforms for two-stage detectors."""
     if not TORCH_AVAILABLE:
         raise ImportError("PyTorch not available for transforms")
 
+    transforms = [T.ToImage(), T.ToDtype(torch.float32, scale=True)]
     if augment:
-        train_transform = T.Compose(
+        transforms.extend(
             [
-                T.TrivialAugmentWide(),
-                T.ToImage(),
-                T.ToDtype(torch.float32, scale=True),
+                T.ColorJitter(brightness=0.4, saturation=0.7, hue=0.015),
+                T.RandomAffine(degrees=0, translate=(0.1, 0.1), scale=(0.5, 1.5)),
+                T.RandomHorizontalFlip(p=0.5),
+                T.SanitizeBoundingBoxes(),
             ]
         )
-    else:
-        train_transform = T.Compose([T.ToImage(), T.ToDtype(torch.float32, scale=True)])
 
+    train_transform = T.Compose(transforms)
     eval_transform = T.Compose([T.ToImage(), T.ToDtype(torch.float32, scale=True)])
-
     return train_transform, eval_transform
 
 

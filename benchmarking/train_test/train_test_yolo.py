@@ -14,13 +14,10 @@ from ultralytics import YOLO
 
 from ..annotations.ann_handler import create_new_pagexml_file
 from ..utils import (
-    get_augment_policy,
     get_adaptive_batch_size,
     get_adaptive_num_workers,
+    get_augment_policy,
 )
-from ..ultralytics_monkey_patch import apply_ultralytics_monkey_patch
-
-apply_ultralytics_monkey_patch()
 
 
 def prepare_yolo_data(data_json, data_dir, yolo_data_dir, split, cat_id_map, debug):
@@ -90,10 +87,8 @@ def train(args, yolo_data_dir, model, artifacts_dir, train_json, image_root):
     print(f"   📈 Scaled learning rate: {scaled_lr:.4f} (base: {base_lr:.4f})")
     print(f"   👷 Adaptive workers: {adaptive_workers}")
 
-    auto_augment = None
     if args.augment:
-        print("   💪 Augmentation enabled (TrivialAugmentWide).")
-        auto_augment = get_augment_policy("str")
+        print("   💪 Standard YOLO layout augmentation enabled.")
 
     device_str = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -106,8 +101,7 @@ def train(args, yolo_data_dir, model, artifacts_dir, train_json, image_root):
         device=device_str,
         exist_ok=True,
         name="train",
-        augment=args.augment,
-        auto_augment=auto_augment,
+        **get_augment_policy(args.task, "str", args.augment),
         batch=adaptive_batch,
         workers=adaptive_workers,
         lr0=scaled_lr,  # Initial learning rate (scaled)
