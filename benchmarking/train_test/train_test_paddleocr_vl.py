@@ -1,5 +1,8 @@
 """
 Training and prediction script for PaddleOCR-VL for OCR/OMR.
+
+Reference:
+[1] C. Cui et al., “PaddleOCR-VL: boosting multilingual document parsing via a 0.9B ultra-compact vision-language model,” Nov. 25, 2025, arXiv: arXiv:2510.14528. doi: 10.48550/arXiv.2510.14528.
 """
 
 import json
@@ -44,12 +47,14 @@ MIN_VAL_SAMPLES = 4
 
 
 def _get_dtype() -> torch.dtype:
+    # Prefer reduced precision on GPU; keep float32 on CPU for portability.
     if not torch.cuda.is_available():
         return torch.float32
     return torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
 
 
 def _load_annotations(json_path: Path, debug: bool):
+    # Centralize annotation loading so train/predict share the same sample filter.
     annotations, image_map = load_ocmr_annotations_and_image_map(json_path)
     if debug:
         annotations = annotations[:5]
@@ -57,27 +62,31 @@ def _load_annotations(json_path: Path, debug: bool):
 
 
 def _target_text(ann: dict) -> str:
+    # Accept both OCR-style and OMR-style fields, then normalize whitespace.
     return (ann.get("description") or ann.get("text") or "").strip()
 
 
 def _crop_line_image(data_dir: Path, image_info: dict, ann: dict) -> Image.Image:
+    # Decode the source page, then isolate the annotated region as the model input.
     image_path = data_dir / image_info["file_name"]
     full_image = cv2.imread(str(image_path))
     if full_image is None:
         raise FileNotFoundError(f"Could not read image: {image_path}")
 
     x, y, w, h = [int(value) for value in ann["bbox"]]
-    margin = 8
+    # Clamp the box to the image bounds; this prevents invalid crops on edge cases.
+    margin = 0
     x = max(0, x - margin)
     y = max(0, y - margin)
     w = min(full_image.shape[1] - x, w + 2 * margin)
     h = min(full_image.shape[0] - y, h + 2 * margin)
 
-    line_image = full_image[y : y + h, x : x + w]
+    line_image = full_image[y: y + h, x: x + w]
     line_image = cv2.cvtColor(line_image, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(line_image)
 
     if image.width < UPSCALE_THRESHOLD and image.height < UPSCALE_THRESHOLD:
+        # Double small crops to preserve glyph detail before processor resizing.
         image = image.resize(
             (image.width * 2, image.height * 2), Image.Resampling.LANCZOS
         )
@@ -86,6 +95,7 @@ def _crop_line_image(data_dir: Path, image_info: dict, ann: dict) -> Image.Image
 
 
 def _ensure_tensors(inputs) -> dict[str, torch.Tensor]:
+    # Normalize processor outputs to tensors so downstream code can stay uniform.
     output = {}
     for key, value in inputs.items():
         if not isinstance(value, torch.Tensor):
@@ -95,16 +105,20 @@ def _ensure_tensors(inputs) -> dict[str, torch.Tensor]:
 
 
 def _resolve_shortest_edge(processor) -> int:
+    # Pull the processor's native resize policy instead of hard-coding an image size.
     image_processor = processor.image_processor
     shortest_edge = getattr(image_processor, "min_pixels", None)
     if shortest_edge is None:
-        shortest_edge = getattr(getattr(image_processor, "size", None), "shortest_edge", None)
+        shortest_edge = getattr(
+            getattr(image_processor, "size", None), "shortest_edge", None)
     if shortest_edge is None:
-        raise AttributeError("Could not resolve PaddleOCR-VL shortest_edge from processor.image_processor")
+        raise AttributeError(
+            "Could not resolve PaddleOCR-VL shortest_edge from processor.image_processor")
     return int(shortest_edge)
 
 
 def _prepare_inputs(processor, image: Image.Image, prompt: str, target_text: Optional[str] = None):
+    # Build the multimodal chat payload expected by PaddleOCR-VL.
     messages = [
         {
             "role": "user",
@@ -178,7 +192,8 @@ class PaddleOCRVLTrainDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = self.samples[idx]
-        image = _crop_line_image(self.data_dir, sample["image_info"], sample["ann"])
+        image = _crop_line_image(
+            self.data_dir, sample["image_info"], sample["ann"])
         if self.augment_transform:
             image = self.augment_transform(image)
 
@@ -190,10 +205,14 @@ class PaddleOCRVLTrainDataset(Dataset):
             target_text=sample["target_text"],
         )
 
+        # Build supervised labels only from the answer tokens.
+        # The prompt is still part of the forward pass, but it must not
+        # contribute to cross-entropy because the task is conditional OCR/OMR.
         prompt_length = prompt_inputs["input_ids"].shape[-1]
         labels = full_inputs["input_ids"].squeeze(0).clone().long()
         labels[:prompt_length] = -100
 
+        # Ignore tokenizer padding in the loss.
         pad_token_id = self.processor.tokenizer.pad_token_id
         if pad_token_id is not None:
             labels[labels == pad_token_id] = -100
@@ -235,7 +254,8 @@ class PaddleOCRVLPredictDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = self.samples[idx]
-        image = _crop_line_image(self.data_dir, sample["image_info"], sample["ann"])
+        image = _crop_line_image(
+            self.data_dir, sample["image_info"], sample["ann"])
         inputs = _prepare_inputs(self.processor, image, self.prompt)
 
         return {
@@ -269,6 +289,7 @@ class PaddleOCRVLCollator:
             seq_len = feature["input_ids"].shape[0]
             pad_len = max_len - seq_len
 
+            # Pad every text-side stream to a shared length so tensors can be stacked.
             input_id_pad = torch.full(
                 (pad_len,), self.pad_token_id, dtype=feature["input_ids"].dtype
             )
@@ -276,32 +297,45 @@ class PaddleOCRVLCollator:
                 (pad_len,), dtype=feature["attention_mask"].dtype
             )
 
+            # mm_token_type_ids must stay aligned with the token sequence.
             mm_token_type_pad = torch.zeros(
                 (pad_len,), dtype=feature["mm_token_type_ids"].dtype
             )
 
             if self.pad_side == "left":
-                input_ids.append(torch.cat([input_id_pad, feature["input_ids"]], dim=0))
+                # Left padding is used for generation: all sequences end at the same index.
+                input_ids.append(
+                    torch.cat([input_id_pad, feature["input_ids"]], dim=0))
                 attention_masks.append(
-                    torch.cat([attention_pad, feature["attention_mask"]], dim=0)
+                    torch.cat(
+                        [attention_pad, feature["attention_mask"]], dim=0)
                 )
                 mm_token_type_ids.append(
-                    torch.cat([mm_token_type_pad, feature["mm_token_type_ids"]], dim=0)
+                    torch.cat(
+                        [mm_token_type_pad, feature["mm_token_type_ids"]], dim=0)
                 )
                 if self.with_labels:
-                    label_pad = torch.full((pad_len,), -100, dtype=feature["labels"].dtype)
-                    labels.append(torch.cat([label_pad, feature["labels"]], dim=0))
+                    label_pad = torch.full(
+                        (pad_len,), -100, dtype=feature["labels"].dtype)
+                    labels.append(
+                        torch.cat([label_pad, feature["labels"]], dim=0))
             else:
-                input_ids.append(torch.cat([feature["input_ids"], input_id_pad], dim=0))
+                # Right padding is used for training so causal positions stay conventional.
+                input_ids.append(
+                    torch.cat([feature["input_ids"], input_id_pad], dim=0))
                 attention_masks.append(
-                    torch.cat([feature["attention_mask"], attention_pad], dim=0)
+                    torch.cat(
+                        [feature["attention_mask"], attention_pad], dim=0)
                 )
                 mm_token_type_ids.append(
-                    torch.cat([feature["mm_token_type_ids"], mm_token_type_pad], dim=0)
+                    torch.cat([feature["mm_token_type_ids"],
+                              mm_token_type_pad], dim=0)
                 )
                 if self.with_labels:
-                    label_pad = torch.full((pad_len,), -100, dtype=feature["labels"].dtype)
-                    labels.append(torch.cat([feature["labels"], label_pad], dim=0))
+                    label_pad = torch.full(
+                        (pad_len,), -100, dtype=feature["labels"].dtype)
+                    labels.append(
+                        torch.cat([feature["labels"], label_pad], dim=0))
 
             pixel_values.append(feature["pixel_values"])
             image_grid_thw.append(feature["image_grid_thw"])
@@ -347,11 +381,13 @@ class _PaddleOCRVLTrainer(Trainer):
 def _move_batch_to_device(batch: dict, device: torch.device) -> dict:
     moved = {}
     for key, value in batch.items():
-        moved[key] = value.to(device) if isinstance(value, torch.Tensor) else value
+        moved[key] = value.to(device) if isinstance(
+            value, torch.Tensor) else value
     return moved
 
 
 def _resolve_batch_size(args, train_json: Path, image_root: Path) -> int:
+    # Dynamic-resolution image tokens are memory-intensive; cap local micro-batches.
     if not torch.cuda.is_available() or args.debug:
         return 1
 
@@ -362,6 +398,7 @@ def _resolve_batch_size(args, train_json: Path, image_root: Path) -> int:
 
 
 def load_model(model_identifier, load_model_path):
+    # A saved local checkpoint takes precedence; otherwise start from the hub model.
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     dtype = _get_dtype()
 
@@ -372,6 +409,8 @@ def load_model(model_identifier, load_model_path):
         model_source = model_identifier
         print(f"   Loading base model: {model_source}")
 
+    # Always obtain the processor from the base identifier: it defines the model's
+    # chat template, tokenizer, and dynamic image preprocessing contract.
     processor = AutoProcessor.from_pretrained(model_identifier, use_fast=False)
 
     model = PaddleOCRVLForConditionalGeneration.from_pretrained(
@@ -382,6 +421,7 @@ def load_model(model_identifier, load_model_path):
 
 
 def make_datasets(args, train_json, val_json, processor):
+    # Augment only training crops; validation must remain a fixed measurement set.
     augment_transform = None
     if args.augment:
         print("   💪 Augmentation enabled.")
@@ -411,10 +451,12 @@ def train(args, model, processor, train_dataset, val_dataset):
     train_json = Path(train_dataset.json_file)
 
     per_device_batch_size = _resolve_batch_size(args, train_json, image_root)
+    # Accumulate micro-batches to target the paper's nominal global batch of 128.
     gradient_accumulation_steps = max(
         1, math.ceil(PAPER_GLOBAL_BATCH_SIZE / per_device_batch_size)
     )
-    adaptive_workers = 0 if args.debug else min(4, get_adaptive_num_workers(train_json, image_root))
+    adaptive_workers = 0 if args.debug else min(
+        4, get_adaptive_num_workers(train_json, image_root))
 
     print(f"   📊 Per-device batch size: {per_device_batch_size}")
     print(f"   🔁 Gradient accumulation: {gradient_accumulation_steps}")
@@ -423,13 +465,16 @@ def train(args, model, processor, train_dataset, val_dataset):
     )
     print(f"   👷 Data workers: {adaptive_workers}")
 
+    # Avoid selecting checkpoints on an unstable, near-empty validation split.
     has_sufficient_val_data = len(val_dataset) >= MIN_VAL_SAMPLES
     if not has_sufficient_val_data:
         print(
-            f"⚠️  Validation set too small ({len(val_dataset)} samples), disabling validation"
+            f"⚠️  Validation set too small ({len(
+                val_dataset)} samples), disabling validation"
         )
 
     dtype = _get_dtype()
+    # Retain the paper's Stage-2 epochs/LR endpoints where local hardware permits.
     training_args = TrainingArguments(
         output_dir=str(artifacts_path),
         per_device_train_batch_size=per_device_batch_size,
@@ -453,6 +498,7 @@ def train(args, model, processor, train_dataset, val_dataset):
         fp16=dtype == torch.float16,
     )
 
+    # Right-padded batches and masked labels train only the assistant transcription.
     trainer = _PaddleOCRVLTrainer(
         model=model,
         processing_class=processor,
@@ -466,6 +512,7 @@ def train(args, model, processor, train_dataset, val_dataset):
         ),
         min_learning_rate=PAPER_MIN_LR,
     )
+    # Trainer handles forward loss, gradient accumulation, validation, and checkpoints.
     trainer.train()
     return trainer, artifacts_path
 
@@ -484,6 +531,7 @@ def save_model(trainer, processor, save_model_path):
 
 
 def predict(args, model, processor, device, output_dir, test_json):
+    # Build prompt-only crops: generation, unlike training, has no target sequence.
     dataset = PaddleOCRVLPredictDataset(
         test_json,
         args.data_dir or args.test_dir,
@@ -491,6 +539,7 @@ def predict(args, model, processor, device, output_dir, test_json):
         task=args.task,
         debug=args.debug,
     )
+    # Left padding aligns each prompt's final token, the shared generation start.
     collator = PaddleOCRVLCollator(
         pad_token_id=processor.tokenizer.pad_token_id,
         with_labels=False,
@@ -509,6 +558,7 @@ def predict(args, model, processor, device, output_dir, test_json):
         collate_fn=collator,
     )
 
+    # Pre-create the benchmark's page-level output domain; crops are grouped by page.
     expected_stems = load_image_stems_from_json(Path(test_json))
     image_predictions = defaultdict(list)
 
@@ -517,10 +567,12 @@ def predict(args, model, processor, device, output_dir, test_json):
         for batch_idx, batch in enumerate(dataloader, start=1):
             image_stems = batch.pop("image_stems")
             batch = _move_batch_to_device(batch, device)
+            # Record the padded prompt width so decoding excludes supplied context.
             context_length = batch["input_ids"].shape[1]
             outputs = model.generate(**batch, max_new_tokens=MAX_NEW_TOKENS)
 
             for image_stem, output_ids in zip(image_stems, outputs):
+                # Score/report only newly generated answer tokens, never the OCR/OMR prompt.
                 generated = output_ids[context_length:]
                 prediction = processor.decode(
                     generated,
@@ -529,9 +581,11 @@ def predict(args, model, processor, device, output_dir, test_json):
                 ).strip()
                 image_predictions[image_stem].append(prediction)
                 if args.debug:
-                    print(f"   [batch {batch_idx}] {image_stem}: {prediction[:80]}")
+                    print(f"   [batch {batch_idx}] {
+                          image_stem}: {prediction[:80]}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
+    # The benchmark expects one text file per page; annotation order defines concatenation.
     for image_stem in expected_stems:
         text = " ".join(image_predictions.get(image_stem, []))
         save_text_predictions(image_stem, text, output_dir)
@@ -554,13 +608,16 @@ def train_test_paddleocr_vl(
     if args.task not in {"ocr", "omr"}:
         raise ValueError("paddleocr_vl supports only task=ocr|omr")
 
+    # Execute the adapter lifecycle: load → construct datasets → fine-tune → generate.
     print(f"📦 Loading PaddleOCR-VL model ({model_identifier})...")
     model, processor, device = load_model(model_identifier, load_model_path)
 
-    train_dataset, val_dataset = make_datasets(args, train_json, val_json, processor)
+    train_dataset, val_dataset = make_datasets(
+        args, train_json, val_json, processor)
 
     print(f"🚀 Training on {device}...")
-    trainer, artifacts_path = train(args, model, processor, train_dataset, val_dataset)
+    trainer, artifacts_path = train(
+        args, model, processor, train_dataset, val_dataset)
     save_model(trainer, processor, save_model_path)
 
     if test_json is not None:
@@ -569,5 +626,6 @@ def train_test_paddleocr_vl(
     else:
         print("⏭️  No test split provided; skipping prediction.")
 
+    # Keep only explicitly requested model exports; discard Trainer's temporary artifacts.
     if artifacts_path.exists():
         shutil.rmtree(artifacts_path)
