@@ -27,5 +27,5 @@ remote_command=${remote_config[2]}
 encoded_dir=$(printf '%s' "$remote_dir" | base64 -w 0)
 encoded_command=$(printf '%s' "$remote_command" | base64 -w 0)
 
-ssh -t "$remote_host" bash -s -- "$mode" "$encoded_dir" "$encoded_command" \
+ssh "$remote_host" bash -s -- "$mode" "$encoded_dir" "$encoded_command" \
   < "$project_root/remote_test.remote.sh"

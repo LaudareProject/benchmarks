@@ -5,6 +5,8 @@ default_poll_timeout=${REMOTE_TEST_POLL_TIMEOUT:-60}
 remote_dir=$(printf '%s' "${2:-TGF1ZGFyZUJlbmNobWFya3M=}" | base64 -d)
 remote_command=$(printf '%s' "${3:-fi8ubG9jYWwvYmluL21pc2UgZXhlYyB1diAtLSAuL2V4cGVyaW1lbnRzLnNoIGRhdGEvSS1DdF85MSAtLWRldmljZSBjdWRhOjEgLS1kZWJ1Zw==}" | base64 -d)
 remote_command=${remote_command//\$/\\$}
+log_dir=/tmp/remote_test
+mkdir -p "$log_dir"
 
 mapfile -t sessions < <(tmux list-sessions -F '#{session_name}')
 if (( ${#sessions[@]} != 1 )); then
@@ -15,7 +17,7 @@ fi
 session=${sessions[0]}
 if [[ "$mode" == "--poll" ]]; then
   shopt -s nullglob
-  logs=(/tmp/remote_test_*.log)
+  logs=("$log_dir"/remote_test_*.log)
   if (( ${#logs[@]} == 0 )); then
     echo "No remote_test log found to poll." >&2
     exit 1
@@ -23,12 +25,14 @@ if [[ "$mode" == "--poll" ]]; then
   log_file=$(ls -t -- "${logs[@]}" | head -n 1)
   echo "Polling $log_file in tmux session $session."
 else
-  window_name="remote_test_$$"
-  log_file="/tmp/${window_name}.log"
-  script_file="/tmp/${window_name}.sh"
+  run_id=$(date +%s)_$$
+  log_file="$log_dir/remote_test_${run_id}.log"
+  script_file="$log_dir/remote_test_${run_id}.sh"
 
   cat > "$script_file" <<COMMAND
 #!/usr/bin/env bash
+set -euo pipefail
+exec > >(tee -a "$log_file") 2>&1
 cd "$remote_dir"
 $remote_command
 status=\$?
@@ -36,9 +40,9 @@ printf '__REMOTE_TEST_DONE__:%s\n' "\$status"
 COMMAND
   chmod +x "$script_file"
 
-  pane=$(tmux new-window -d -P -F '#{pane_id}' -t "$session" -n "$window_name" \
-    "bash '$script_file' 2>&1 | tee '$log_file'; exec bash")
-  echo "Started remote_test.sh on $remote_host in tmux window $window_name ($pane)."
+  window_name="remote_test_${run_id}"
+  tmux new-window -d -t "=${session}:" -n "$window_name" "bash '$script_file'; exec bash"
+  echo "Started remote_test.sh in tmux session $session, window $window_name; log: $log_file"
 fi
 
 next_line=1
