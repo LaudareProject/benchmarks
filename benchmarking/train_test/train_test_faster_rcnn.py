@@ -15,6 +15,7 @@ from torchvision.models.detection import (
     fasterrcnn_resnet50_fpn,
 )
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from torchvision import transforms
 from torchvision.tv_tensors import BoundingBoxFormat, BoundingBoxes
 
 from ..annotations.ann_handler import create_new_pagexml_file
@@ -119,6 +120,8 @@ class CocoLayoutDataset(Dataset):
 
         if self.transforms:
             image, target = self.transforms(image, target)
+        else:
+            image = transforms.ToTensor()(image)
         target["boxes"] = target["boxes"].as_subclass(torch.Tensor)
 
         return image, target
