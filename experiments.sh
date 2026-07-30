@@ -122,17 +122,17 @@ COMMON_ARGS="$DEBUG_FLAG $DEVICE_FLAG"
 # #@@@@@@@@@@
 #
 ./run.sh --framework detr --task layout --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework detr --task layout --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework detr --task layout --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 #
 ./run.sh --framework faster_rcnn --task layout --model-name "mobilenet" --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework faster_rcnn --task layout --model-name "resnet50" --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework faster_rcnn --task layout --model-name "mobilenet" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework faster_rcnn --task layout --model-name "resnet50" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework faster_rcnn --task layout --model-name "mobilenet" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework faster_rcnn --task layout --model-name "resnet50" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 #
 ./run.sh --framework yolo --task layout --model-name "yolo26m" --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 ./run.sh --framework yolo --task layout --model-name "yolo26s" --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework yolo --task layout --model-name "yolo26m" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework yolo --task layout --model-name "yolo26s" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework yolo --task layout --model-name "yolo26m" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework yolo --task layout --model-name "yolo26s" --edition editorial --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 #
 # ./run.sh --framework trocr --task ocr --model-name "large" --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
 # ./run.sh --framework trocr --task ocr --model-name "small" --edition diplomatic --n-fold --data-dir "$DATA_DIR" $COMMON_ARGS
@@ -170,19 +170,19 @@ COMMON_ARGS="$DEBUG_FLAG $DEVICE_FLAG"
 # #@ Sequential @
 # #@@@@@@@@@@@@@@
 #
-# ./run.sh --framework detr --task layout --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework detr --task layout --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-#
-# ./run.sh --framework faster_rcnn --task layout --model-name "mobilenet" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework faster_rcnn --task layout --model-name "resnet50" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework faster_rcnn --task layout --model-name "mobilenet" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework faster_rcnn --task layout --model-name "resnet50" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-#
-# ./run.sh --framework yolo --task layout --model-name "yolo26m" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework yolo --task layout --model-name "yolo26s" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework yolo --task layout --model-name "yolo26m" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-# ./run.sh --framework yolo --task layout --model-name "yolo26s" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-#
+./run.sh --framework detr --task layout --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework detr --task layout --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+
+./run.sh --framework faster_rcnn --task layout --model-name "mobilenet" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework faster_rcnn --task layout --model-name "resnet50" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework faster_rcnn --task layout --model-name "mobilenet" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework faster_rcnn --task layout --model-name "resnet50" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+
+./run.sh --framework yolo --task layout --model-name "yolo26m" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework yolo --task layout --model-name "yolo26s" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework yolo --task layout --model-name "yolo26m" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework yolo --task layout --model-name "yolo26s" --edition editorial --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+
 # ./run.sh --framework trocr --task ocr --model-name "large" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 # ./run.sh --framework trocr --task ocr --model-name "small" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
 # ./run.sh --framework trocr --task omr --model-name "large" --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
@@ -252,7 +252,7 @@ fi
 # ./run.sh --framework calamari --task omr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 # ./run.sh --framework trocr --model-name "large" --task ocr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 # ./run.sh --framework trocr --model-name "large" --task omr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
-# ./run.sh --framework yolo --task layout --model-name "yolo26s" --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
+./run.sh --framework yolo --task layout --model-name "yolo26m" --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task ocr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
 ./run.sh --framework vlt --task ocr --edition diplomatic --train-dir "$train_dir" --test-dir "$test_dir" $COMMON_ARGS
@@ -266,7 +266,7 @@ fi
 # ./run.sh --framework kraken --task omr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 # ./run.sh --framework calamari --task ocr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 # ./run.sh --framework calamari --task omr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
-# ./run.sh --framework yolo --task layout --model-name "yolo26s" --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
+./run.sh --framework yolo --task layout --model-name "yolo26m" --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task ocr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 ./run.sh --framework paddleocr_vl --task omr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
 ./run.sh --framework vlt --task ocr --edition diplomatic --pretrain-dir "$train_dir" --data-dir "$test_dir" --strategy random_sample --enable-pretrain $COMMON_ARGS
