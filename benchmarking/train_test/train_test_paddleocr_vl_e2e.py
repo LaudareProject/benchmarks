@@ -27,6 +27,8 @@ from .train_test_paddleocr_vl import (
 
 
 MAX_PAGE_NEW_TOKENS = 2048
+DEBUG_NEW_TOKENS = 128
+DEBUG_PAGES = 1
 
 
 class PaddleOCRVLE2ETrainDataset(Dataset):
@@ -97,7 +99,7 @@ class PaddleOCRVLE2EPredictDataset(Dataset):
             data = json.load(source)
         self.images = data.get("images", [])
         if debug:
-            self.images = self.images[:5]
+            self.images = self.images[:DEBUG_PAGES]
 
     def __len__(self):
         return len(self.images)
@@ -139,7 +141,10 @@ def predict(args, model, processor, device, output_dir, test_json):
             image_stems = batch.pop("image_stems")
             batch = _move_batch_to_device(batch, device)
             context_length = batch["input_ids"].shape[1]
-            outputs = model.generate(**batch, max_new_tokens=MAX_PAGE_NEW_TOKENS)
+            outputs = model.generate(
+                **batch,
+                max_new_tokens=DEBUG_NEW_TOKENS if args.debug else MAX_PAGE_NEW_TOKENS,
+            )
             for image_stem, output_ids in zip(image_stems, outputs):
                 generated = output_ids[context_length:]
                 predictions[image_stem] = processor.decode(
@@ -153,7 +158,7 @@ def predict(args, model, processor, device, output_dir, test_json):
     output_dir.mkdir(parents=True, exist_ok=True)
     expected_stems = load_image_stems_from_json(Path(test_json))
     if args.debug:
-        expected_stems = expected_stems[:5]
+        expected_stems = expected_stems[:DEBUG_PAGES]
     for image_stem in expected_stems:
         save_text_predictions(image_stem, predictions.get(image_stem, ""), output_dir)
     print(f"✅ Full-page predictions saved to {output_dir}")
