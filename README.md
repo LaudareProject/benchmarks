@@ -51,23 +51,29 @@ You can also run more specific experiments (see the Help file) and/or add your o
 
 ### End-to-End Pipeline Benchmarking
 
-Run full-pipeline evaluation (layout → crop → OCR/OMR) with:
+Start with bounded, fold-0 debug checks for OCR and OMR:
 
 ```bash
-# Pipeline mode: layout_fw + text_fw, optional text_model
-uv run python3 -m benchmarking.run_pipeline_benchmark \
-  --framework yolo+trocr \
-  --model-name yolov8n+large \
-  --data-dir data/I-Ct_91 \
-  --fold 0 --edition diplomatic
+# Cascaded layout → predicted regions → line-crop PaddleOCR-VL
+uv run python -m benchmarking.run_pipeline_benchmark \
+  --framework doclayout_yolo+paddleocr_vl \
+  --model-name default+default \
+  --data-dir data/I-Ct_91 --fold 0 --edition diplomatic --task ocr --debug
+uv run python -m benchmarking.run_pipeline_benchmark \
+  --framework doclayout_yolo+paddleocr_vl \
+  --model-name default+default \
+  --data-dir data/I-Ct_91 --fold 0 --edition diplomatic --task omr --debug
 
-# E2E mode: single framework, evaluate text tasks only
-uv run python3 -m benchmarking.run_pipeline_benchmark \
-  --framework paddleocr_vl_e2e \
-  --data-dir data/I-Ct_91
+# Direct full-page PaddleOCR-VL, without an external layout detector
+uv run python -m benchmarking.run_pipeline_benchmark \
+  --framework paddleocr_vl_e2e --model-name default \
+  --data-dir data/I-Ct_91 --fold 0 --edition diplomatic --task ocr --debug
+uv run python -m benchmarking.run_pipeline_benchmark \
+  --framework paddleocr_vl_e2e --model-name default \
+  --data-dir data/I-Ct_91 --fold 0 --edition diplomatic --task omr --debug
 ```
 
-**Pipeline mode** stages layout detection, converts PageXML predictions → COCO JSON, runs OCR/OMR on predicted regions, evaluates all three tasks. Results go to `results/{exp_id}/pipeline_{layout_fw}+{text_fw}__{fw_task_model}/`. **E2E mode** runs OCR/OMR without layout. Use `--task layout` / `--task ocr` / `--task omr` to restrict stages. Reuses trained weights across standalone/pipeline runs.
+Direct E2E `--debug` predicts only the first test page per task with at most 128 new tokens, so its metrics are a wiring check, **not** reportable transcription accuracy. Omit `--debug` for a full fold. **Pipeline mode** stages layout detection, converts predicted PageXML regions to COCO JSON, runs line-crop OCR/OMR, and evaluates against the page-level test references. **E2E mode** fine-tunes and predicts from full-page images; its one `.pred.txt` per page is compared with the evaluator’s annotation-order concatenation of the page’s ground-truth regions. Results are stored in fold-specific result directories; pipeline predictions use a `pipeline_{layout_fw}+{text_fw}` prefix so they do not overwrite standalone results. Use `--task layout` / `--task ocr` / `--task omr` to restrict stages.
 
 3. **Review Results**:
     - Benchmark results for the single fold run will be stored in subdirectories under `benchmarking/results/diplomatic/fold_test_0/`.
