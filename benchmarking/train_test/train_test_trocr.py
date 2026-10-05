@@ -16,8 +16,13 @@ from transformers import (
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
     TrOCRProcessor,
+    ViTImageProcessor,
     VisionEncoderDecoderModel,
     default_data_collator,
+)
+from transformers.models.auto.tokenization_auto import (
+    get_tokenizer_config,
+    tokenizer_class_from_name,
 )
 
 from ..utils import (
@@ -26,6 +31,11 @@ from ..utils import (
     get_adaptive_num_workers,
     load_ocmr_annotations_and_image_map,
 )
+
+# Beam-search decoding contract for inference: predictions must be generated
+# with num_beams > 1, never greedily.
+GENERATION_NUM_BEAMS = 4
+GENERATION_MAX_LENGTH = 128
 
 
 class CustomVisionEncoderDecoderModel(VisionEncoderDecoderModel):
@@ -269,8 +279,8 @@ def train(args, model, processor, train_dataset, val_dataset):
         training_args = Seq2SeqTrainingArguments(
             output_dir=str(artifacts_path),
             predict_with_generate=True,
-            generation_max_length=128,
-            generation_num_beams=4,
+            generation_max_length=GENERATION_MAX_LENGTH,
+            generation_num_beams=GENERATION_NUM_BEAMS,
             per_device_train_batch_size=adaptive_batch,
             per_device_eval_batch_size=adaptive_batch,
             gradient_accumulation_steps=1,
@@ -297,8 +307,8 @@ def train(args, model, processor, train_dataset, val_dataset):
         training_args = Seq2SeqTrainingArguments(
             output_dir=str(artifacts_path),
             predict_with_generate=True,
-            generation_max_length=128,
-            generation_num_beams=4,
+            generation_max_length=GENERATION_MAX_LENGTH,
+            generation_num_beams=GENERATION_NUM_BEAMS,
             per_device_train_batch_size=adaptive_batch,
             per_device_eval_batch_size=adaptive_batch,
             gradient_accumulation_steps=1,
@@ -363,7 +373,11 @@ def predict(args, model, processor, output_dir, test_json, trainer):
     test_dataset = TrOCRDataset(
         test_json, args.data_dir or args.test_dir, processor, debug=args.debug
     )
-    test_results = trainer.predict(test_dataset)
+    test_results = trainer.predict(
+        test_dataset,
+        max_length=GENERATION_MAX_LENGTH,
+        num_beams=GENERATION_NUM_BEAMS,
+    )
 
     pred_ids = test_results.predictions
     pred_str = processor.batch_decode(pred_ids, skip_special_tokens=True)
@@ -403,6 +417,34 @@ def save_model(trainer, save_model_path):
             print(f"   ⚠️  Failed to copy model to standardized path: {e}")
 
 
+def load_processor(model_identifier):
+    """Load the TrOCR processor for a checkpoint.
+
+    Transformers v5 resolves the `vision-encoder-decoder` model type to its
+    tokenizers backend, which requires a `tokenizer.json` that the Microsoft
+    TrOCR checkpoints do not ship (only `sentencepiece.bpe.model`, or
+    `vocab.json`/`merges.txt`). Fall back to the tokenizer class named in the
+    checkpoint's `tokenizer_config.json`, mirroring what `AutoTokenizer` used
+    to do.
+    """
+    try:
+        return TrOCRProcessor.from_pretrained(model_identifier)
+    except (ValueError, OSError):
+        tokenizer_class = tokenizer_class_from_name(
+            get_tokenizer_config(model_identifier).get("tokenizer_class") or ""
+        )
+        if tokenizer_class is None:
+            raise
+        print(
+            "   ℹ️  Building processor from the checkpoint's slow tokenizer "
+            f"({tokenizer_class.__name__})"
+        )
+        return TrOCRProcessor(
+            image_processor=ViTImageProcessor.from_pretrained(model_identifier),
+            tokenizer=tokenizer_class.from_pretrained(model_identifier),
+        )
+
+
 def load_model(model_identifier, load_model_path):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -413,7 +455,7 @@ def load_model(model_identifier, load_model_path):
         model_to_load = model_identifier
         print(f"   Loading base model: {model_to_load}")
 
-    processor = TrOCRProcessor.from_pretrained(model_identifier)
+    processor = load_processor(model_identifier)
     model = CustomVisionEncoderDecoderModel.from_pretrained(model_to_load)
     model.to(device)
 
