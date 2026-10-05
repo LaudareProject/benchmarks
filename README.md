@@ -49,6 +49,13 @@ Install system dependencies:
 
 You can also run more specific experiments (see the Help file) and/or add your own framework.
 
+For `--n-fold` runs, `run.sh` passes the planned fold count to result analysis. An aggregate is
+`complete` only when every requested fold has every task metric. The JSON report records
+`status`, `expected_folds`, `available_folds`, `missing_folds`, `missing_metrics`, and `metrics`;
+statistics are included only for metrics present in every requested fold. Incomplete
+single-framework analysis writes that report and exits nonzero. `--debug --n-fold` expects only
+two folds and is a wiring check, not reportable results.
+
 ### End-to-End Pipeline Benchmarking
 
 Start with bounded, fold-0 debug checks for OCR and OMR:

@@ -405,7 +405,7 @@ if [[ "$TASK" =~ ^(ocr|omr|layout|ocmr)$ ]]; then
     # Save to a JSON file
     analyze_args+=(--output-file "$AGG_OUTPUT_FILE")
 
-    # The python script will handle file naming and saving logic.
+    # Pass the planned fold count so analysis can flag missing fold or metric coverage.
     uv run python "${BENCHMARKING_DIR}/analyze_results.py" "${analyze_args[@]}"
 
   fi

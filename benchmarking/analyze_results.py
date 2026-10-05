@@ -42,7 +42,7 @@ def get_eval_path_and_metrics(args):
 
 
 def analyze_single_framework(args):
-    """Analyzes results for a single framework and returns summary stats."""
+    """Analyze one framework without aggregating partial fold coverage."""
     print(f"\n--- Analyzing: {args.framework.upper()} for {args.task.upper()} ---")
 
     results_base_dir = (
@@ -55,6 +55,9 @@ def analyze_single_framework(args):
         return {}
 
     collected_metrics = {metric: [] for metric in key_metrics}
+    missing_metric_folds = {metric: [] for metric in key_metrics}
+    available_folds = []
+    missing_folds = []
 
     for i in range(args.num_folds):
         fold_dir = results_base_dir / f"fold_{i}"
@@ -64,8 +67,12 @@ def analyze_single_framework(args):
 
         if not eval_file.exists():
             print(f"   - Fold {i}: Evaluation file not found at {eval_file}")
+            missing_folds.append(i)
+            for metric in key_metrics:
+                missing_metric_folds[metric].append(i)
             continue
 
+        available_folds.append(i)
         with open(eval_file, "r") as f:
             data = json.load(f)
 
@@ -74,12 +81,18 @@ def analyze_single_framework(args):
         for metric in key_metrics:
             if metric in metrics_data:
                 collected_metrics[metric].append(metrics_data[metric])
+            else:
+                missing_metric_folds[metric].append(i)
 
-    output_data = {}
+    output_metrics = {}
 
     for metric, values in collected_metrics.items():
-        if not values:
-            print(f"Metric '{metric}': No data found.")
+        missing = missing_metric_folds[metric]
+        if missing:
+            print(
+                f"Metric '{metric}': incomplete; missing from fold(s) "
+                f"{', '.join(map(str, missing))}."
+            )
             continue
 
         values = np.array(values)
@@ -94,32 +107,49 @@ def analyze_single_framework(args):
                 loc=np.mean(values),
                 scale=scipy.stats.sem(values),
             )
-            ci_lower, ci_upper = ci
+            ci_interval = tuple(float(bound) for bound in ci)
         else:
-            ci_lower, ci_upper = None, None
+            ci_interval = None
 
-        output_data[metric] = {
-            "mean": mean,
-            "min": min_val,
-            "max": max_val,
-            "95_ci": (ci_lower, ci_upper) if ci_lower is not None else None,
+        output_metrics[metric] = {
+            "mean": float(mean),
+            "min": float(min_val),
+            "max": float(max_val),
+            "95_ci": ci_interval,
             "values": values.tolist(),
         }
 
+    incomplete_metrics = {
+        metric: missing
+        for metric, missing in missing_metric_folds.items()
+        if missing
+    }
+    is_complete = not missing_folds and not incomplete_metrics
+    result = {
+        "status": "complete" if is_complete else "incomplete",
+        "expected_folds": args.num_folds,
+        "available_folds": available_folds,
+        "missing_folds": missing_folds,
+        "missing_metrics": incomplete_metrics,
+        "metrics": output_metrics,
+    }
+    print(
+        f"Aggregation status: {result['status']} "
+        f"({len(available_folds)}/{args.num_folds} evaluation files found)."
+    )
+
     if args.output_file:
-        print(f"   -> Saving aggregated JSON results to: {args.output_file}")
+        print(f"   -> Saving aggregation report to: {args.output_file}")
         args.output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(args.output_file, "w") as f:
-            json.dump(output_data, f, indent=2)
-        print(
-            f"   -> Aggregated results for {args.framework.upper()} saved to {args.output_file}"
-        )
+            json.dump(result, f, indent=2)
+        print(f"   -> Aggregation report saved to {args.output_file}")
 
-    return output_data
+    return result
 
 
 def create_summary_table(args):
-    """Creates a summary CSV table comparing all relevant frameworks for a task."""
+    """Create a cross-framework CSV with fold coverage for each metric."""
     print("\n--- Aggregated Cross-Framework Results ---")
 
     frameworks = get_frameworks_for_task(args.task)
@@ -129,51 +159,77 @@ def create_summary_table(args):
     dummy_args.framework = frameworks[0]
     _, key_metrics = get_eval_path_and_metrics(dummy_args)
 
-    header = ["Framework", "Metric", "Mean", "Min", "Max", "95% CI"]
+    header = [
+        "Framework",
+        "Framework Status",
+        "Metric",
+        "Metric Status",
+        "Fold Coverage",
+        "Mean",
+        "Min",
+        "Max",
+        "95% CI",
+        "Missing Folds",
+        "Missing Metric Folds",
+    ]
     table_data = [header]
 
     print(
         f"\n{'-' * 80}\nTask: {args.task.upper()}, Dataset: {args.edition}\n{'-' * 80}"
     )
-    print(
-        f"{'Framework':<15} | {'Metric':<10} | {'Mean':<8} | {'Min':<8} | {'Max':<8} | {'95% CI':<20}"
-    )
-    print("=" * 80)
 
     for fw in frameworks:
         fw_args = argparse.Namespace(**vars(args))
         fw_args.framework = fw
         fw_args.output_file = None
 
-        fw_stats = analyze_single_framework(fw_args)
-
-        if not fw_stats:
-            print(f"{fw:<15} | {'No data found':<63}")
-            continue
+        fw_result = analyze_single_framework(fw_args)
+        global_missing = ", ".join(map(str, fw_result["missing_folds"]))
 
         for metric in key_metrics:
-            if metric in fw_stats:
-                stats = fw_stats[metric]
-                mean = stats["mean"]
-                min_val = stats["min"]
-                max_val = stats["max"]
+            stats = fw_result["metrics"].get(metric)
+            metric_missing = fw_result["missing_metrics"].get(metric, [])
+            metric_status = "complete" if stats is not None else "incomplete"
+            metric_coverage = args.num_folds - len(metric_missing)
+            fold_coverage = f"{metric_coverage}/{args.num_folds}"
+
+            if stats is None:
+                mean = min_val = max_val = ci_str = ""
+                print(
+                    f"{fw:<15} | {metric:<10} | incomplete | "
+                    f"{fold_coverage} folds; missing metric folds "
+                    f"{', '.join(map(str, metric_missing))}"
+                )
+            else:
+                mean = f"{stats['mean']:.4f}"
+                min_val = f"{stats['min']:.4f}"
+                max_val = f"{stats['max']:.4f}"
                 ci = stats["95_ci"]
                 ci_str = (
-                    f"({ci[0]:.4f}, {ci[1]:.4f})" if ci and ci[0] is not None else "N/A"
+                    f"({ci[0]:.4f}, {ci[1]:.4f})"
+                    if ci and ci[0] is not None
+                    else "N/A"
+                )
+                print(
+                    f"{fw:<15} | {metric:<10} | {metric_status:<10} | "
+                    f"{fold_coverage} | {mean} | {min_val} | {max_val} | {ci_str}"
                 )
 
-                row = [
+            table_data.append(
+                [
                     fw,
+                    fw_result["status"],
                     metric,
-                    f"{mean:.4f}",
-                    f"{min_val:.4f}",
-                    f"{max_val:.4f}",
+                    metric_status,
+                    fold_coverage,
+                    mean,
+                    min_val,
+                    max_val,
                     ci_str,
+                    global_missing,
+                    ", ".join(map(str, metric_missing)),
                 ]
-                table_data.append(row)
-                print(
-                    f"{fw:<15} | {metric:<10} | {mean:<8.4f} | {min_val:<8.4f} | {max_val:<8.4f} | {ci_str:<20}"
-                )
+            )
 
     # Save to CSV
     csv_output_dir = (
@@ -231,7 +287,10 @@ def main():
         help="Model index used for models that have different versions (e.g., yolo, faster_rcnn).",
     )
     parser.add_argument(
-        "--num-folds", type=int, required=True, help="Number of folds that were run"
+        "--num-folds",
+        type=int,
+        required=True,
+        help="Number of folds expected in the aggregate",
     )
     parser.add_argument(
         "--output-file",
@@ -247,24 +306,32 @@ def main():
 
     args = parser.parse_args()
 
+    if args.num_folds <= 0:
+        parser.error("--num-folds must be greater than zero")
+
     if args.framework == "all":
         create_summary_table(args)
+        return
+
+    result = analyze_single_framework(args)
+    if result["metrics"]:
+        print("\n--- Summary ---")
+        for metric, values in result["metrics"].items():
+            ci_str = (
+                f"({values['95_ci'][0]:.4f}, {values['95_ci'][1]:.4f})"
+                if values["95_ci"] and values["95_ci"][0] is not None
+                else "N/A"
+            )
+            print(f"Metric: {metric}")
+            print(
+                f"  - Mean: {values['mean']:.4f}, Min: {values['min']:.4f}, "
+                f"Max: {values['max']:.4f}, 95% CI: {ci_str}"
+            )
     else:
-        stats = analyze_single_framework(args)
-        if stats:
-            print("\n--- Summary ---")
-            for metric, values in stats.items():
-                ci_str = (
-                    f"({values['95_ci'][0]:.4f}, {values['95_ci'][1]:.4f})"
-                    if values["95_ci"] and values["95_ci"][0] is not None
-                    else "N/A"
-                )
-                print(f"Metric: {metric}")
-                print(
-                    f"  - Mean: {values['mean']:.4f}, Min: {values['min']:.4f}, Max: {values['max']:.4f}, 95% CI: {ci_str}"
-                )
-        else:
-            print("No results to display.")
+        print("No complete metric results to display.")
+
+    if result["status"] == "incomplete":
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

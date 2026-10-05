@@ -92,6 +92,10 @@ EXAMPLES:
 OUTPUT:
   - Final results are saved in: ./results/{data_dir_name}/{edition}/
   - N-fold aggregated results are in: ./results/{data_dir_name}/{edition}/aggregated/
+  - The N-fold JSON report records fold and per-metric coverage. Statistics are included only
+    for metrics present in every expected fold.
+  - Single-framework analysis exits nonzero if a fold or required metric is missing; the
+    incomplete report is still saved at the aggregate output path.
   - Sequential results are processed in: ./data/{data_dir}/annotations-{edition}/processed_splits/{strategy}/
   - Processed data splits are in: ./data/{data_dir}/annotations-{edition}/processed_splits/
   - Synthetic pre-training data is in: ./data/pretrain_data/
