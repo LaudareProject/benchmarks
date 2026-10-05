@@ -83,8 +83,10 @@ uv run python -m benchmarking.run_pipeline_benchmark \
 Direct E2E `--debug` predicts only the first test page per task with at most 128 new tokens, so its metrics are a wiring check, **not** reportable transcription accuracy. Omit `--debug` for a full fold. **Pipeline mode** stages layout detection, converts predicted PageXML regions to COCO JSON, runs line-crop OCR/OMR, and evaluates against the page-level test references. **E2E mode** fine-tunes and predicts from full-page images; its one `.pred.txt` per page is compared with the evaluator’s annotation-order concatenation of the page’s ground-truth regions. Results are stored in fold-specific result directories; pipeline predictions use a `pipeline_{layout_fw}+{text_fw}` prefix so they do not overwrite standalone results. Use `--task layout` / `--task ocr` / `--task omr` to restrict stages.
 
 3. **Review Results**:
-    - Benchmark results for the single fold run will be stored in subdirectories under `benchmarking/results/diplomatic/fold_test_0/`.
-    - Log files for each tool and task will also be available.
+   - Results are stored below
+     `results/${LAUDARE_EXPERIMENT_ID:-default}/{dataset}/{edition}/`.
+   - N-fold aggregates are stored in the `aggregated/` subdirectory.
+   - Log files for each tool and task will also be available.
 
 ### Pre-training on Synthetic Data
 
