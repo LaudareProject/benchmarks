@@ -226,10 +226,10 @@ COMMON_ARGS="$DEBUG_FLAG $DEVICE_FLAG"
 # ./run.sh --framework kraken --task omr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
 # ./run.sh --framework calamari --task ocr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
 # ./run.sh --framework calamari --task omr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
-./run.sh --framework paddleocr_vl --task ocr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-./run.sh --framework paddleocr_vl --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-./run.sh --framework vlt --task ocr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
-./run.sh --framework vlt --task omr --edition diplomatic --strategy random_sample --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework paddleocr_vl --task ocr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework paddleocr_vl --task omr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task ocr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
+./run.sh --framework vlt --task omr --edition diplomatic --strategy random_sample --enable-pretrain --data-dir "$DATA_DIR" $COMMON_ARGS
 
 #@@@@@@@@@@@@@@
 #@ train-test @
