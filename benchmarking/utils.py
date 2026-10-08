@@ -276,6 +276,30 @@ def get_layout_augmentation(task: str, enabled: bool) -> dict:
     return {key: 0.0 for key in LAYOUT_AUGMENTATION}
 
 
+def debug_limit(env_name: str, default: int) -> int:
+    """Resolve a debug-mode budget: env unset -> default, 0 -> unlimited, N -> N."""
+    raw = os.environ.get(env_name, "").strip()
+    if not raw:
+        return default
+    return max(0, int(raw))
+
+
+def apply_debug_limit(items, env_name: str, default: int) -> list:
+    """Cap a sequence for debug mode (0 or unset-with-default-0 disables the cap)."""
+    items = list(items)
+    cap = debug_limit(env_name, default)
+    return items if cap == 0 else items[:cap]
+
+
+def debug_epochs(debug: bool, default: int, full: int) -> int:
+    """Epoch budget: full budget when not in debug mode, else LAUDARE_DEBUG_EPOCHS
+    (unset -> default, 0 -> full budget, N -> N)."""
+    if not debug:
+        return full
+    cap = debug_limit("LAUDARE_DEBUG_EPOCHS", default)
+    return full if cap == 0 else cap
+
+
 def get_transforms(augment=False):
     """Return bbox-aware YOLO-style transforms for two-stage detectors."""
     if not TORCH_AVAILABLE:

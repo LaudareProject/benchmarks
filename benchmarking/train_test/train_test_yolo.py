@@ -14,9 +14,11 @@ from ultralytics import YOLO
 
 from ..annotations.ann_handler import create_new_pagexml_file
 from ..utils import (
+    apply_debug_limit,
+    debug_epochs,
     get_adaptive_batch_size,
     get_adaptive_num_workers,
-    get_augment_policy,
+    get_layout_augmentation,
 )
 
 
@@ -29,7 +31,7 @@ def prepare_yolo_data(data_json, data_dir, yolo_data_dir, split, cat_id_map, deb
         data = json.load(f)
 
     if debug:
-        images = data["images"][:5]
+        images = apply_debug_limit(data["images"], "LAUDARE_DEBUG_SAMPLES", 5)
     else:
         images = data["images"]
     image_info = {img["id"]: img for img in images}
@@ -68,7 +70,7 @@ def prepare_yolo_data(data_json, data_dir, yolo_data_dir, split, cat_id_map, deb
 
 
 def train(args, yolo_data_dir, model, artifacts_dir, train_json, image_root):
-    epochs = 3 if args.debug else 100
+    epochs = debug_epochs(args.debug, 3, 100)
     patience = 15
 
     # Calculate adaptive parameters with LR scaling
@@ -101,7 +103,7 @@ def train(args, yolo_data_dir, model, artifacts_dir, train_json, image_root):
         device=device_str,
         exist_ok=True,
         name="train",
-        **get_augment_policy(args.task, "str", args.augment),
+        **get_layout_augmentation(args.task, args.augment),
         batch=adaptive_batch,
         workers=adaptive_workers,
         lr0=scaled_lr,  # Initial learning rate (scaled)

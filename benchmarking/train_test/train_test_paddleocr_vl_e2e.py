@@ -13,7 +13,7 @@ import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 
-from ..utils import load_image_stems_from_json, save_text_predictions
+from ..utils import apply_debug_limit, load_image_stems_from_json, save_text_predictions
 from .train_test_paddleocr_vl import (
     PaddleOCRVLCollator,
     PROMPTS,
@@ -99,7 +99,7 @@ class PaddleOCRVLE2EPredictDataset(Dataset):
             data = json.load(source)
         self.images = data.get("images", [])
         if debug:
-            self.images = self.images[:DEBUG_PAGES]
+            self.images = apply_debug_limit(self.images, "LAUDARE_DEBUG_PAGES", DEBUG_PAGES)
 
     def __len__(self):
         return len(self.images)
@@ -158,7 +158,7 @@ def predict(args, model, processor, device, output_dir, test_json):
     output_dir.mkdir(parents=True, exist_ok=True)
     expected_stems = load_image_stems_from_json(Path(test_json))
     if args.debug:
-        expected_stems = expected_stems[:DEBUG_PAGES]
+        expected_stems = apply_debug_limit(expected_stems, "LAUDARE_DEBUG_PAGES", DEBUG_PAGES)
     for image_stem in expected_stems:
         save_text_predictions(image_stem, predictions.get(image_stem, ""), output_dir)
     print(f"✅ Full-page predictions saved to {output_dir}")

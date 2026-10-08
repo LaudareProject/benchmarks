@@ -28,7 +28,7 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import ConcatDataset, DataLoader, Dataset
 
 from ..evaluation import calculate_wer_cer
-from ..utils import get_augment_policy, load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
+from ..utils import get_augment_policy, apply_debug_limit, debug_epochs, debug_limit, load_image_stems_from_json, load_ocmr_annotations_and_image_map, save_text_predictions
 
 IMAGE_HEIGHT = 128
 MAX_TARGET_LENGTH = 128
@@ -198,7 +198,7 @@ class VLTDataset(Dataset):
         if json_file is not None:
             annotations, image_map = load_ocmr_annotations_and_image_map(Path(json_file))
         if debug:
-            annotations = annotations[:5]
+            annotations = apply_debug_limit(annotations, "LAUDARE_DEBUG_SAMPLES", 5)
 
         self.base_samples: list[dict] = []
         for sid, ann in enumerate(annotations):
@@ -223,15 +223,24 @@ class VLTDataset(Dataset):
         else:
             flag = augment_transform is not None
             self.samples = [{**s, "apply_augment": flag} for s in self.base_samples]
+        # Last decoded page image, reused for consecutive crops of the same page.
+        self._page_cache: tuple[Path, np.ndarray] | None = None
 
     def __len__(self) -> int:
         return len(self.samples)
 
     def _load_and_crop(self, sample: dict) -> np.ndarray:
         ann, img_info = sample["ann"], sample["image_info"]
-        img = cv2.imread(str(self.data_dir / img_info["file_name"]), cv2.IMREAD_COLOR)
-        if img is None:
-            raise FileNotFoundError(f"Could not read: {self.data_dir / img_info['file_name']}")
+        image_path = self.data_dir / img_info["file_name"]
+        # Crops are stored in page order, so caching the last decoded page turns one
+        # page decode per line into one per page (a ~10x I/O cut on OCR splits).
+        if self._page_cache is not None and self._page_cache[0] == image_path:
+            img = self._page_cache[1]
+        else:
+            img = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
+            if img is None:
+                raise FileNotFoundError(f"Could not read: {image_path}")
+            self._page_cache = (image_path, img)
         x, y, w, h = [int(v) for v in ann["bbox"]]
         x, y = max(0, x), max(0, y)
         w, h = min(img.shape[1] - x, w), min(img.shape[0] - y, h)
@@ -543,7 +552,9 @@ def _freeze_decoder(model: PaperVLTModel) -> None:
 
 
 def _resolve_batch_size(args) -> int:
-    if args.debug or not torch.cuda.is_available():
+    if args.debug:
+        return max(1, debug_limit("LAUDARE_DEBUG_BATCH", 1))
+    if not torch.cuda.is_available():
         return 1
     gb = torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)
     return 16 if gb >= 40 else 8 if gb >= 24 else 4 if gb >= 16 else 2
@@ -570,7 +581,8 @@ def _evaluate(model: PaperVLTModel, processor: VLTProcessor, loader: DataLoader,
 
 
 def _make_loader(args, processor, dataset, shuffle=True, num_workers=None):
-    nw = (0 if args.debug else min(4, os.cpu_count() or 0)) if num_workers is None else num_workers
+    nw = (debug_limit("LAUDARE_DEBUG_WORKERS", 0) if args.debug
+          else min(4, os.cpu_count() or 0)) if num_workers is None else num_workers
     collator = VLTTrainCollator(processor)
     return DataLoader(dataset, batch_size=_resolve_batch_size(args), shuffle=shuffle, num_workers=nw, collate_fn=collator)
 
@@ -588,8 +600,9 @@ def _run_training_stage(args, model, processor, train_dataset, val_dataset, stag
     )
     best_state, best_cer = None, float("inf")
 
-    print(f"   📘 {stage_name}: {1 if args.debug else max_epochs} epoch(s)")
-    for epoch in range(1, (2 if args.debug else max_epochs + 1)):
+    stage_epochs = debug_epochs(args.debug, 1, max_epochs)
+    print(f"   📘 {stage_name}: {stage_epochs} epoch(s)")
+    for epoch in range(1, stage_epochs + 1):
         model.train()
         total_loss = ce_total = ctc_total = lr = 0.0
         n = 0

@@ -472,8 +472,11 @@ fi
 
 echo ""
 echo "🧽 CLEANING UP LARGE FILES"
-if [ -d "${PROJECT_ROOT}/results" ]; then
-  for file in $(find "${PROJECT_ROOT}/results" -type f ! -name "*_evaluation.json" -size +1M); do
+# Keep only the current experiment's results tree in scope: a global scan would
+# also placeholder checkpoints of other (possibly still running) experiments.
+CLEANUP_DIR="${PROJECT_ROOT}/results/${LAUDARE_EXPERIMENT_ID:-default}"
+if [ -d "$CLEANUP_DIR" ]; then
+  for file in $(find "$CLEANUP_DIR" -type f ! -name "*_evaluation.json" -size +1M); do
     printf '%s\n' "PLACEHOLDER: original file was larger than 1MB" > "$file"
   done
 fi

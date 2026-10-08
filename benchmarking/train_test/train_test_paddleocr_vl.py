@@ -25,6 +25,9 @@ from transformers import (
 )
 
 from ..utils import (
+    apply_debug_limit,
+    debug_epochs,
+    debug_limit,
     get_adaptive_num_workers,
     load_image_stems_from_json,
     load_ocmr_annotations_and_image_map,
@@ -57,7 +60,7 @@ def _load_annotations(json_path: Path, debug: bool):
     # Centralize annotation loading so train/predict share the same sample filter.
     annotations, image_map = load_ocmr_annotations_and_image_map(json_path)
     if debug:
-        annotations = annotations[:5]
+        annotations = apply_debug_limit(annotations, "LAUDARE_DEBUG_SAMPLES", 5)
     return annotations, image_map
 
 
@@ -66,10 +69,52 @@ def _target_text(ann: dict) -> str:
     return (ann.get("description") or ann.get("text") or "").strip()
 
 
+def _valid_bbox(ann: dict, image_info: dict) -> bool:
+    """Reject degenerate or out-of-bounds boxes that would yield an empty crop."""
+    bbox = ann.get("bbox") or []
+    if len(bbox) != 4:
+        return False
+    try:
+        x, y, w, h = (int(value) for value in bbox)
+    except (TypeError, ValueError):
+        return False
+    if x < 0 or y < 0 or w < 1 or h < 1:
+        return False
+    image_width, image_height = image_info.get("width"), image_info.get("height")
+    if image_width is not None and x >= int(image_width):
+        return False
+    if image_height is not None and y >= int(image_height):
+        return False
+    return True
+
+
+_PAGE_CACHE: dict[str, "np.ndarray"] = {}
+_PAGE_CACHE_MAX = 2
+
+
+def _read_page_image(image_path: Path):
+    """Decode a page once per process; consecutive crops of the same page reuse it.
+
+    An OCR split holds many crops per page, so this removes the redundant
+    full-page decode that otherwise dominates loader time.
+    """
+    key = str(image_path)
+    cached = _PAGE_CACHE.get(key)
+    if cached is not None:
+        return cached
+    image = cv2.imread(key)
+    if image is None:
+        return None
+    if len(_PAGE_CACHE) >= _PAGE_CACHE_MAX:
+        _PAGE_CACHE.pop(next(iter(_PAGE_CACHE)))
+    _PAGE_CACHE[key] = image
+    return image
+
+
 def _crop_line_image(data_dir: Path, image_info: dict, ann: dict) -> Image.Image:
     # Decode the source page, then isolate the annotated region as the model input.
     image_path = data_dir / image_info["file_name"]
-    full_image = cv2.imread(str(image_path))
+    full_image = _read_page_image(image_path)
     if full_image is None:
         raise FileNotFoundError(f"Could not read image: {image_path}")
 
@@ -82,6 +127,9 @@ def _crop_line_image(data_dir: Path, image_info: dict, ann: dict) -> Image.Image
     h = min(full_image.shape[0] - y, h + 2 * margin)
 
     line_image = full_image[y: y + h, x: x + w]
+    if line_image.size == 0:
+        raise ValueError(
+            f"Empty crop for annotation {ann.get('id')} in {image_path}")
     line_image = cv2.cvtColor(line_image, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(line_image)
 
@@ -181,6 +229,8 @@ class PaddleOCRVLTrainDataset(Dataset):
             image_info = image_map.get(ann["image_id"])
             if image_info is None:
                 continue
+            if not _valid_bbox(ann, image_info):
+                continue
             self.samples.append(
                 {
                     "ann": ann,
@@ -242,6 +292,8 @@ class PaddleOCRVLPredictDataset(Dataset):
         for ann in annotations:
             image_info = image_map.get(ann["image_id"])
             if image_info is None:
+                continue
+            if not _valid_bbox(ann, image_info):
                 continue
             self.samples.append(
                 {
@@ -391,7 +443,7 @@ def _move_batch_to_device(batch: dict, device: torch.device) -> dict:
 def _resolve_batch_size(args, train_json: Path, image_root: Path) -> int:
     # Dynamic-resolution image tokens are memory-intensive; cap local micro-batches.
     if not torch.cuda.is_available() or args.debug:
-        return 1
+        return max(1, debug_limit("LAUDARE_DEBUG_BATCH", 1))
 
     total_gb = torch.cuda.get_device_properties(0).total_memory / (1024**3)
     if total_gb >= 24:
@@ -457,7 +509,7 @@ def train(args, model, processor, train_dataset, val_dataset):
     gradient_accumulation_steps = max(
         1, math.ceil(PAPER_GLOBAL_BATCH_SIZE / per_device_batch_size)
     )
-    adaptive_workers = 0 if args.debug else min(
+    adaptive_workers = debug_limit("LAUDARE_DEBUG_WORKERS", 0) if args.debug else min(
         4, get_adaptive_num_workers(train_json, image_root))
 
     print(f"   📊 Per-device batch size: {per_device_batch_size}")
@@ -480,7 +532,7 @@ def train(args, model, processor, train_dataset, val_dataset):
         per_device_eval_batch_size=per_device_batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
         dataloader_num_workers=adaptive_workers,
-        num_train_epochs=1 if args.debug else PAPER_SFT_EPOCHS,
+        num_train_epochs=debug_epochs(args.debug, 1, PAPER_SFT_EPOCHS),
         learning_rate=PAPER_MAX_LR,
         save_strategy="epoch",
         eval_strategy="epoch" if has_sufficient_val_data else "no",
