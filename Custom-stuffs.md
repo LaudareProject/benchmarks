@@ -43,7 +43,7 @@ uv run python3 -m benchmarking.run_pipeline_benchmark \
 - **Isolation**: Pipeline predictions go to `pipeline_{fw1}+{fw2}__{fw_task_model}/predictions/` (separate from standalone runs)
 - **Weights reuse**: `save_model_path` shared; trained weights are cached across pipeline/standalone
 - **Ground-truth matching**: OCR/OMR train on GT, test on predicted regions; evaluation still uses original GT JSON for metrics
-- **Region selection**: TextLine elements preferred from PageXML; falls back to all regions if absent
+- **Region selection**: OCR uses line/TextLine regions (category 6); OMR uses staff regions (category 5). Missing task regions produce no crops; regions from another task are never substituted.
 - **Empty results**: handled gracefully (zero annotations → test skip)
 
 ### Flags

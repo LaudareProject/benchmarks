@@ -678,7 +678,44 @@ def train_test_bgk(
     val_samples = build_staff_samples(Path(val_json), train_root)
     test_samples = build_staff_samples(Path(test_json), test_root) if test_json else []
     expected_test_stems = load_image_stems_from_json(Path(test_json)) if test_json else []
-    labels, _, _ = build_label_space([*train_samples, *val_samples])
+    if is_sequential and train_samples and not val_samples:
+        samples_by_page = defaultdict(list)
+        for sample in train_samples:
+            samples_by_page[sample.image_stem].append(sample)
+        if len(samples_by_page) < 2:
+            raise ValueError(
+                "BGK sequential step has no OMR validation staff and fewer than two training pages"
+            )
+        validation_page = min(
+            samples_by_page,
+            key=lambda stem: (len(samples_by_page[stem]), stem),
+        )
+        val_samples = samples_by_page[validation_page]
+        train_samples = [
+            sample for sample in train_samples if sample.image_stem != validation_page
+        ]
+        print(
+            f"⚠️ OMR validation split was empty; holding out page {validation_page} "
+            f"({len(val_samples)} staff crops) from sequential training."
+        )
+    model_path = Path(load_model_path) if load_model_path else None
+    if model_path is not None and model_path.suffix != ".pt":
+        model_path = model_path.with_suffix(".pt")
+    if not train_samples and not is_sequential:
+        raise ValueError("BGK requires OMR staff samples for non-sequential training")
+    if not train_samples and (model_path is None or not model_path.is_file()):
+        raise ValueError("BGK sequential step has no OMR staff samples or prior checkpoint")
+
+    model = YOLO(str(model_path) if model_path else model_identifier)
+    if train_samples:
+        labels, _, _ = build_label_space([*train_samples, *val_samples])
+    else:
+        model_names = model.names
+        labels = (
+            [model_names[index] for index in sorted(model_names)]
+            if isinstance(model_names, dict)
+            else list(model_names)
+        )
     print(f"🧾 BGK staff samples train={len(train_samples)} val={len(val_samples)} test={len(test_samples)} labels={len(labels)}")
 
     artifacts_dir = Path(tempfile.mkdtemp(prefix="bgk_artifacts_"))
@@ -700,25 +737,26 @@ def train_test_bgk(
         cache_key,
     )
 
-    if load_model_path:
-        if Path(load_model_path).suffix != ".pt":
-            load_model_path = Path(load_model_path).with_suffix(".pt")
-    model = YOLO(load_model_path if load_model_path else model_identifier)
 
-    print("🚀 Training YOLO model...")
-    yolo_args = copy.copy(args)
-    yolo_args.task = "layout"
-    best_model_path = train_yolo(
-        yolo_args,
-        dataset_dir,
-        model,
-        artifacts_dir,
-        Path(train_json),
-        train_root,
-    )
-
-    if best_model_path is None:
-        return
+    if train_samples:
+        print("🚀 Training YOLO model...")
+        yolo_args = copy.copy(args)
+        yolo_args.task = "layout"
+        best_model_path = train_yolo(
+            yolo_args,
+            dataset_dir,
+            model,
+            artifacts_dir,
+            Path(train_json),
+            train_root,
+        )
+        if best_model_path is None:
+            return
+    else:
+        print("⏭ No OMR staff samples in this sequential step; carrying forward the previous checkpoint.")
+        best_model_path = model_path
+        if best_model_path is None:
+            raise ValueError("BGK sequential step has no previous checkpoint")
 
     _save_model(best_model_path, save_model_path)
 

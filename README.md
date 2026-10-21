@@ -61,7 +61,7 @@ two folds and is a wiring check, not reportable results.
 Start with bounded, fold-0 debug checks for OCR and OMR:
 
 ```bash
-# Cascaded layout → predicted regions → line-crop PaddleOCR-VL
+# Cascaded layout → predicted line/staff regions → PaddleOCR-VL
 uv run python -m benchmarking.run_pipeline_benchmark \
   --framework doclayout_yolo+paddleocr_vl \
   --model-name default+default \
@@ -80,7 +80,7 @@ uv run python -m benchmarking.run_pipeline_benchmark \
   --data-dir data/I-Ct_91 --fold 0 --edition diplomatic --task omr --debug
 ```
 
-Direct E2E `--debug` predicts only the first test page per task with at most 128 new tokens, so its metrics are a wiring check, **not** reportable transcription accuracy. Omit `--debug` for a full fold. **Pipeline mode** stages layout detection, converts predicted PageXML regions to COCO JSON, runs line-crop OCR/OMR, and evaluates against the page-level test references. **E2E mode** fine-tunes and predicts from full-page images; its one `.pred.txt` per page is compared with the evaluator’s annotation-order concatenation of the page’s ground-truth regions. Results are stored in fold-specific result directories; pipeline predictions use a `pipeline_{layout_fw}+{text_fw}` prefix so they do not overwrite standalone results. Use `--task layout` / `--task ocr` / `--task omr` to restrict stages.
+Direct E2E `--debug` predicts only the first test page per task with at most 128 new tokens, so its metrics are a wiring check, **not** reportable transcription accuracy. Omit `--debug` for a full fold. **Pipeline mode** stages layout detection, converts predicted PAGE-XML OCR line/TextLine regions to category 6 and OMR staff regions to category 5 in COCO JSON, runs the corresponding line/staff crops, and evaluates against the page-level test references. Regions for another task are never used as a fallback, so missing task-specific regions yield an empty crop set. **E2E mode** fine-tunes and predicts from full-page images; its one `.pred.txt` per page is compared with the evaluator’s annotation-order concatenation of the page’s ground-truth regions. Results are stored in fold-specific result directories; pipeline predictions use a `pipeline_{layout_fw}+{text_fw}` prefix so they do not overwrite standalone results. Use `--task layout` / `--task ocr` / `--task omr` to restrict the run to one stage.
 
 3. **Review Results**:
    - Results are stored below

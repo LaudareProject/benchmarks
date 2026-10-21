@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .evaluation import evaluate_predictions_entry, extract_layout_from_pagexml
 from .run_single_fold_benchmark import load_and_run_framework, setup_pretrain_training
-from .utils import RESULTS_DIR, get_pretrained_model_path, setup_with_args
+from .utils import RESULTS_DIR, TASK_CATEGORY_IDS, get_pretrained_model_path, setup_with_args
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.absolute()
 
@@ -37,18 +37,24 @@ def _pipeline_pred_dir(setup_dict: dict, pipeline_id: str) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def _pagexml_preds_to_coco(layout_preds_dir: Path, reference_json: Path) -> dict:
-    """Convert layout PageXML predictions to a COCO JSON for OCR/OMR input.
+def _pagexml_preds_to_coco(
+    layout_preds_dir: Path, reference_json: Path, task: str
+) -> dict:
+    """Convert predicted OCR lines or OMR staffs to recognition COCO crops.
 
-    Bboxes come from predicted regions; text fields are left empty (not used
-    during prediction, only ground-truth JSON is used for evaluation).
+    Only regions for the requested task are used; missing task regions yield
+    no crops. Reference image records and metadata are kept unchanged.
     """
+    category_name = {"ocr": "line", "omr": "staff"}[task]
+    category_id = next(iter(TASK_CATEGORY_IDS[task]))
     with open(reference_json) as f:
         ref = json.load(f)
 
     stem_to_image = {Path(img["file_name"]).stem: img for img in ref["images"]}
-    categories = ref.get("categories", [{"id": 1, "name": "line", "supercategory": "layout"}])
-    default_cat_id = categories[0]["id"] if categories else 1
+    categories = ref.get(
+        "categories",
+        [{"id": category_id, "name": category_name, "supercategory": "layout"}],
+    )
 
     annotations: list[dict] = []
     ann_id = 1
@@ -63,9 +69,10 @@ def _pagexml_preds_to_coco(layout_preds_dir: Path, reference_json: Path) -> dict
         if not regions:
             continue
 
-        # Prefer TextLine-level crops; fall back to all regions when absent
-        lines = [r for r in regions if r.get("type") in ("TextLine", "line")]
-        crop_regions = lines if lines else regions
+        # Untyped PAGE TextLines denote OCR lines. Explicit staff types must
+        # remain staff even when the PAGE element itself is a TextLine.
+        region_types = ("line", "TextLine") if task == "ocr" else ("staff",)
+        crop_regions = [r for r in regions if r.get("type") in region_types]
 
         for region in crop_regions:
             bbox = region["bbox"]  # [x, y, w, h]
@@ -76,7 +83,7 @@ def _pagexml_preds_to_coco(layout_preds_dir: Path, reference_json: Path) -> dict
                 {
                     "id": ann_id,
                     "image_id": image_id,
-                    "category_id": default_cat_id,
+                    "category_id": category_id,
                     "bbox": bbox,
                     "area": w * h,
                     "iscrowd": 0,
@@ -87,7 +94,7 @@ def _pagexml_preds_to_coco(layout_preds_dir: Path, reference_json: Path) -> dict
             )
             ann_id += 1
 
-    return {"images": ref["images"], "categories": categories, "annotations": annotations}
+    return {**ref, "categories": categories, "annotations": annotations}
 
 
 # ---------------------------------------------------------------------------
@@ -176,7 +183,7 @@ def run_pipeline(args, layout_fw: str, text_fw: str, layout_model: str, text_mod
             continue
 
         # Build COCO JSON from layout predictions
-        pipeline_coco = _pagexml_preds_to_coco(layout_preds_dir, gt_test_json)
+        pipeline_coco = _pagexml_preds_to_coco(layout_preds_dir, gt_test_json, task)
         n_anns = len(pipeline_coco["annotations"])
         pipeline_test_json = layout_preds_dir.parent / f"pipeline_{task}_test.json"
         with open(pipeline_test_json, "w") as f:

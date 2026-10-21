@@ -112,8 +112,10 @@ class VLTTokenizer:
         return len(self.ctc_tokens)
 
     def encode_seq(self, text: str, max_length: int) -> torch.Tensor:
-        ids = [self.bos_token_id] + [self.seq_token_to_id.get(c, self.unk_token_id) for c in text] + [self.eos_token_id]
-        ids = ids[:max_length]
+        # Keep BOS/EOS in the seq2seq target, but don't let long lines truncate EOS.
+        ids = [self.bos_token_id]
+        ids.extend(self.seq_token_to_id.get(c, self.unk_token_id) for c in text[:max(0, max_length - 2)])
+        ids.append(self.eos_token_id)
         ids += [self.pad_token_id] * (max_length - len(ids))
         return torch.tensor(ids, dtype=torch.long)
 

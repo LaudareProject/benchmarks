@@ -183,6 +183,7 @@ def predict(
             pred_annotations,
             "layout",
             categories_list=categories,
+            image_base_path=args.data_dir or args.test_dir,
         )
 
     print(f"✅ Predictions saved to {output_dir}")

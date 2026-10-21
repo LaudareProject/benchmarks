@@ -159,7 +159,7 @@ def extract_layout_from_pagexml(xml_file: Path) -> List[Dict]:
                         regions.append(
                             {
                                 "id": text_line.get("id", ""),
-                                "type": "TextLine",
+                                "type": text_line.get("type") or "TextLine",
                                 "bbox": bbox,
                                 "confidence": 1.0,
                             }

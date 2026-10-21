@@ -192,6 +192,7 @@ def predict(
                 pred_annotations,
                 "layout",
                 categories_list=categories,
+                image_base_path=args.data_dir or args.test_dir,
             )
             if args.debug and i == 4:
                 break
