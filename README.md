@@ -88,6 +88,14 @@ Direct E2E `--debug` predicts only the first test page per task with at most 128
    - N-fold aggregates are stored in the `aggregated/` subdirectory.
    - Log files for each tool and task will also be available.
 
+### Experiment Matrix GUI
+
+`gui/index.html` is a dependency-free matrix of frameworks (rows) × protocols (columns) for building
+a custom `experiments.sh`. Greyed cells are impossible combinations: synthetic pretraining has no
+layout data, and CATMuS pretraining is OCR-only. The **Generate experiments.sh** button downloads a
+replacement script containing only the checked cells, keeping the original scaffolding. See
+[`gui/README.md`](gui/README.md) for usage and tests.
+
 ### Pre-training on Synthetic Data
 
 The framework supports pre-training models on synthetically generated data before fine-tuning on

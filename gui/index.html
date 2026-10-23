@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laudare experiment matrix</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="page-header">
+  <h1>Laudare experiment matrix</h1>
+  <p class="subtitle">
+    Pick the framework/task rows and the experiment columns you want, then generate a runnable
+    replacement for <code>experiments.sh</code>. Every command is derived from fixed configuration
+    (no free-text input) and follows the argument conventions of the checked-in
+    <code>experiments.sh</code>.
+  </p>
+</header>
+
+<div class="toolbar" role="group" aria-label="Selection actions">
+  <button id="generate" type="button" class="btn btn-primary" disabled>
+    Generate experiments.sh
+  </button>
+  <button id="clear" type="button" class="btn">Clear all</button>
+  <span id="selected-count" class="count" aria-live="polite">Selected: 0 cells</span>
+  <span id="hint" class="hint">Select at least one cell to enable generation.</span>
+</div>
+
+<main>
+  <div class="table-wrap" id="table-wrap">
+    <table id="matrix" class="matrix">
+      <caption class="visually-hidden">Experiment matrix: rows are framework/task combinations, columns are experiment protocols.</caption>
+      <thead id="matrix-head"></thead>
+      <tbody id="matrix-body"></tbody>
+    </table>
+  </div>
+
+  <section class="legend" aria-labelledby="legend-title">
+    <h2 id="legend-title">Legend</h2>
+    <ul id="legend-list"></ul>
+    <p class="legend-notes">
+      Click a column title checkbox to toggle every enabled cell in that column; click a row label
+      to toggle every enabled cell in that row. Grey hatched cells are not applicable and cannot be
+      selected.
+    </p>
+  </section>
+</main>
+
+<footer class="page-footer">
+  <p>
+    Generated scripts use <code>./run.sh</code> from the repository root and are not executable by
+    default: run <code>chmod +x experiments.sh</code> afterwards.
+  </p>
+</footer>
+
+<noscript>
+  <p class="noscript">This page needs JavaScript to build the matrix and generate the script.</p>
+</noscript>
+
+<script src="matrix.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
