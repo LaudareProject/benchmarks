@@ -13,9 +13,8 @@ DEFAULT_DATASET_DIR = PROJECT_ROOT / "data" / "CATMuS_medieval"
 DEFAULT_CHECKPOINT_DIR = PROJECT_ROOT / "models" / "catmus"
 DEFAULT_RESULTS_DIR = PROJECT_ROOT / "results" / "catmus_pretrain"
 
-SUPPORTED_FRAMEWORKS = ("kraken", "calamari", "trocr", "paddleocr_vl", "vlt")
-RECOGNITION_TASKS = ("ocr", "omr")
-TASK_CATEGORY_IDS = {"ocr": 6, "omr": 5}
+CATMUS_TASKS = ("ocr",)
+TASK_CATEGORY_IDS = {"ocr": 6}
 FRAMEWORK_SUFFIXES = {
     "kraken": ".mlmodel",
     "calamari": ".ckpt",
@@ -218,7 +217,7 @@ def materialize_catmus_dataset(
                     }
                 ],
             }
-            for task in RECOGNITION_TASKS
+            for task in CATMUS_TASKS
         }
 
         kept_rows = 0
@@ -375,12 +374,12 @@ def main() -> None:
     for framework in frameworks:
         recognition_entries = {
             task: models[framework][task]
-            for task in RECOGNITION_TASKS
+            for task in CATMUS_TASKS
             if task in models[framework]
         }
         if not recognition_entries:
             raise ValueError(
-                f"Framework '{framework}' has no OCR/OMR entries in {args.models_file}; CATMuS pretraining is only defined for recognition frameworks"
+                f"Framework '{framework}' has no OCR entry in {args.models_file}; CATMuS pretraining is OCR-only"
             )
 
         replacements.setdefault(framework, {})

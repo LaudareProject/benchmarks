@@ -328,8 +328,15 @@ def create_pagexml_from_annotations(
                     "image_height": img_height,
                     "annotations": [],
                 }
-            # The PageXML creation function expects a 'text' field.
-            # The source COCO has 'description'. Let's ensure 'text' exists.
+            # PageXML parsers such as Kraken reject line polygons on the image edge.
+            # Keep the generated polygon at least one pixel inside the page bounds.
+            ann = dict(ann)
+            x, y, w, h = ann["bbox"]
+            x1 = max(1, min(int(x), img_width - 2))
+            y1 = max(1, min(int(y), img_height - 2))
+            x2 = max(x1 + 1, min(int(x + w), img_width - 1))
+            y2 = max(y1 + 1, min(int(y + h), img_height - 1))
+            ann["bbox"] = [x1, y1, x2 - x1, y2 - y1]
             ann["text"] = ann.get("description", ann.get("text", ""))
             image_data_map[pagexml_filename]["annotations"].append(ann)
 

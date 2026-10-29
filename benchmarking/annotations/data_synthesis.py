@@ -32,15 +32,24 @@ def get_texture(width, height, texture_pool):
     """Get a random texture from the pre-generated pool and resize it if needed"""
     texture = rg.choice(texture_pool)
 
-    # Resize if the dimensions don't match
+    # Callers draw directly on the returned texture; don't mutate the shared pool.
     if texture.width != width or texture.height != height:
         texture = texture.resize((width, height), Image.Resampling.LANCZOS)
+    else:
+        texture = texture.copy()
 
     return texture
 
 
 def synthesize_text_batch(
-    texts, font_path, capitals_dir, width, height, texture_pool, lines_per_image=20
+    texts,
+    font_path,
+    capitals_dir,
+    width,
+    height,
+    texture_pool,
+    lines_per_image=20,
+    font_size=None,
 ):
     """
     Generate an image with multiple text lines arranged vertically.
@@ -65,12 +74,12 @@ def synthesize_text_batch(
 
     try:
         font = ImageFont.truetype(
-            font_path, size=rg.randint(32, 45)
-        )  # Smaller font for multiple lines
+            font_path,
+            size=rg.randint(32, 45) if font_size is None else font_size,
+        )
     except Exception as e:
         print(f"Error loading font {font_path}: {e}")
         font = ImageFont.load_default()
-
     ink_color = (
         57 + rg.randint(-10, 10),
         41 + rg.randint(-10, 10),
@@ -904,18 +913,26 @@ def generate_single_sample_batch(
     texture_pool,
     lines_per_image=20,
     debug=False,
+    selected_font_path=None,
+    font_size=None,
 ):
     """Generate a single dataset sample with multiple lines batched together"""
     img_filename = f"{mode}{sample_index + 1:04d}.jpg"
     img_path = output_dir / img_filename
     bboxes_and_texts = []
 
-    # Process based on the mode
     if mode == "text":
         texts = content_batch
-        font_path = rg.choice(fonts)
+        font_path = selected_font_path or rg.choice(fonts)
         result = synthesize_text_batch(
-            texts, font_path, capitals_dir, width, height, texture_pool, lines_per_image
+            texts,
+            font_path,
+            capitals_dir,
+            width,
+            height,
+            texture_pool,
+            lines_per_image,
+            font_size=font_size,
         )
         if result is None:
             print(
