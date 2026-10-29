@@ -135,6 +135,36 @@ datasets. This flag will save the pretrained model in a standardized path. If yo
 `run.sh` again with the same `--enable-pretrain` flag, it will reuse the pre-trained model (if any
 exists), skipping the pre-training.
 
+TrOCR-Large uses an adaptive per-device batch size capped at 8 to avoid GPU-memory exhaustion
+on large line-image datasets. TrOCR-Small retains its uncapped adaptive batch size.
+
+To extend an existing synthetic OCR corpus to a total line count, run:
+
+```bash
+uv run python -m benchmarking.extend_synthetic_ocr --target-lines 1000000
+```
+
+The extension appends to the train/validation JSON and image directories, skips text already in
+those splits (after Unicode normalization, case-folding, and whitespace normalization), and creates
+PageXML for the resulting OCR splits. The raw Biblioteca Italiana corpus is loaded once, using
+the existing HTTP cache. Legal whole-word abbreviation combinations are enumerated exhaustively,
+smallest expansion first; lines that admit only one spelling are skipped, and a few very long
+paragraphs are skipped because their combination space is exponential and they are far too wide
+to render as a single line.
+Every candidate is checked against normalized text already stored or reserved. Each page selects a
+font and size from the same configured ranges, then gathers only lines that fit that exact choice;
+too-wide candidates are discarded before image rendering, rather than wasting an image batch. This
+changes which unique candidates are selected, not the source corpus, abbreviation rules, fonts,
+font-size range, or augmentation pipeline.
+If the finite source is exhausted before the target, the command preserves progress and errors;
+another seed cannot create content beyond those legal variants. A new licensed source would be
+needed. Music continuation needs the analogous uniqueness key on normalized chant notation;
+this command only extends OCR.
+
+Image rendering uses 10 worker processes by default; `--workers` accepts values from 1 through 10.
+JSON is checkpointed every 200 generated images (adjustable with `--flush-images`).
+Run Python with `-u` to see progress immediately rather than waiting for buffered output.
+
 ## Use this Dataset with your Model/Framework
 
 ### Quick Start
