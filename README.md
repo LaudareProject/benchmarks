@@ -120,7 +120,12 @@ Generate data with the following command:
 For this task, the page budget, the font directory, and the capital letter directory can also be
 specified (see `./run.sh --help`). The runner converts each page budget to a total line target.
 The `--pretrain-samples` option sets the OMR page budget to one twentieth of the OCR budget to
-keep the two generation times similar.
+keep the two generation times similar. To write to another directory with exact line targets, run:
+
+```bash
+./run.sh --task synthesis --pretrain-dir data/pretrain_data_bis \
+  --ocr-lines 1000000 --omr-lines 900000 --workers 10
+```
 
 1. Synthetic Data Generation: Creates artificial text/music images using:
     - Historical text from Biblioteca Italiana (for OCR)
