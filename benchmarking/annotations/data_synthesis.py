@@ -289,18 +289,7 @@ def synthesize_music_batch(
         if img.mode != "RGBA":
             img = img.convert("RGBA")
 
-        # Get alpha channel
-        alpha = np.array(img.split()[-1])
-
-        # Find where alpha > 0 (non-transparent pixels)
-        coords = np.column_stack(np.where(alpha > 0))
-        if coords.size == 0:
-            return None  # No content
-
-        y_min, x_min = coords.min(axis=0)
-        y_max, x_max = coords.max(axis=0)
-
-        return (x_min, y_min, x_max + 1, y_max + 1)
+        return img.getchannel("A").getbbox()
 
     # Create background
     background = get_texture(width, height, texture_pool)
@@ -975,8 +964,11 @@ def generate_single_sample_batch(
         img, bboxes_and_texts = result
 
     if img is not None and bboxes_and_texts:
-        # Extract the bounding boxes as lists
-        bboxes = [list(bbox) for bbox, text, label in bboxes_and_texts]
+        # Compositors emit COCO xywh; Augraphy tracks xyxy corners.
+        bboxes = [
+            [x, y, x + width, y + height]
+            for (x, y, width, height), _text, _label in bboxes_and_texts
+        ]
 
         # Apply distortions with geometric transformations (with retry mechanism)
         distortion_result = apply_distortions(img, bboxes, debug, max_retries=10)
@@ -985,12 +977,25 @@ def generate_single_sample_batch(
             return None
 
         img, transformed_bboxes = distortion_result
+        if len(transformed_bboxes) != len(bboxes_and_texts):
+            # Dropped boxes lose positional correspondence to labels.
+            return None
 
         # Update the bboxes_and_texts with transformed bounding boxes
         updated_bboxes_and_texts = []
         for idx, (_, text, label) in enumerate(bboxes_and_texts):
             if idx < len(transformed_bboxes):
-                updated_bboxes_and_texts.append((transformed_bboxes[idx], text, label))
+                x0, y0, x1, y1 = transformed_bboxes[idx]
+                x0 = max(1, min(int(x0), img.width - 1))
+                y0 = max(1, min(int(y0), img.height - 1))
+                x1 = max(1, min(int(x1), img.width - 1))
+                y1 = max(1, min(int(y1), img.height - 1))
+                if x1 > x0 and y1 > y0:
+                    updated_bboxes_and_texts.append(
+                        ([x0, y0, x1 - x0, y1 - y0], text, label)
+                    )
+        if not updated_bboxes_and_texts:
+            return None
 
         # Save the image
         img.save(img_path)

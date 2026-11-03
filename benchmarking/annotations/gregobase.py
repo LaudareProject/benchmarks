@@ -21,7 +21,6 @@ import cv2
 import numpy as np
 import requests
 from fitz import Document
-from jinja2 import Environment, BaseLoader
 
 # Default configuration
 DEFAULT_CONFIG = {
@@ -376,161 +375,192 @@ def _truncate_gabc(
     return f"({' '.join(truncated_notes)})", remaining_notes_qualified, max_notes
 
 
-def generate(template,
-             gabc,
-             num_notes,
-             width,
-             height,
-             dpi=300,
-             debug=False) -> list[np.ndarray]:
-    """
-    Generate images from a gabc string using the provided template.
-
-    Args:
-        template: Jinja template to render
-        gabc: The gabc chant notation
-        width: Width of the output image
-        height: Height of the output image
-        dpi: Resolution of the output image
-
-    Returns:
-        List of numpy arrays containing images
-    """
-    # Limit the size of gabc to prevent long rendering times
-    gregoriofonts = ["greciliae", "granapadano", "gregorio"]
-    gregoriofont = random.choice(gregoriofonts)
-
-    # Sanitize gabc to remove characters that might cause issues with gregoriotex
-    gabc = gabc.replace(";", "")
-
-    # Add margins to prevent content from going outside borders
-    margin = 20  # pixels
-    # safe_width = width - 2 * margin
-    safe_height = height - 2 * margin
-
-    # Calculate appropriate sizes
-    fontsize = round(70 + random.random() * 20)
-    # Scale staff size based on available height to prevent overflow
-    max_staffsize = int(safe_height * 0.8)  # Leave 20% margin
-    staffsize = min(int(fontsize * 0.8), max_staffsize)
-    # rescale initial size based on number of notes, avoiding division by zero
-    denominator = max(num_notes - 9, 1)  # Ensure we never divide by zero
-    initialsize = int(staffsize * 2 / denominator)
-
-    source = template.render(
-        fontsize=fontsize,  # this is in pixel!
-        dpi=dpi,
-        width=width,
-        height=height,
-        margin=margin,
-        initialline=0,
-        initialsize=initialsize,  # this is in pixel!
-        staffsize=staffsize,  # this is in pixel!
-        gregoriofont=gregoriofont,
-        gabc=gabc,
-    )
-
-    # Use a unique directory for each LaTeX build to avoid concurrent runs colliding
-    Path("temp").mkdir(exist_ok=True)
-    tmpdir = tempfile.mkdtemp(prefix="gregobase_build_", dir="temp/")
-    build_dir = Path(tmpdir)
-    build_dir.mkdir(parents=True, exist_ok=True)
-    source_path = build_dir / "chant.tex"
-    source_path.write_text(source, encoding="utf-8")
-
-    pdf_path = build_dir / "chant.pdf"
-
-    # Use lualatex directly instead of latexmk
-    lualatex_path = shutil.which("lualatex")
-    if not lualatex_path:
-        print("Error: lualatex executable not found.")
-        # cleanup unless debugging
-        if not debug:
-            try:
-                shutil.rmtree(build_dir)
-            except Exception:
-                pass
-        return []
-
-    cmd = [
-        lualatex_path,
-        "-shell-escape",
-        "-interaction=batchmode",
-        "-halt-on-error",
-        source_path.name,
-    ]
-    if debug:
-        print(f"Running command: {' '.join(cmd)}")
-        print(f"Build directory: {build_dir}")
-
-    env = os.environ.copy()
-    font_path_abs = Path(DEFAULT_CONFIG["font_path"]).resolve()
-    texinputs_path = f".:{str(font_path_abs)}:"
-    env["TEXINPUTS"] = texinputs_path
-    env["LANG"] = "en_US.UTF-8"
-    env["LC_ALL"] = "en_US.UTF-8"
-
-    proc = subprocess.run(cmd,
-                          capture_output=True,
-                          text=True,
-                          cwd=build_dir,
-                          env=env,
-                          timeout=120)
-
-    if proc.returncode != 0 or not pdf_path.exists():
-        timed_log_name = f"logs/error_{os.getpid()}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
-        Path("logs").mkdir(exist_ok=True)
-        import traceback
-
-        # Write full Python traceback and lualatex log to the error log file
-        python_traceback = traceback.format_exc()
-        log_path = build_dir / "chant.log"
-        latex_log = ""
-        if log_path.exists():
-            with open(log_path, "r", encoding="utf-8") as logf:
-                latex_log = logf.read()
-        with open(timed_log_name, "w") as f:
-            f.write(
-                f"Exception traceback:\n{python_traceback}\n\nlatex_log:\n{latex_log}"
-            )
-        # If not in debug mode, cleanup the temporary build directory
-        if not debug:
-            try:
-                shutil.rmtree(build_dir)
-            except Exception:
-                pass
-        if debug:
-            print(f"Exception logged to {timed_log_name}")
-        return []
-
-    with open(pdf_path, "rb") as f:
-        pdf_bytes = f.read()
-
-    # cleanup build directory unless debugging
-    if not debug:
-        try:
-            shutil.rmtree(build_dir)
-        except Exception:
-            pass
-    else:
-        print(
-            f"Debug mode: keeping build directory {build_dir} for inspection")
-
+def _rasterize_pdf(pdf_bytes: bytes, dpi: int) -> list[np.ndarray]:
+    """Rasterize PDF pages to RGBA arrays with white made transparent."""
     pdf = Document(stream=pdf_bytes)
-
-    # create raster images from pdf
     images = []
     for pagenum in range(len(pdf)):
         page = pdf.load_page(pagenum)
-        pix = page.get_pixmap(dpi=dpi, clip=False,
-                              annots=False)  # type: ignore
+        pix = page.get_pixmap(dpi=dpi, clip=False, annots=False)  # type: ignore
         img = np.frombuffer(pix.samples_mv, dtype=np.uint8).reshape(
             (pix.height, pix.width, -1))
         img = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
         # where the image is white, set alpha to 0
         img[np.all(img == 255, axis=-1)] = (200, 200, 200, 0)
         images.append(img)
+    pdf.close()
     return images
+
+
+def _compile_gabc_files(
+        build_dir: Path, gabc_entries: List[Tuple[str, str]]) -> List[bool]:
+    """Compile gabc files to .gtex with the gregorio binary.
+
+    Gregorio 6 exits non-zero for recoverable warnings (for example a leading
+    key definition), so success is defined by the .gtex file being produced.
+    """
+    gregorio_path = shutil.which("gregorio")
+    if not gregorio_path:
+        raise RuntimeError("gregorio executable not found")
+
+    results = []
+    for name, gabc in gabc_entries:
+        (build_dir / f"{name}.gabc").write_text(
+            f"name: {name};\n%%\n{gabc}\n", encoding="utf-8")
+        proc = subprocess.run(
+            [gregorio_path, f"{name}.gabc"],
+            cwd=build_dir,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        produced = (build_dir / f"{name}.gtex").exists()
+        if not produced and proc.returncode != 0:
+            print(f"  gregorio failed for {name}: {proc.stderr.strip()[:200]}")
+        results.append(produced)
+    return results
+
+
+def generate_batch(
+    gabcs: List[str],
+    width: int,
+    height: int,
+    dpi: int = 300,
+    debug: bool = False,
+) -> List[Optional[np.ndarray]]:
+    """Render many chant snippets with a single LaTeX run.
+
+    One lualatex invocation costs ~6s regardless of how many scores it lays
+    out, so rendering ~32 snippets per document is far faster than one run per
+    snippet. Each score occupies its own page and is rasterized to the same
+    RGBA format consumed by the music compositor.
+    """
+    if not gabcs:
+        return []
+
+    gregoriofonts = ["greciliae", "granapadano", "gregorio"]
+    gregoriofont = random.choice(gregoriofonts)
+    margin = 20
+    safe_height = height - 2 * margin
+    fontsize = round(70 + random.random() * 20)
+    max_staffsize = int(safe_height * 0.8)
+    staffsize = min(int(fontsize * 0.8), max_staffsize)
+
+    build_dir = Path(tempfile.mkdtemp(prefix="gregobase_build_"))
+    try:
+        entries = [
+            (f"score{i}", gabc) for i, gabc in enumerate(gabcs)
+        ]
+        compiled = _compile_gabc_files(build_dir, entries)
+
+        pages = []
+        for i, ok in enumerate(compiled):
+            if ok:
+                pages.append(i)
+        if not pages:
+            return [None] * len(gabcs)
+
+        lines = [
+            r"\documentclass{article}",
+            rf"\usepackage[paperheight={height / dpi}in,"
+            rf"paperwidth={width / dpi}in,left={20 / dpi}in,"
+            rf"right={20 / dpi}in,top={90 / dpi}in,"
+            rf"bottom={20 / dpi}in]{{geometry}}",
+            r"\usepackage{fontspec}",
+            r"\usepackage[autocompile]{gregoriotex}",
+            r"\begin{document}",
+            r"\pagestyle{empty}",
+            r"\newwrite\scoremap",
+            r"\immediate\openout\scoremap=batch.pages",
+            rf"\fontsize{{{72 * fontsize / dpi}pt}}"
+            rf"{{{1.2 * 72 * fontsize / dpi}pt}}\selectfont",
+            r"\gresetinitiallines{0}",
+            r"\gresetlinecolor{gregoriocolor}",
+            rf"\grechangestaffsize{{{72 * staffsize // dpi}}}",
+            rf"\gresetgregoriofont{{{gregoriofont}}}",
+        ]
+        for page_index in pages:
+            lines.append(r"\clearpage")
+            lines.append(
+                rf"\immediate\write\scoremap{{{page_index} \thepage}}"
+            )
+            lines.append(rf"\input{{score{page_index}.gtex}}")
+        lines.append(r"\clearpage")
+        lines.append(r"\immediate\write\scoremap{end \thepage}")
+        lines.append(r"\immediate\closeout\scoremap")
+        lines.append(r"\end{document}")
+        (build_dir / "batch.tex").write_text("\n".join(lines), encoding="utf-8")
+
+        env = os.environ.copy()
+        font_path_abs = Path(DEFAULT_CONFIG["font_path"]).resolve()
+        env["TEXINPUTS"] = f".:{font_path_abs}:"
+        env["LANG"] = "en_US.UTF-8"
+        env["LC_ALL"] = "en_US.UTF-8"
+
+        proc = subprocess.run(
+            [
+                shutil.which("lualatex") or "lualatex",
+                "-interaction=batchmode",
+                "-halt-on-error",
+                "batch.tex",
+            ],
+            cwd=build_dir,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+        pdf_path = build_dir / "batch.pdf"
+        if proc.returncode != 0 or not pdf_path.exists():
+            if debug:
+                print(f"Batch LaTeX build failed in {build_dir}")
+                log_path = build_dir / "batch.log"
+                if log_path.exists():
+                    errors = [
+                        line for line in log_path.read_text(
+                            errors="ignore").splitlines()
+                        if line.startswith("!")
+                    ]
+                    print("\n".join(errors[:5]))
+            return [None] * len(gabcs)
+
+        images = _rasterize_pdf(pdf_path.read_bytes(), dpi)
+        markers = [
+            (index, int(page) - 1)
+            for index, page in (
+                line.split()
+                for line in (build_dir / "batch.pages").read_text().splitlines()
+            )
+        ]
+        if len(markers) != len(pages) + 1:
+            raise RuntimeError("Incomplete score-to-PDF page mapping")
+        rendered = [None] * len(gabcs)
+        for (index, start), (_, end) in zip(markers, markers[1:]):
+            # Reject wrapped scores: assigning their first page the full label
+            # would silently corrupt both this score and subsequent mappings.
+            if end - start == 1 and 0 <= start < len(images):
+                image = images[start]
+                alpha = image[:, :, 3]
+                touches_edge = (
+                    np.any(alpha[:2]) or np.any(alpha[-2:])
+                    or np.any(alpha[:, :2]) or np.any(alpha[:, -2:])
+                )
+                red = (
+                    (image[:, :, 0] > 150)
+                    & (image[:, :, 1] < 140)
+                    & (image[:, :, 2] < 140)
+                    & (alpha > 0)
+                )
+                staff_rows = np.count_nonzero(red, axis=1) > image.shape[1] // 2
+                staff_lines = np.count_nonzero(
+                    staff_rows & ~np.concatenate(([False], staff_rows[:-1]))
+                )
+                if np.any(alpha) and not touches_edge and staff_lines == 4:
+                    rendered[int(index)] = image
+        return rendered
+    finally:
+        if not debug:
+            shutil.rmtree(build_dir, ignore_errors=True)
 
 
 def setup_cache(cache_name: str, cache_days: int) -> None:
@@ -554,6 +584,7 @@ def get_music_page_generator(
     latex_jobs: int = 4,
     max_pages: Optional[int] = None,
     debug: bool = False,
+    batch_size: int = 32,
 ) -> Generator[Tuple[np.ndarray, str, str], None, None]:
     """
     This function is a wrapper that sets up a ThreadPoolExecutor and yields from
@@ -568,6 +599,7 @@ def get_music_page_generator(
             cache_days,
             max_pages,
             debug,
+            batch_size,
         )
 
 
@@ -579,6 +611,7 @@ def generate_music_page_concurrently(
     cache_days: int,
     max_pages: Optional[int] = None,
     debug: bool = False,
+    batch_size: int = 32,
 ) -> Generator[Tuple[np.ndarray, str, str], None, None]:
     """
     Generate music pages one by one as they are retrieved from the online database.
@@ -635,55 +668,8 @@ def generate_music_page_concurrently(
         print(f"An unexpected error occurred during data fetching: {e}")
         return
 
-    # Setup template
-    template_string = r"""% 1 in is 2.54 cm
-% 1 pt is 1/72 in
-% 1 px is 1 in at 1 dpi
-% set dpi to D
-% X px is our input
-% it is X/D in
-% X/D is 72X/D pt
 
-\documentclass{article}
-
-\usepackage{geometry}
-\geometry{paperheight=\VAR{height / dpi}in,paperwidth=\VAR{width / dpi}in}
-\geometry{hmargin={\VAR{margin / dpi}in,\VAR{margin / dpi}in},vmargin={\VAR{margin / dpi}in,\VAR{margin / dpi}in}}
-
-\usepackage{fontspec}
-
-%- if gabc is not none
-\usepackage[autocompile]{gregoriotex}
-%- endif
-
-\begin{document}
-
-\fontsize{\VAR{72 * fontsize / dpi}}{\VAR{1.2 *
- 72 * fontsize / dpi}}
-
-%- if gabc is not none
-% the gabc code
-% size of the initial line
-\gresetinitiallines{\VAR{initialline}}
-\grechangestyle{initial}{\VAR{72 * initialsize / dpi}pt}
-% use red lines
-\gresetlinecolor{gregoriocolor}
-\grechangestaffsize{\VAR{72 * staffsize // dpi}}
-\gresetgregoriofont{\VAR{gregoriofont}}
-\gabcsnippet{\VAR{gabc}}
-%- endif
-
-\end{document}
-"""
-    env = Environment(
-        loader=BaseLoader(),
-        line_statement_prefix="%-",
-        variable_start_string=r"\VAR{",
-        variable_end_string="}",
-    )
-    template = env.from_string(template_string)
-
-    # Parse SQL and stream segments with bounded futures window
+    # Parse SQL and stream segments with a bounded batch window
     chant_generator = parse_sql(sql_content)
     remaining_notes_queue = deque()
 
@@ -695,10 +681,9 @@ def generate_music_page_concurrently(
     if debug:
         print("🎵 DEBUG: Note reuse system activated! Will show statistics...")
 
-    # Bounded futures window (2x number of workers to keep pool busy)
-    max_pending_futures = executor._max_workers * 2
+    # One lualatex run renders a whole batch; keep a few batches in flight.
     futures = {}
-    
+
     def process_notes_to_chant(
             notes_list: List[str],
             source: str = "new") -> Optional[Tuple[str, str, int, int]]:
@@ -722,116 +707,123 @@ def generate_music_page_concurrently(
 
         return truncated_chant, custom_notation, width, height
 
-    def submit_segment(truncated_chant, num_notes, custom_notation, width, height):
-        """Submit a single segment to the thread pool."""
-        nonlocal segments_yielded
-        
+    def submit_batch() -> bool:
+        """Collect up to `batch_size` segments and submit one LaTeX batch."""
+        batch = []
+        while len(batch) < batch_size:
+            segment = get_next_segment()
+            if segment is None:
+                break
+            truncated_chant, num_notes, custom_notation, width, height, origin = segment
+            batch.append(
+                (truncated_chant, custom_notation, num_notes, width, height, origin)
+            )
+        if not batch:
+            return False
+        width = batch[0][3]
+        height = batch[0][4]
         future = executor.submit(
-            generate,
-            template,
-            truncated_chant,
-            num_notes,
+            generate_batch,
+            [item[0] for item in batch],
             width=width,
             height=height,
             dpi=DEFAULT_CONFIG["dpi"],
+            debug=debug,
         )
-        futures[future] = (truncated_chant, custom_notation)
-        
+        futures[future] = batch
         if debug:
-            print(f"Submitted segment (pending: {len(futures)})")
+            print(f"Submitted batch of {len(batch)} (pending batches: {len(futures)})")
+        return True
 
     # Create iterators for streaming
     chant_iter = iter(chant_generator)
     current_chant = None
-    
+
     def get_next_segment():
         """Get next segment from either queue or new chant."""
-        nonlocal current_chant, chants_processed, chants_skipped, segments_from_queue
-        
+        nonlocal current_chant, chants_processed, chants_skipped
+
         # First try queued remaining notes
         if remaining_notes_queue:
             queued_notes = remaining_notes_queue.popleft()
             result = process_notes_to_chant(queued_notes, "queue")
             if result:
                 truncated_chant, custom_notation, width, height = result
-                segments_from_queue += 1
-                return truncated_chant, len(queued_notes), custom_notation, width, height
-        
+                return (truncated_chant, len(queued_notes), custom_notation,
+                        width, height, "queue")
+
         # Then try new chants
         while True:
             try:
                 if current_chant is None:
                     current_chant = next(chant_iter)
-                
+
                 chants_processed += 1
                 chant = current_chant
                 current_chant = None  # Mark as consumed
-                
-                # Keep only text inside round brackets from chant
-                filtered_chant = "(" + " ".join(GREGORIO_REGEX.findall(chant)) + ")"
-                
-                # Get notes from the filtered chant
-                match = GREGORIO_REGEX.search(filtered_chant)
-                if not match or not match.group(1).strip():
+
+                joined = " ".join(GREGORIO_REGEX.findall(chant))
+                notes = joined.split()
+                if not notes:
                     continue
-                
-                notes = match.group(1).split()
+
                 result = process_notes_to_chant(notes, "new")
                 if result is None:
                     chants_skipped += 1
                     continue
-                
+
                 truncated_chant, custom_notation, width, height = result
-                return truncated_chant, len(notes), custom_notation, width, height
-                
+                return (truncated_chant, len(notes), custom_notation,
+                        width, height, "new")
+
             except StopIteration:
                 return None  # No more segments available
 
-    # Fill initial futures window
-    for _ in range(max_pending_futures):
-        segment = get_next_segment()
-        if segment is None:
+    # Fill initial batch window
+    for _ in range(max(1, executor._max_workers)):
+        if not submit_batch():
             break
-        if segments_yielded >= max_pages:
-            break
-        truncated_chant, num_notes, custom_notation, width, height = segment
-        submit_segment(truncated_chant, num_notes, custom_notation, width, height)
 
-    # Process results and maintain bounded window
+    # Process results and maintain the window
+    consecutive_failed_batches = 0
     while futures:
-        # Wait for next completion
         completed_future = next(as_completed(futures))
-        truncated_chant, custom_notation = futures[completed_future]
-        
-        # Remove completed future immediately (KEY MEMORY FIX)
-        del futures[completed_future]
-        
+        batch = futures.pop(completed_future)
+
         try:
             images = completed_future.result()
-            if images:
-                for image in images:
-                    segments_yielded += 1
-                    yield image, truncated_chant, custom_notation
-                    
-                    # Check if we've reached the limit
-                    if segments_yielded >= max_pages:
-                        # Cancel remaining futures and exit
-                        for future in futures:
-                            future.cancel()
-                        print(f"Generated {segments_yielded} segments from {chants_processed} processed ({chants_skipped} skipped)")
-                        print(f"  - {segments_yielded - segments_from_queue} from new segments")
-                        print(f"  - {segments_from_queue} from reused remaining notes")
-                        return
-            
-            # Refill the window with new segment (if available and not at limit)
-            if segments_yielded < max_pages:
-                segment = get_next_segment()
-                if segment is not None:
-                    truncated_chant, num_notes, custom_notation, width, height = segment
-                    submit_segment(truncated_chant, num_notes, custom_notation, width, height)
-                
         except Exception as exc:
             print(f"Chant generation created an exception: {exc}")
+            images = []
+
+        rendered_any = False
+        for index, (truncated_chant, custom_notation, _n, _w, _h,
+                    origin) in enumerate(batch):
+            image = images[index] if index < len(images) else None
+            if image is None:
+                continue
+            rendered_any = True
+            segments_yielded += 1
+            if origin == "queue":
+                segments_from_queue += 1
+            yield image, truncated_chant, custom_notation
+            if max_pages and segments_yielded >= max_pages:
+                for pending in futures:
+                    pending.cancel()
+                print(f"Generated {segments_yielded} segments from {chants_processed} processed ({chants_skipped} skipped)")
+                print(f"  - {segments_yielded - segments_from_queue} from new segments")
+                print(f"  - {segments_from_queue} from reused remaining notes")
+                return
+
+        consecutive_failed_batches = 0 if rendered_any else consecutive_failed_batches + 1
+        if consecutive_failed_batches >= 3:
+            for pending in futures:
+                pending.cancel()
+            print("Music rendering failed for 3 consecutive batches; stopping.")
+            return
+
+        if not max_pages or segments_yielded + batch_size <= max_pages:
+            submit_batch()
 
     print(f"Generated {segments_yielded} segments from {chants_processed} processed ({chants_skipped} skipped)")
     print(f"  - {segments_yielded - segments_from_queue} from new segments")

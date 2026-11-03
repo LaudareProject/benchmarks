@@ -130,6 +130,30 @@ keeping a similar time for the generation.
 3. Fine-tuning Phase: Pre-trained models are then fine-tuned on your real dataset
 
 Generated synthetic data is cached in `./data/pretrain_data/`.
+Music rendering batches scores into one `lualatex` invocation and tracks each
+score's PDF pages explicitly. Wrapped, blank, or edge-clipped score images are
+rejected rather than assigned a potentially incorrect full-line label.
+
+To extend OMR pretraining to 900,000 total line annotations with ten workers:
+
+```bash
+uv run python -u -m benchmarking.extend_synthetic_omr --target-lines 900000 --workers 10
+```
+
+The OMR extender samples contiguous 7–15-group passages at every start offset,
+carrying the active clef into each excerpt. Musical-label deduplication applies
+across existing annotations and new excerpts; changing fonts alone does not
+count as new music. Source-chant identity, section, offset, and length are retained as
+provenance. Chants with unsupported chromatic alterations or unknown notation
+are skipped rather than assigned incorrect natural-pitch labels. Newly generated
+excerpts from the same source chant have a stable
+split assignment; legacy data is preserved and is not retroactively re-split.
+The often-quoted roughly 86k non-overlapping segments are not a capacity ceiling:
+overlapping offsets and different lengths supply additional distinct passages.
+Checkpoints count annotations actually saved, not candidates enumerated, and are
+written every 20 images by default (`--flush-images`). PAGE XML is rebuilt when
+the run finishes. OCR data is not changed by this command.
+
 You can enable pre-training with the flag `--enable-pretraining` when running experiments on real
 datasets. This flag will save the pretrained model in a standardized path. If you run the script
 `run.sh` again with the same `--enable-pretrain` flag, it will reuse the pre-trained model (if any
