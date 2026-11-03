@@ -23,7 +23,7 @@ FONT_DIR="./fonts"
 CAPITALS_DIR="./fonts/capitals"
 PRETRAIN_DIR=""
 AUGMENT="true"
-LATEX_JOBS=8
+WORKERS=8
 FOLD_NUM=0
 MODEL_NAME="default"
 while [[ $# -gt 0 ]]; do
@@ -122,8 +122,8 @@ while [[ $# -gt 0 ]]; do
     shift
     shift
     ;;
-  --latex-jobs)
-    LATEX_JOBS="$2"
+  --workers)
+    WORKERS="$2"
     shift
     shift
     ;;
@@ -279,37 +279,59 @@ if [ "$TASK" = "annotations" ]; then
   echo ""
 fi
 
-# Generate pre-training data if the task is "synthesis"
-if [ "$TASK" == "synthesis" ]; then
-  echo "📚 STEP 1.5: Generating Pre-training Data"
-  echo "─────────────────────────────────────────"
+# Generate synthetic data if the task is "synthesis"
+if [ "$TASK" = "synthesis" ]; then
+  echo "📚 STEP 1.5: Generating Synthetic Data"
+  echo "──────────────────────────────────────"
 
   PRETRAIN_DATA_DIR="${PROJECT_ROOT}/data/pretrain_data"
   mkdir -p "${PRETRAIN_DATA_DIR}"
 
-  # Generate OMR synthetic data
-  echo "🎵 Generating OMR synthetic data..."
-  OMR_ARGS=(--task omr --output-dir "${PRETRAIN_DATA_DIR}/omr" --num-samples "$OMR_PRETRAIN_SAMPLES" --latex-jobs "$LATEX_JOBS")
+  # Debug runs use five lines per page and at most 10 pages.
+  PAGE_LIMIT=0
+  PAGE_LINES=15
   if [ "$DEBUG_MODE" = true ]; then
-    OMR_ARGS+=(--debug)
+    PAGE_LINES=5
+    PAGE_LIMIT=10
+    WORKERS=1
   fi
-  uv run python -m "${BENCHMARKING_DIR}.generate_pretrain_data" "${OMR_ARGS[@]}"
+  OMR_PAGES="$OMR_PRETRAIN_SAMPLES"
+  OCR_PAGES="$OCR_PRETRAIN_SAMPLES"
+  if (( PAGE_LIMIT > 0 )); then
+    (( OMR_PAGES > PAGE_LIMIT )) && OMR_PAGES=$PAGE_LIMIT
+    (( OCR_PAGES > PAGE_LIMIT )) && OCR_PAGES=$PAGE_LIMIT
+  fi
+  OMR_TARGET_LINES=$((OMR_PAGES * PAGE_LINES))
+  OCR_TARGET_LINES=$((OCR_PAGES * PAGE_LINES))
+  EXTENDER_ARGS=()
+  if [ "$DEBUG_MODE" = true ]; then
+    EXTENDER_ARGS+=(--debug)
+  fi
 
-  echo "✅ Pre-training data generation complete"
-  echo ""
-
-  # Generate OCR synthetic data
-  if [ -n "$FONT_DIR" ]; then
-    echo "📝 Generating OCR synthetic data..."
-    OCR_ARGS=(--task ocr --output-dir "${PRETRAIN_DATA_DIR}/ocr" --num-samples "$OCR_PRETRAIN_SAMPLES")
-    if [ "$DEBUG_MODE" = true ]; then
-      OCR_ARGS+=(--debug)
+  run_extender_if_needed() {
+    local task="$1"
+    local data_dir="$2"
+    local target_lines="$3"
+    shift 3
+    local existing_lines
+    existing_lines=$(uv run python -c 'import json, pathlib, sys; root=pathlib.Path(sys.argv[1]) / "annotations-diplomatic"; paths=[root / f"{sys.argv[2]}_{split}.json" for split in ("train", "val")]; print(sum(len(json.loads(p.read_text(encoding="utf-8"))["annotations"]) for p in paths if p.exists()))' "$data_dir" "$task")
+    if (( existing_lines >= target_lines )); then
+      echo "⏭️  Skipping ${task}: ${existing_lines} existing lines meet target ${target_lines}"
+      return
     fi
-    OCR_ARGS+=(--font-dir "$FONT_DIR")
+    echo "🎨 Extending ${task} synthetic data to ${target_lines} lines..."
+    uv run python -m "${BENCHMARKING_DIR}.extend_synthetic_${task}" \
+      --data-dir "$data_dir" --target-lines "$target_lines" --workers "$WORKERS" "${EXTENDER_ARGS[@]}" "$@"
+  }
+
+  run_extender_if_needed omr "${PRETRAIN_DATA_DIR}/omr" "$OMR_TARGET_LINES"
+
+  if [ -n "$FONT_DIR" ]; then
+    OCR_ARGS=(--font-dir "$FONT_DIR")
     if [ -n "$CAPITALS_DIR" ]; then
       OCR_ARGS+=(--capitals-dir "$CAPITALS_DIR")
     fi
-    uv run python -m "${BENCHMARKING_DIR}.generate_pretrain_data" "${OCR_ARGS[@]}"
+    run_extender_if_needed ocr "${PRETRAIN_DATA_DIR}/ocr" "$OCR_TARGET_LINES" "${OCR_ARGS[@]}"
   else
     echo "⚠️  Skipping OCR synthetic data generation - no --font-dir provided"
   fi

@@ -1,4 +1,4 @@
-"""Append unique Gregorian chant annotations to synthetic OMR pretrain data."""
+"""Create or extend synthetic OMR data with unique Gregorian chant annotations."""
 
 import argparse
 import atexit
@@ -24,6 +24,7 @@ from .extend_synthetic_ocr import (
     LINES_PER_IMAGE,
     MAX_WORKERS,
     _LazyTexturePool,
+    _initialize_splits,
     _texture_pool,
 )
 
@@ -222,6 +223,7 @@ def extend_dataset(
     flush_images: int = 20,
     batch_size: int = 30,
     seed: int = 2025,
+    debug: bool = False,
 ) -> int:
     if not 1 <= workers <= MAX_WORKERS:
         raise ValueError(f"workers must be between 1 and {MAX_WORKERS}")
@@ -231,12 +233,7 @@ def extend_dataset(
         raise ValueError("flush-images and batch-size must be positive")
     data_dir = data_dir.resolve()
 
-    annotations_dir = data_dir / "annotations-diplomatic"
-    split_paths = {
-        "train": annotations_dir / "omr_train.json",
-        "val": annotations_dir / "omr_val.json",
-    }
-    splits = {name: _load_split(path) for name, path in split_paths.items()}
+    split_paths, splits = _initialize_splits(data_dir, "omr")
     existing_annotations = [
         annotation
         for split in splits.values()
@@ -247,6 +244,9 @@ def extend_dataset(
         raise ValueError(
             f"Target {target_lines:,} is below the existing {line_count:,} OMR lines"
         )
+    if debug:
+        target_lines = min(target_lines, line_count + 50)
+        workers = 1
     if target_lines == line_count:
         print(f"Already at target: {line_count:,} OMR lines")
         _write_pagexml(data_dir, split_paths)
@@ -298,7 +298,7 @@ def extend_dataset(
         # Share on-disk textures; workers load only a small LRU subset instead of
         # serializing a hundred full-resolution PIL images into each process.
         texture_paths = []
-        textures = _texture_pool(seed)
+        textures = _texture_pool(seed, debug=debug)
         for index, texture in enumerate(textures[:TEXTURE_CACHE_SIZE]):
             texture_path = Path(texture_directory.name) / f"texture_{index:03}.png"
             texture.save(texture_path, format="PNG")
@@ -421,14 +421,21 @@ def extend_dataset(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Append unique Gregorian chant OMR lines to synthetic pretrain data."
+        description="Create or extend synthetic OMR data with unique Gregorian chants."
     )
-    parser.add_argument("--target-lines", type=int, default=900_000)
+    parser.add_argument(
+        "--target-lines", type=int, default=900_000,
+        help="Total line annotations across the training and validation splits.",
+    )
     parser.add_argument("--workers", type=int, default=MAX_WORKERS)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--flush-images", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=30)
     parser.add_argument("--seed", type=int, default=2025)
+    parser.add_argument(
+        "--debug", action="store_true",
+        help="Add at most 50 lines with one worker and a smaller texture pool.",
+    )
     args = parser.parse_args()
     extend_dataset(
         args.data_dir,
@@ -437,6 +444,7 @@ def main() -> None:
         args.flush_images,
         args.batch_size,
         args.seed,
+        debug=args.debug,
     )
 
 

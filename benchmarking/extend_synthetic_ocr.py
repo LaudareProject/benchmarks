@@ -1,4 +1,4 @@
-"""Extend synthetic OCR data without reusing previously stored text lines."""
+"""Create or extend synthetic OCR data with unique text lines."""
 
 import argparse
 from collections import OrderedDict, deque
@@ -105,6 +105,34 @@ def _load_split(path: Path) -> dict:
         return json.load(stream)
 
 
+def _initialize_splits(
+    data_dir: Path, task: str
+) -> tuple[dict[str, Path], dict[str, dict]]:
+    annotations_dir = data_dir / "annotations-diplomatic"
+    annotations_dir.mkdir(parents=True, exist_ok=True)
+    split_paths = {
+        name: annotations_dir / f"{task}_{name}.json"
+        for name in ("train", "val")
+    }
+    for path in split_paths.values():
+        if not path.exists():
+            update_json_file(
+                path,
+                {
+                    "images": [],
+                    "annotations": [],
+                    "categories": [
+                        {
+                            "id": 6 if task == "ocr" else 5,
+                            "name": "line" if task == "ocr" else "music_line",
+                            "supercategory": "recognition",
+                        }
+                    ],
+                },
+            )
+    return split_paths, {name: _load_split(path) for name, path in split_paths.items()}
+
+
 def _write_pagexml(data_dir: Path, split_paths: dict[str, Path]) -> None:
     processed_dir = data_dir / "annotations-diplomatic" / "processed_splits"
     for path in split_paths.values():
@@ -116,17 +144,17 @@ def _write_pagexml(data_dir: Path, split_paths: dict[str, Path]) -> None:
             target_tasks="ocr",
         )
 
-def _texture_pool(seed: int) -> list[Image.Image]:
+def _texture_pool(seed: int, debug: bool = False) -> list[Image.Image]:
     rng = random.Random(seed)
     pool = []
     tessellation = au.VoronoiTessellation(
         mult_range=(50, 80),
         seed=1994,
-        num_cells_range=(5000, 6000),
+        num_cells_range=(1000, 2000) if debug else (5000, 6000),
         noise_type="random",
         background_value=(200, 256),
     )
-    for _ in range(100):
+    for _ in range(10 if debug else 100):
         width = round((rng.random() + 0.5) * IMAGE_WIDTH)
         height = round((rng.random() + 0.5) * IMAGE_HEIGHT)
         background = (
@@ -148,15 +176,16 @@ def extend_dataset(
     seed: int = 2025,
     flush_images: int = 200,
     workers: int = MAX_WORKERS,
+    debug: bool = False,
 ) -> int:
     if not 1 <= workers <= MAX_WORKERS:
         raise ValueError(f"workers must be between 1 and {MAX_WORKERS}")
-    annotations_dir = data_dir / "annotations-diplomatic"
-    split_paths = {
-        "train": annotations_dir / "ocr_train.json",
-        "val": annotations_dir / "ocr_val.json",
-    }
-    splits = {name: _load_split(path) for name, path in split_paths.items()}
+    if target_lines < 0:
+        raise ValueError("target-lines must be non-negative")
+    if lines_per_image < 1 or flush_images < 1:
+        raise ValueError("lines-per-image and flush-images must be positive")
+    data_dir = data_dir.resolve()
+    split_paths, splits = _initialize_splits(data_dir, "ocr")
     existing_annotations = [
         annotation
         for split in splits.values()
@@ -167,6 +196,10 @@ def extend_dataset(
         raise ValueError(
             f"Target {target_lines:,} is below the existing {line_count:,} OCR lines"
         )
+    if debug:
+        target_lines = min(target_lines, line_count + 50)
+        lines_per_image = min(lines_per_image, 5)
+        workers = 1
     if target_lines == line_count:
         print(f"Already at target: {line_count:,} OCR text lines")
         _write_pagexml(data_dir, split_paths)
@@ -175,8 +208,6 @@ def extend_dataset(
     fonts = get_fonts(font_dir)
     if not fonts:
         raise ValueError(f"No OCR fonts found in {font_dir}")
-    if lines_per_image < 1 or flush_images < 1:
-        raise ValueError("lines-per-image and flush-images must be positive")
 
     seen = {
         _line_key(annotation.get("description", ""))
@@ -207,7 +238,7 @@ def extend_dataset(
     started = time.monotonic()
     added_images = 0
     added_lines = 0
-    textures = _texture_pool(seed)
+    textures = _texture_pool(seed, debug=debug)
     source = iter_unique_text(seed, seen)
     stopped_on_exhaustion = False
 
@@ -363,15 +394,22 @@ def extend_dataset(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Append unique historical-text OCR lines to synthetic pretrain data."
+        description="Create or extend synthetic OCR data with unique historical text."
     )
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--font-dir", type=Path, default=DEFAULT_FONT_DIR)
     parser.add_argument("--capitals-dir", type=Path, default=DEFAULT_CAPITALS_DIR)
-    parser.add_argument("--target-lines", type=int, default=1_000_000)
+    parser.add_argument(
+        "--target-lines", type=int, default=1_000_000,
+        help="Total line annotations across the training and validation splits.",
+    )
     parser.add_argument("--lines-per-image", type=int, default=LINES_PER_IMAGE)
     parser.add_argument("--seed", type=int, default=2025)
     parser.add_argument("--flush-images", type=int, default=200)
+    parser.add_argument(
+        "--debug", action="store_true",
+        help="Add at most 50 lines with one worker and a smaller texture pool.",
+    )
     parser.add_argument(
         "--workers",
         type=int,
@@ -390,6 +428,7 @@ def main() -> None:
         args.seed,
         args.flush_images,
         workers=args.workers,
+        debug=args.debug,
     )
 
 

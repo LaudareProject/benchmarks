@@ -56,12 +56,16 @@ PRE-TRAINING OPTIONS:
   --enable-pretrain          Enable pre-training on synthetic data. Note that if a pre-trained model is found in the standard directory, it is loaded and pre-training is skipped.
   --pretrain-dir DIR         Custom directory for pre-training data (overrides default synthetic data from ./data/pretrain_data/).
                              When provided, models will be named with the directory basename to avoid conflicts.
-  --pretrain-samples N       Number of synthetic samples to generate. Sets OCR samples to N and OMR samples to N/20 (default: OCR=5000, OMR=250).
+  --pretrain-samples N       Sets OCR page budget to N and OMR page budget to N/20
+                             (default: 5000 pages per task). Normal runs convert 15 lines per page.
+                             Debug runs convert 5 lines per page and cap each task at 10 pages.
   --font-dir DIR             Directory with fonts for OCR data generation (default: ./fonts).
   --capitals-dir DIR         Directory with decorative capital fonts (default: ./fonts/capitals).
-  --latex-jobs N             Number of parallel LaTeX jobs for OMR data generation (default: 8).
-                             
-  Note: Pre-training data is generated during the 'synthesis' task step and saved in ./data/pretrain_data/.
+  --workers N                Number of extender worker processes (default: 8, maximum: 10).
+                             Debug synthesis always uses one worker.
+
+  Note: Synthetic data is extended during the 'synthesis' task and saved in ./data/pretrain_data/.
+        If a task already has at least its requested line target, that task is skipped.
 
 EXAMPLES:
   # Run a single benchmark on fold 0 for OCR with Kraken.

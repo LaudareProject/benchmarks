@@ -117,9 +117,10 @@ Generate data with the following command:
 ./run.sh --task synthesis
 ```
 
-For this task, the number of generated samples, the font and the capital letter directories can also
-be specified (see `./run.sh --help`). Note that the number of OMR samples is divided by 20 for
-keeping a similar time for the generation.
+For this task, the page budget, the font directory, and the capital letter directory can also be
+specified (see `./run.sh --help`). The runner converts each page budget to a total line target.
+The `--pretrain-samples` option sets the OMR page budget to one twentieth of the OCR budget to
+keep the two generation times similar.
 
 1. Synthetic Data Generation: Creates artificial text/music images using:
     - Historical text from Biblioteca Italiana (for OCR)
@@ -135,7 +136,7 @@ score's PDF pages explicitly. Wrapped, blank, or edge-clipped score images are
 rejected rather than assigned a potentially incorrect full-line label.
 
 Music and text compositing share one pre-paste augmentation pipeline. It varies
-each rendered line independently in music-only, text-only, and mixed pages:
+each rendered line independently in music-only and text-only pages:
 
 - 35% receive shared geometric deformation: broad waves, shorter ripples,
   slant, horizontal displacement, and 5–12% variation in staff spacing. Wave
@@ -166,17 +167,18 @@ alpha mask is tinted with the selected text ink color before pasting, so
 distortions affect the ink rather than the page texture.
 
 Bounding boxes follow the final cropped, scaled, and positioned ink. Batched
-compositors, including mixed text/music, return COCO `xywh`; single-line
-renderers return `xyxy`. These augmentations affect newly generated pages only;
-cached synthetic data is not rewritten.
+compositors return COCO `xywh`; single-line renderers return `xyxy`. These
+augmentations affect newly generated pages only; cached synthetic data is not rewritten.
 
-To extend OMR pretraining to 900,000 total line annotations with ten workers:
+To create or extend OMR pretraining data to 900,000 total line annotations with ten workers:
 
 ```bash
 uv run python -u -m benchmarking.extend_synthetic_omr --target-lines 900000 --workers 10
 ```
 
-The OMR extender samples contiguous 7–15-group passages at every start offset,
+The OMR extender creates the split files and the annotation directory when the data directory is
+empty. When the directory holds earlier output, the extender appends new pages and keeps the
+existing pages. The extender samples contiguous 7–15-group passages at every start offset,
 carrying the active clef into each excerpt. Musical-label deduplication applies
 across existing annotations and new excerpts; changing fonts alone does not
 count as new music. Source-chant identity, section, offset, and length are retained as
@@ -198,13 +200,15 @@ exists), skipping the pre-training.
 TrOCR-Large uses an adaptive per-device batch size capped at 8 to avoid GPU-memory exhaustion
 on large line-image datasets. TrOCR-Small retains its uncapped adaptive batch size.
 
-To extend an existing synthetic OCR corpus to a total line count, run:
+To create or extend a synthetic OCR corpus to a total line count, run:
 
 ```bash
 uv run python -m benchmarking.extend_synthetic_ocr --target-lines 1000000
 ```
 
-The extension appends to the train/validation JSON and image directories, skips text already in
+The OCR extender creates the split files and the annotation directory when the data directory is
+empty. When the directory holds earlier output, the extender appends to the train and validation
+JSON files and the image directory, skips text already in
 those splits (after Unicode normalization, case-folding, and whitespace normalization), and creates
 PageXML for the resulting OCR splits. The raw Biblioteca Italiana corpus is loaded once, using
 the existing HTTP cache. Legal whole-word abbreviation combinations are enumerated exhaustively,
@@ -218,11 +222,11 @@ changes which unique candidates are selected, not the source corpus, abbreviatio
 font-size range, or augmentation pipeline.
 If the finite source is exhausted before the target, the command preserves progress and errors;
 another seed cannot create content beyond those legal variants. A new licensed source would be
-needed. Music continuation needs the analogous uniqueness key on normalized chant notation;
-this command only extends OCR.
+needed. The OMR extender applies the analogous uniqueness key to normalized chant notation.
 
 Image rendering uses 10 worker processes by default; `--workers` accepts values from 1 through 10.
 JSON is checkpointed every 200 generated images (adjustable with `--flush-images`).
+Both commands accept `--debug`, which caps a run at 50 new lines and uses one worker.
 Run Python with `-u` to see progress immediately rather than waiting for buffered output.
 
 ## Use this Dataset with your Model/Framework
