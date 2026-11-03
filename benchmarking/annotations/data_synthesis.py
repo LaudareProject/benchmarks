@@ -42,6 +42,40 @@ def get_texture(width, height, texture_pool):
     return texture
 
 
+def _render_text_ink(text, font, capital_font=None):
+    """Render tightly bounded black ink, including an optional decorative capital."""
+    parts = [(text, font)]
+    if capital_font is not None and len(text) > 1:
+        parts = [(text[0].upper(), capital_font), (text[1:], font)]
+    bounds = [part_font.getbbox(part) for part, part_font in parts]
+    widths = [box[2] - box[0] for box in bounds]
+    heights = [box[3] - box[1] for box in bounds]
+    gap = 5 if len(parts) > 1 else 0
+    image = Image.new("RGBA", (max(1, sum(widths) + gap), max(1, max(heights))))
+    draw = ImageDraw.Draw(image)
+    x = 0
+    for (part, part_font), box, part_width, part_height in zip(
+        parts, bounds, widths, heights
+    ):
+        draw.text(
+            (x - box[0], (image.height - part_height) // 2 - box[1]),
+            part, font=part_font, fill=(0, 0, 0, 255),
+        )
+        x += part_width + gap
+    return image
+
+
+def _prepare_text_line(text, font, ink_color, max_width, max_height, capital_font=None):
+    """Apply the shared line pipeline before tinting and pasting text ink."""
+    ink = _render_text_ink(text, font, capital_font)
+    x_bounds = font.getbbox("x")
+    spacing = max(4.0, (x_bounds[3] - x_bounds[1]) / 2)
+    ink = _prepare_ink_line(ink, max_width, max_height, spacing=spacing)
+    tinted = Image.new("RGBA", ink.size, (*ink_color, 0))
+    tinted.putalpha(ink.getchannel("A"))
+    return tinted
+
+
 def synthesize_text_batch(
     texts,
     font_path,
@@ -52,31 +86,11 @@ def synthesize_text_batch(
     lines_per_image=20,
     font_size=None,
 ):
-    """
-    Generate an image with multiple text lines arranged vertically.
-
-    Args:
-        texts: List of text strings to render
-        font_path: Path to the font file
-        capitals_dir: Directory containing font files for decorative capitals
-        width: Width of the output image
-        height: Height of the output image
-        texture_pool: Pool of background textures
-        lines_per_image: Number of text lines to put in each image
-
-    Returns:
-        PIL Image and list of bounding boxes with corresponding texts
-    """
-    capitals_dir = Path(capitals_dir) if capitals_dir else None
-
-    # Create background image
+    """Composite pre-distorted text lines, returning COCO xywh boxes."""
     img = get_texture(width, height, texture_pool)
-    draw = ImageDraw.Draw(img)
-
     try:
         font = ImageFont.truetype(
-            font_path,
-            size=rg.randint(32, 45) if font_size is None else font_size,
+            font_path, size=rg.randint(32, 45) if font_size is None else font_size
         )
     except Exception as e:
         print(f"Error loading font {font_path}: {e}")
@@ -86,186 +100,60 @@ def synthesize_text_batch(
         41 + rg.randint(-10, 10),
         25 + rg.randint(-10, 10),
     )
-
-    # Calculate line spacing
-    sample_bbox = draw.textbbox((0, 0), "Sample Text", font=font)
-    line_height = sample_bbox[3] - sample_bbox[1]
-    line_spacing = int(line_height * 2)  # 30% spacing between lines
-
-    # Calculate starting Y position to center all lines vertically
-    total_height = len(texts) * line_spacing
-    start_y = max(20, (height - total_height) // 2)
-
+    sample_bbox = font.getbbox("Sample Text")
+    line_spacing = (sample_bbox[3] - sample_bbox[1]) * 2
+    start_y = max(20, (height - len(texts) * line_spacing) // 2)
     bboxes_and_texts = []
-
     for i, text in enumerate(texts):
         if not text.strip():
             continue
-
         y_position = start_y + i * line_spacing
-
-        # Skip if text would go outside image bounds
-        if y_position + line_height > height - 20:
+        slot_height = min(line_spacing - 10, height - 20 - y_position)
+        if slot_height < 1:
             break
-
-        # Calculate text positioning
-        text_bbox = draw.textbbox((0, 0), text, font=font)
-        text_width = text_bbox[2] - text_bbox[0]
-
-        # Center text horizontally with some margin
-        x_position = max(20, (width - text_width) // 2)
-
-        # Skip if text is too wide
-        if x_position + text_width > width - 20:
-            continue
-
-        # Draw the text
-        draw.text((x_position, y_position), text, font=font, fill=ink_color)
-
-        # Get the actual bounding box of the drawn text
-        text_bbox = draw.textbbox((x_position, y_position), text, font=font)
-        bbox = (
-            text_bbox[0],
-            text_bbox[1],
-            text_bbox[2] - text_bbox[0],
-            text_bbox[3] - text_bbox[1],
-        )
-        bboxes_and_texts.append((bbox, text))
-
+        ink = _prepare_text_line(text, font, ink_color, width - 40, slot_height)
+        x = _line_x_offset(width, ink.width)
+        y = y_position + (slot_height - ink.height) // 2
+        img.paste(ink, (x, y), ink)
+        bboxes_and_texts.append(((x, y, ink.width, ink.height), text))
     return img, bboxes_and_texts
 
 
 def synthesize_text(text, font_path, capitals_dir, width, height, texture_pool):
-    """
-    Generate an image with the provided text using the specified font.
-
-    Args:
-        text: The text to render
-        font_path: Path to the font file
-        capitals_dir: Directory containing font files for decorative capitals
-        width: Width of the output image
-        height: Height of the output image
-
-    Returns:
-        PIL Image containing the rendered text and bounding box coordinates
-    """
-    capitals_dir = Path(capitals_dir) if capitals_dir else None
-    # Create a blank white image
+    """Composite a pre-distorted text line and return its xyxy bounds."""
     img = get_texture(width, height, texture_pool)
-    draw = ImageDraw.Draw(img)
-
+    if not text.strip():
+        return img, None
     try:
         font = ImageFont.truetype(font_path, size=rg.randint(52, 65))
     except Exception as e:
         print(f"Error loading font {font_path}: {e}")
         font = ImageFont.load_default()
-
-    # Check if we should use a decorative capital
-    use_decorative_capital = (
-        capitals_dir and text and len(text) > 1 and capitals_dir.exists()
-    )
-
     ink_color = (
         57 + rg.randint(-10, 10),
         41 + rg.randint(-10, 10),
         25 + rg.randint(-10, 10),
-    )  # rgb
-
-    # If using decorative capital, we'll handle the text differently
-    if use_decorative_capital:
-        first_char = text[0].upper()
-        rest_of_text = text[1:]
-
-        # Calculate size of the rest of the text
-        rest_bbox = draw.textbbox((0, 0), rest_of_text, font=font)
-        rest_width = rest_bbox[2] - rest_bbox[0]
-        rest_height = rest_bbox[3] - rest_bbox[1]
-
-        # Get list of fonts in the capitals directory
+    )
+    capital_font = None
+    if capitals_dir and len(text) > 1 and Path(capitals_dir).exists():
         capital_fonts = [
-            f for f in os.listdir(capitals_dir) if f.endswith((".ttf", ".otf"))
+            path for path in Path(capitals_dir).iterdir()
+            if path.suffix.lower() in (".ttf", ".otf")
         ]
-
-        # Choose a random font for the capital
-        capital_font_path = os.path.join(capitals_dir, rg.choice(capital_fonts))  # type: ignore
-
-        try:
-            # Load the decorative font and make it larger than the normal text
-            capital_font_size = max(int(rest_height * (1.5 * rg.random() + 1)), 35)
-            capital_font = ImageFont.truetype(capital_font_path, size=capital_font_size)
-
-            # Get the size of the capital letter
-            capital_bbox = draw.textbbox((0, 0), first_char, font=capital_font)
-            capital_width = capital_bbox[2] - capital_bbox[0]
-            capital_height = capital_bbox[3] - capital_bbox[1]
-
-            # Calculate text positioning
-            # Position capital letter and ensure rest of text aligns properly
-            capital_x = (width - (capital_width + rest_width + 5)) // 2
-            capital_y = (height - capital_height) // 2
-
-            # Draw the capital letter
-            draw.text(
-                (capital_x, capital_y), first_char, font=capital_font, fill=ink_color
-            )
-
-            # Get the actual bounding box of the drawn capital
-            capital_bbox = draw.textbbox(
-                (capital_x, capital_y), first_char, font=capital_font
-            )
-
-            # Draw the rest of the text next to the capital
-            rest_x = capital_x + capital_width + 5
-            rest_y = (height - rest_height) // 2
-            draw.text((rest_x, rest_y), rest_of_text, font=font, fill=ink_color)
-
-            # Get the actual bounding box of the drawn text
-            text_bbox = draw.textbbox((rest_x, rest_y), rest_of_text, font=font)
-            # Create a bounding box that encompasses both the capital and the text
-            bbox = (
-                min(capital_bbox[0], text_bbox[0]),
-                min(capital_bbox[1], text_bbox[1]),
-                max(capital_bbox[2], text_bbox[2]),
-                max(capital_bbox[3], text_bbox[3]),
-            )
-
-        except Exception as e:
-            print(f"Error applying capital letter: {e}")
-            standard_text_rendering = True
-        else:
-            standard_text_rendering = False
-            # Use the bounding box from the decorative capital path
-            bbox = (
-                min(capital_bbox[0], text_bbox[0]),
-                min(capital_bbox[1], text_bbox[1]),
-                max(capital_bbox[2], text_bbox[2]),
-                max(capital_bbox[3], text_bbox[3]),
-            )
-    else:
-        standard_text_rendering = True
-
-    if standard_text_rendering:
-        # Standard text rendering (used if decorative capital failed or is not requested)
-        text_bbox = draw.textbbox((0, 0), text, font=font)
-        text_width = text_bbox[2] - text_bbox[0]
-        text_height = text_bbox[3] - text_bbox[1]
-
-        x = (width - text_width) // 2
-        y = (height - text_height) // 2
-
-        # Draw text
-        draw.text((x, y), text, font=font, fill=ink_color)
-
-        # Get the actual bounding box of the drawn text
-        text_bbox = draw.textbbox((x, y), text, font=font)
-        bbox = (
-            text_bbox[0],
-            text_bbox[1],
-            text_bbox[2],
-            text_bbox[3],
-        )
-
-    return img, bbox
+        if capital_fonts:
+            try:
+                rest_bbox = font.getbbox(text[1:])
+                size = max(int((rest_bbox[3] - rest_bbox[1]) * (1.5 * rg.random() + 1)), 35)
+                capital_font = ImageFont.truetype(str(rg.choice(capital_fonts)), size=size)
+            except Exception as e:
+                print(f"Error applying capital letter: {e}")
+    ink = _prepare_text_line(
+        text, font, ink_color, width - 40, height - 40, capital_font
+    )
+    x = _line_x_offset(width, ink.width)
+    y = (height - ink.height) // 2
+    img.paste(ink, (x, y), ink)
+    return img, (x, y, x + ink.width, y + ink.height)
 
 
 def _music_staff_spacing(image):
@@ -378,14 +266,16 @@ def _weather_music_ink(image):
     return Image.fromarray(pixels)
 
 
-def _prepare_music_line(chant_image, max_width, max_height):
-    """Crop, optionally deform ink, and select native-size or zoomed placement."""
-    image = Image.fromarray(chant_image).convert("RGBA")
+def _prepare_ink_line(image, max_width, max_height, spacing=None):
+    """Crop, distort, and scale transparent music or text ink before compositing."""
+    if not isinstance(image, Image.Image):
+        image = Image.fromarray(image)
+    image = image.convert("RGBA")
     bounds = image.getchannel("A").getbbox()
     if bounds is None:
-        raise ValueError("Chant image has no visible content")
+        raise ValueError("Line image has no visible content")
     image = image.crop(bounds)
-    spacing = _music_staff_spacing(image)
+    spacing = _music_staff_spacing(image) if spacing is None else spacing
     # Cover combined staff waves, vertical stretch, and local ink displacement.
     guard = int(np.ceil(2 * spacing + image.height * 0.15 + 4))
     padded = Image.new("RGBA", (image.width + 2 * guard, image.height + 2 * guard))
@@ -393,7 +283,7 @@ def _prepare_music_line(chant_image, max_width, max_height):
     image = padded
     if rg.random() < 0.35:
         image = _warp_music_staff(image, spacing)
-    if rg.random() < 0.4:
+    if rg.random() < 0.9:
         image = _distort_music_ink(image, spacing)
     if rg.random() < 0.3:
         image = _weather_music_ink(image)
@@ -409,7 +299,7 @@ def _prepare_music_line(chant_image, max_width, max_height):
     return image
 
 
-def _music_x_offset(page_width, line_width, margin=20):
+def _line_x_offset(page_width, line_width, margin=20):
     """Choose centered placement or independently sampled left/right padding."""
     free = page_width - line_width - 2 * margin
     if rg.random() < 0.5:
@@ -448,9 +338,9 @@ def synthesize_music_batch(
             continue
 
         try:
-            pil_image = _prepare_music_line(chant_image, width - 40, line_height - 10)
+            pil_image = _prepare_ink_line(chant_image, width - 40, line_height - 10)
             new_width, new_height = pil_image.size
-            x_offset = _music_x_offset(width, new_width)
+            x_offset = _line_x_offset(width, new_width)
             y_offset = 20 + i * line_height + (line_height - new_height) // 2
 
             # Skip if would go outside bounds
@@ -518,21 +408,14 @@ def synthesize_mixed_batch(
             if y_position + text_line_height > height - 20:
                 break
 
-            text_bbox = draw.textbbox((0, 0), text, font=font)
-            text_width = text_bbox[2] - text_bbox[0]
-            text_height = text_bbox[3] - text_bbox[1]
-            x_position = max(20, (width - text_width) // 2)
-
-            if x_position + text_width > width - 20:
-                continue
-
-            draw.text((x_position, y_position), text, font=font, fill=ink_color)
-            bbox = (
-                x_position,
-                y_position,
-                x_position + text_width,
-                y_position + text_height,
-            )
+            slot_height = min(line_spacing - 10, height - 20 - y_position)
+            if slot_height < 1:
+                break
+            ink = _prepare_text_line(text, font, ink_color, width - 40, slot_height)
+            x_position = _line_x_offset(width, ink.width)
+            y_position += (slot_height - ink.height) // 2
+            background.paste(ink, (x_position, y_position), ink)
+            bbox = (x_position, y_position, ink.width, ink.height)
             bboxes_and_texts.append((bbox, text, 6))  # Label 6 for text
 
         elif content_type == "music":
@@ -541,11 +424,11 @@ def synthesize_mixed_batch(
                 continue
 
             try:
-                pil_image = _prepare_music_line(
+                pil_image = _prepare_ink_line(
                     chant_image, width - 40, line_spacing - 10
                 )
                 new_width, new_height = pil_image.size
-                x_offset = _music_x_offset(width, new_width)
+                x_offset = _line_x_offset(width, new_width)
                 # Center vertically within the allocated line space
                 y_offset = y_position + (line_spacing - new_height) // 2
 
@@ -558,8 +441,8 @@ def synthesize_mixed_batch(
                 bbox = (
                     x_offset,
                     y_offset,
-                    x_offset + new_width,
-                    y_offset + new_height,
+                    new_width,
+                    new_height,
                 )
                 bboxes_and_texts.append((bbox, custom, 5))  # Label 5 for music
 
@@ -585,13 +468,13 @@ def synthesize_music(chant_image, width, height, texture_pool):
     # Convert numpy array to PIL Image
     try:
         if chant_image is not None:
-            pil_image = _prepare_music_line(chant_image, width - 40, height - 40)
+            pil_image = _prepare_ink_line(chant_image, width - 40, height - 40)
             new_width, new_height = pil_image.size
 
             # Create a background texture of the desired size
             background = get_texture(width, height, texture_pool)
 
-            x_offset = _music_x_offset(width, new_width)
+            x_offset = _line_x_offset(width, new_width)
             y_offset = (height - new_height) // 2
 
             # Paste the chant onto the background
