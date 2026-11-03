@@ -134,6 +134,34 @@ Music rendering batches scores into one `lualatex` invocation and tracks each
 score's PDF pages explicitly. Wrapped, blank, or edge-clipped score images are
 rejected rather than assigned a potentially incorrect full-line label.
 
+OMR compositing varies each rendered chant independently, in music-only and mixed
+pages:
+
+- 35% receive shared geometric deformation: broad waves, shorter ripples,
+  slant, horizontal displacement, and 5–12% variation in staff spacing. Wave
+  amplitudes scale with the detected red-staff spacing (23–52% for the broad wave,
+  5–13% for ripples), rather than fixed pixels. Notes and staff share this map;
+  its positive vertical scale retains staff order.
+- Independently, 40% receive glyph-scale elastic deformation of dark ink, with
+  displacement bounds randomly chosen from 9–25% of staff spacing and a control
+  grid approximately one staff spacing apart. This reshapes neume contours;
+  half of those also receive fractional stroke thickening. Strong local
+  deformation is not a guarantee that every generated glyph remains readable.
+- Independently, 30% receive patchy ink fading across both black and colored
+  strokes. Half of those also receive partial erosion for thinner strokes;
+  erosion retains at least 65% of the original coverage, before fading, rather
+  than deleting fine stems or staff lines.
+- Adaptive transparent padding protects combined staff and ink displacements
+  before cropping back to content.
+- Half keep their native size, shrinking only when needed to fit. The rest use
+  65–100% of the largest aspect-preserving scale that fits the available slot.
+- Half are centered; the rest randomly divide the remaining horizontal space
+  between left and right padding, retaining a 20-pixel page margin.
+
+Bounding boxes follow the final cropped, scaled, and positioned chant. These
+augmentations affect newly generated pages only; cached synthetic data is not
+rewritten.
+
 To extend OMR pretraining to 900,000 total line annotations with ten workers:
 
 ```bash

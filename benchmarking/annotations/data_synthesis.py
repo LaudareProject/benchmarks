@@ -17,6 +17,7 @@ import os
 import random as rg
 from pathlib import Path
 
+import cv2
 import augraphy as au
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -267,6 +268,155 @@ def synthesize_text(text, font_path, capitals_dir, width, height, texture_pool):
     return img, bbox
 
 
+def _music_staff_spacing(image):
+    """Estimate staff spacing from colored horizontal rules before deformation."""
+    pixels = np.asarray(image)
+    red = (
+        (pixels[:, :, 0] > 150) & (pixels[:, :, 1] < 140)
+        & (pixels[:, :, 2] < 140) & (pixels[:, :, 3] > 0)
+    )
+    counts = red.sum(axis=1)
+    rows = np.flatnonzero(counts > max(1, counts.max() * 0.6))
+    if rows.size:
+        groups = np.split(rows, np.flatnonzero(np.diff(rows) > 1) + 1)
+        centers = np.array([group.mean() for group in groups])
+        if centers.size >= 2:
+            return float(np.median(np.diff(centers)))
+    return max(4.0, image.height / 8)
+
+
+def _distort_music_ink(image, spacing=None):
+    """Deform dark notation independently of the colored staff and paper."""
+    pixels = np.array(image)
+    rgb = pixels[:, :, :3]
+    black = (rgb.max(axis=2) < 200) & (
+        rgb.max(axis=2).astype(np.int16) - rgb.min(axis=2) < 40
+    )
+    ink = np.where(black, pixels[:, :, 3], 0).astype(np.uint8)
+    if not ink.any():
+        return image
+
+    pixels[black, 3] = 0
+    h, w = ink.shape
+    # Glyph-scale fields reshape individual contours instead of merely shifting
+    # whole neume groups. Keep vertical motion within a quarter staff spacing.
+    spacing = _music_staff_spacing(image) if spacing is None else spacing
+    amplitude = rg.uniform(0.09, 0.25) * spacing
+    cell = max(6, int(spacing * rg.uniform(0.6, 1.1)))
+    fields = []
+    for _ in range(2):
+        grid = np.array(
+            [[rg.uniform(-amplitude, amplitude) for _ in range(max(2, w // cell))]
+             for _ in range(max(2, h // cell))],
+            dtype=np.float32,
+        )
+        fields.append(cv2.resize(grid, (w, h), interpolation=cv2.INTER_LINEAR))
+    x, y = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
+    ink = cv2.remap(
+        ink, x + fields[0], y + fields[1], cv2.INTER_LINEAR,
+        borderMode=cv2.BORDER_CONSTANT, borderValue=0,
+    )
+    # Fractional dilation varies stroke weight without erasing thin stems.
+    if rg.random() < 0.5:
+        thick = cv2.dilate(ink, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+        ink = cv2.addWeighted(ink, 1 - (weight := rg.uniform(0.15, 0.55)), thick, weight, 0)
+    overlay = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    overlay.putalpha(Image.fromarray(ink))
+    return Image.alpha_composite(Image.fromarray(pixels), overlay)
+
+
+def _warp_music_staff(image, spacing=None):
+    """Apply shared waves, slant, and varying staff spacing to all notation."""
+    spacing = _music_staff_spacing(image) if spacing is None else spacing
+    pixels = np.array(image, dtype=np.float32)
+    h, w = pixels.shape[:2]
+    t = np.linspace(0, 1, w, dtype=np.float32)[None, :]
+    phase = rg.uniform(0, 2 * np.pi)
+    wave = np.sin(2 * np.pi * rg.uniform(1.0, 2.5) * t + phase)
+    ripple = np.sin(2 * np.pi * rg.uniform(3.0, 6.0) * t + rg.uniform(0, 2 * np.pi))
+    displacement = spacing * (
+        rg.uniform(0.23, 0.52) * wave
+        + rg.uniform(0.05, 0.13) * ripple
+        + rg.uniform(-0.33, 0.33) * (t - 0.5)
+    )
+    x, y = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
+    # Positive vertical scale preserves staff order while varying line spacing.
+    stretch = 1 + rg.uniform(0.05, 0.12) * wave
+    map_y = (y - h / 2) / stretch + h / 2 + displacement
+    map_x = x + spacing * rg.uniform(0.065, 0.195) * ripple
+    # Interpolate premultiplied color to avoid fringes from transparent pixels.
+    pixels[:, :, :3] *= pixels[:, :, 3:4] / 255
+    warped = cv2.remap(
+        pixels, map_x, map_y, cv2.INTER_LINEAR,
+        borderMode=cv2.BORDER_CONSTANT, borderValue=0,
+    )
+    alpha = warped[:, :, 3:4]
+    np.divide(warped[:, :, :3] * 255, alpha, out=warped[:, :, :3], where=alpha > 0)
+    return Image.fromarray(np.clip(np.rint(warped), 0, 255).astype(np.uint8))
+
+
+def _weather_music_ink(image):
+    """Partially thin strokes and vary ink coverage without deleting symbols."""
+    pixels = np.array(image)
+    alpha = pixels[:, :, 3]
+    if rg.random() < 0.5:
+        thin = cv2.erode(
+            alpha, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)),
+            borderType=cv2.BORDER_CONSTANT, borderValue=0,
+        )
+        # Keep at least 65% of even a one-pixel stroke.
+        weight = rg.uniform(0.1, 0.35)
+        alpha = cv2.addWeighted(alpha, 1 - weight, thin, weight, 0)
+    h, w = alpha.shape
+    coverage = np.array(
+        [[rg.uniform(0.55, 1.0) for _ in range(max(2, w // 12))]
+         for _ in range(max(2, h // 12))],
+        dtype=np.float32,
+    )
+    coverage = cv2.resize(coverage, (w, h), interpolation=cv2.INTER_LINEAR)
+    pixels[:, :, 3] = np.rint(alpha * coverage).astype(np.uint8)
+    return Image.fromarray(pixels)
+
+
+def _prepare_music_line(chant_image, max_width, max_height):
+    """Crop, optionally deform ink, and select native-size or zoomed placement."""
+    image = Image.fromarray(chant_image).convert("RGBA")
+    bounds = image.getchannel("A").getbbox()
+    if bounds is None:
+        raise ValueError("Chant image has no visible content")
+    image = image.crop(bounds)
+    spacing = _music_staff_spacing(image)
+    # Cover combined staff waves, vertical stretch, and local ink displacement.
+    guard = int(np.ceil(2 * spacing + image.height * 0.15 + 4))
+    padded = Image.new("RGBA", (image.width + 2 * guard, image.height + 2 * guard))
+    padded.paste(image, (guard, guard))
+    image = padded
+    if rg.random() < 0.35:
+        image = _warp_music_staff(image, spacing)
+    if rg.random() < 0.4:
+        image = _distort_music_ink(image, spacing)
+    if rg.random() < 0.3:
+        image = _weather_music_ink(image)
+    image = image.crop(image.getchannel("A").getbbox())
+    fit = min(max_width / image.width, max_height / image.height)
+    scale = min(1.0, fit) if rg.random() < 0.5 else fit * rg.uniform(0.65, 1.0)
+    size = (
+        max(1, min(max_width, int(image.width * scale))),
+        max(1, min(max_height, int(image.height * scale))),
+    )
+    if size != image.size:
+        image = image.resize(size, Image.Resampling.LANCZOS)
+    return image
+
+
+def _music_x_offset(page_width, line_width, margin=20):
+    """Choose centered placement or independently sampled left/right padding."""
+    free = page_width - line_width - 2 * margin
+    if rg.random() < 0.5:
+        return (page_width - line_width) // 2
+    return margin + rg.randint(0, max(0, free))
+
+
 def synthesize_music_batch(
     chant_images, width, height, texture_pool, lines_per_image=20
 ):
@@ -284,13 +434,6 @@ def synthesize_music_batch(
         PIL Image and list of bounding boxes with corresponding custom notations
     """
 
-    def get_content_bbox(img):
-        """Get the bounding box of non-transparent content in an RGBA image"""
-        if img.mode != "RGBA":
-            img = img.convert("RGBA")
-
-        return img.getchannel("A").getbbox()
-
     # Create background
     background = get_texture(width, height, texture_pool)
 
@@ -305,31 +448,9 @@ def synthesize_music_batch(
             continue
 
         try:
-            # Convert numpy array to PIL Image
-            pil_image = Image.fromarray(chant_image, "RGBA")
-
-            # Crop to content before resizing
-            content_bbox = get_content_bbox(pil_image)
-            if content_bbox:
-                pil_image = pil_image.crop(content_bbox)
-
-            # Scale to fit within line height while maintaining aspect ratio
-            original_width, original_height = pil_image.size
-            max_width = width - 40  # Leave horizontal margin
-            max_height = line_height - 10  # Leave vertical spacing
-
-            scale = min(max_width / original_width, max_height / original_height)
-
-            new_width = int(original_width * scale)
-            new_height = int(original_height * scale)
-
-            if scale != 1:
-                pil_image = pil_image.resize(
-                    (new_width, new_height), Image.Resampling.LANCZOS
-                )
-
-            # Calculate position
-            x_offset = (width - new_width) // 2
+            pil_image = _prepare_music_line(chant_image, width - 40, line_height - 10)
+            new_width, new_height = pil_image.size
+            x_offset = _music_x_offset(width, new_width)
             y_offset = 20 + i * line_height + (line_height - new_height) // 2
 
             # Skip if would go outside bounds
@@ -420,21 +541,11 @@ def synthesize_mixed_batch(
                 continue
 
             try:
-                pil_image = Image.fromarray(chant_image, "RGBA")
-                original_width, original_height = pil_image.size
-                max_width = width - 40
-                max_height = line_spacing - 10
-
-                scale = min(max_width / original_width, max_height / original_height)
-                new_width = int(original_width * scale)
-                new_height = int(original_height * scale)
-
-                if scale != 1:
-                    pil_image = pil_image.resize(
-                        (new_width, new_height), Image.Resampling.LANCZOS
-                    )
-
-                x_offset = (width - new_width) // 2
+                pil_image = _prepare_music_line(
+                    chant_image, width - 40, line_spacing - 10
+                )
+                new_width, new_height = pil_image.size
+                x_offset = _music_x_offset(width, new_width)
                 # Center vertically within the allocated line space
                 y_offset = y_position + (line_spacing - new_height) // 2
 
@@ -474,26 +585,13 @@ def synthesize_music(chant_image, width, height, texture_pool):
     # Convert numpy array to PIL Image
     try:
         if chant_image is not None:
-            # Convert the BGRA image to RGB for compatibility with PIL
-            pil_image = Image.fromarray(chant_image, "RGBA")
-
-            # Resize if needed to fit within target dimensions
-            original_width, original_height = pil_image.size
-            scale = min(width / original_width, height / original_height)
-
-            new_width = int(original_width * scale)
-            new_height = int(original_height * scale)
-
-            if scale != 1:
-                pil_image = pil_image.resize(
-                    (new_width, new_height), Image.Resampling.LANCZOS
-                )
+            pil_image = _prepare_music_line(chant_image, width - 40, height - 40)
+            new_width, new_height = pil_image.size
 
             # Create a background texture of the desired size
             background = get_texture(width, height, texture_pool)
 
-            # Calculate position to center the chant image on the background
-            x_offset = (width - new_width) // 2
+            x_offset = _music_x_offset(width, new_width)
             y_offset = (height - new_height) // 2
 
             # Paste the chant onto the background
