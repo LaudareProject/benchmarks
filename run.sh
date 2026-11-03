@@ -19,6 +19,8 @@ N_FOLD_MODE=false
 SEQUENTIAL_MODE=false
 OCR_PRETRAIN_SAMPLES=5000
 OMR_PRETRAIN_SAMPLES=5000
+OCR_LINES=""
+OMR_LINES=""
 FONT_DIR="./fonts"
 CAPITALS_DIR="./fonts/capitals"
 PRETRAIN_DIR=""
@@ -104,6 +106,28 @@ while [[ $# -gt 0 ]]; do
   --pretrain-samples)
     OMR_PRETRAIN_SAMPLES="$(($2 / 20))"
     OCR_PRETRAIN_SAMPLES="$2"
+    shift
+    shift
+    ;;
+  --ocr-lines)
+    case "$2" in
+    '' | *[!0-9]*)
+      echo "Invalid --ocr-lines value: $2"
+      exit 1
+      ;;
+    esac
+    OCR_LINES="$2"
+    shift
+    shift
+    ;;
+  --omr-lines)
+    case "$2" in
+    '' | *[!0-9]*)
+      echo "Invalid --omr-lines value: $2"
+      exit 1
+      ;;
+    esac
+    OMR_LINES="$2"
     shift
     shift
     ;;
@@ -284,7 +308,7 @@ if [ "$TASK" = "synthesis" ]; then
   echo "📚 STEP 1.5: Generating Synthetic Data"
   echo "──────────────────────────────────────"
 
-  PRETRAIN_DATA_DIR="${PROJECT_ROOT}/data/pretrain_data"
+  PRETRAIN_DATA_DIR="${PRETRAIN_DIR:-${PROJECT_ROOT}/data/pretrain_data}"
   mkdir -p "${PRETRAIN_DATA_DIR}"
 
   # Debug runs use five lines per page and at most 10 pages.
@@ -303,6 +327,12 @@ if [ "$TASK" = "synthesis" ]; then
   fi
   OMR_TARGET_LINES=$((OMR_PAGES * PAGE_LINES))
   OCR_TARGET_LINES=$((OCR_PAGES * PAGE_LINES))
+  if [ -n "$OMR_LINES" ]; then
+    OMR_TARGET_LINES="$OMR_LINES"
+  fi
+  if [ -n "$OCR_LINES" ]; then
+    OCR_TARGET_LINES="$OCR_LINES"
+  fi
   EXTENDER_ARGS=()
   if [ "$DEBUG_MODE" = true ]; then
     EXTENDER_ARGS+=(--debug)

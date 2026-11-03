@@ -55,10 +55,13 @@ EXECUTION MODES:
 PRE-TRAINING OPTIONS:
   --enable-pretrain          Enable pre-training on synthetic data. Note that if a pre-trained model is found in the standard directory, it is loaded and pre-training is skipped.
   --pretrain-dir DIR         Custom directory for pre-training data (overrides default synthetic data from ./data/pretrain_data/).
+                             During --task synthesis, this directory receives the ocr/ and omr/ subdirectories.
                              When provided, models will be named with the directory basename to avoid conflicts.
   --pretrain-samples N       Sets OCR page budget to N and OMR page budget to N/20
                              (default: 5000 pages per task). Normal runs convert 15 lines per page.
                              Debug runs convert 5 lines per page and cap each task at 10 pages.
+  --ocr-lines N              Exact total OCR line target for --task synthesis. Overrides the page budget.
+  --omr-lines N              Exact total OMR line target for --task synthesis. Overrides the page budget.
   --font-dir DIR             Directory with fonts for OCR data generation (default: ./fonts).
   --capitals-dir DIR         Directory with decorative capital fonts (default: ./fonts/capitals).
   --workers N                Number of extender worker processes (default: 8, maximum: 10).

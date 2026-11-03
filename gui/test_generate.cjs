@@ -212,7 +212,9 @@ test('script header carries timestamp, counts and scaffolding', () => {
   assert.ok(script.includes('mkdir -p models/$LAUDARE_EXPERIMENT_ID'));
   assert.ok(script.includes('mkdir -p results/$LAUDARE_EXPERIMENT_ID'));
   assert.ok(script.includes('read -p "Press [enter] to continue or CTRL-C to exit > "'));
-  assert.ok(script.includes('# # ./run.sh --task synthesis'), 'annotations block preserved');
+  assert.ok(script.includes('# # ./run.sh --task synthesis --pretrain-dir data/pretrain_data_bis --ocr-lines 1000000 --omr-lines 900000 --workers 10'), 'annotations block preserved');
+  assert.ok(script.includes('# # uv run python -u -m benchmarking.extend_synthetic_ocr --data-dir data/pretrain_data_bis/ocr --target-lines 1000000 --workers 10'));
+  assert.ok(script.includes('# # uv run python -u -m benchmarking.extend_synthetic_omr --data-dir data/pretrain_data_bis/omr --target-lines 900000 --workers 10'));
   assert.ok(script.includes('#@ Annotations @'), 'annotations block preserved');
   assert.ok(script.includes('validate_data_dir'));
   assert.ok(script.includes('--debug)'), 'debug parsing preserved');
