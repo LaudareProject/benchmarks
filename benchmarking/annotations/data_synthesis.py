@@ -95,7 +95,12 @@ def synthesize_text_batch(
         slot_height = min(line_spacing - 10, height - 20 - y_position)
         if slot_height < 1:
             break
-        ink = _prepare_text_line(text, font, ink_color, width - 40, slot_height)
+        try:
+            ink = _prepare_text_line(text, font, ink_color, width - 40, slot_height)
+        except ValueError:
+            # Some fonts lack the abbreviation glyph a line reduces to; the
+            # blank render carries no visible ink, so it cannot carry a label.
+            continue
         x = _line_x_offset(width, ink.width)
         y = y_position + (slot_height - ink.height) // 2
         img.paste(ink, (x, y), ink)
