@@ -114,9 +114,7 @@ COMMON_ARGS="$DEBUG_FLAG $DEVICE_FLAG"
 # #@ Annotations @
 # #@@@@@@@@@@@@@@@
 # # These are the commands used to generate annotations and pre-trained data
-# # uv run python -u -m benchmarking.extend_synthetic_ocr --data-dir data/pretrain_data_bis/ocr --target-lines 1000000 --workers 10
-# # uv run python -u -m benchmarking.extend_synthetic_omr --data-dir data/pretrain_data_bis/omr --target-lines 900000 --workers 10
-# # ./run.sh --task synthesis --pretrain-dir data/pretrain_data_bis --ocr-lines 1000000 --omr-lines 900000 --workers 10
+# # ./run.sh --task synthesis --pretrain-dir data/pretrain_data_bis --ocr-lines 900000 --omr-lines 900000 --workers 10
 # # ./run.sh --task annotations --edition diplomatic --data-dir data/I-Ct_91
 # # ./run.sh --task annotations --edition editorial --data-dir data/I-Ct_91
 # # ./run.sh --task annotations --edition diplomatic --data-dir data/I-Fn_BR_18
