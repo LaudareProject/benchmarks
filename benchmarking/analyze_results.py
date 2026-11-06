@@ -61,9 +61,12 @@ def analyze_single_framework(args):
 
     for i in range(args.num_folds):
         fold_dir = results_base_dir / f"fold_{i}"
-        eval_file = (
-            fold_dir / f"{args.framework}_{args.task}_{args.model_name}" / path_suffix
-        )
+        # Same rule as utils.run_output_label; pretrain runs carry their source.
+        label = f"{args.framework}_{args.task}_{args.model_name}"
+        if getattr(args, "enable_pretrain", False):
+            src = getattr(args, "pretrain_dir", None)
+            label += "_pretrain-" + (Path(src).name if src else "synthetic")
+        eval_file = fold_dir / label / path_suffix
 
         if not eval_file.exists():
             print(f"   - Fold {i}: Evaluation file not found at {eval_file}")

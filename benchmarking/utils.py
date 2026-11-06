@@ -22,6 +22,27 @@ RESULTS_DIR = PROJECT_ROOT / "results" / EXPERIMENT_ID
 MODELS_DIR = PROJECT_ROOT / "models" / EXPERIMENT_ID
 
 
+def run_output_label(
+    framework: str,
+    task: str,
+    model_name: str,
+    enable_pretrain: bool = False,
+    pretrain_dir: Optional[Path] = None,
+) -> str:
+    """Directory name for one run.
+
+    Pretrain runs carry the pretrain source, because sections F, G, H, and I use
+    the same framework, task, and model on the same data splits. Without the
+    source they write to one directory and the later run overwrites the metrics
+    and predictions of the earlier one.
+    """
+    label = f"{framework}_{task}_{model_name}"
+    if not enable_pretrain:
+        return label
+    source = Path(pretrain_dir).name if pretrain_dir else "synthetic"
+    return f"{label}_pretrain-{source}"
+
+
 def get_pretrained_model_path(
     framework: str, task: str, model_name: str, pretrain_dir: Optional[Path] = None
 ) -> Path:
@@ -390,7 +411,13 @@ def setup_with_args(args):
             data_path = data_root_processed / f"train_test_{args.fold}"
             current_results_dir = RESULTS_DIR / data_dir_name / args.edition / fold_name
 
-    output_dir = current_results_dir / f"{args.framework}_{args.task}_{args.model_name}"
+    output_dir = current_results_dir / run_output_label(
+        args.framework,
+        args.task,
+        args.model_name,
+        getattr(args, "enable_pretrain", False),
+        getattr(args, "pretrain_dir", None),
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Handle pretrained models
@@ -456,7 +483,13 @@ def setup_with_args(args):
         prev_model_path = (
             output_dir.parent.parent
             / f"seq_{prev_step:02d}"
-            / f"{args.framework}_{args.task}_{args.model_name}"
+            / run_output_label(
+                args.framework,
+                args.task,
+                args.model_name,
+                getattr(args, "enable_pretrain", False),
+                getattr(args, "pretrain_dir", None),
+            )
             / "best_model"
         )
         if prev_model_path.exists():
