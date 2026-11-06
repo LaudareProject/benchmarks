@@ -2,6 +2,7 @@ import json
 import re
 import random
 import datetime
+import time
 from typing import Generator, Optional, List, Dict
 
 from lxml import etree  # type: ignore
@@ -59,9 +60,17 @@ ABBREVIATIONS = {
 }
 
 
-def http_get(url: str, timeout: int = 10) -> requests.Response:
-    """Simple HTTP GET request with timeout."""
-    return requests.get(url, timeout=timeout)
+def http_get(
+    url: str, timeout: int = 10, attempts: int = 5
+) -> requests.Response:
+    """HTTP GET with retries for transient connection failures."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return requests.get(url, timeout=timeout)
+        except requests.RequestException:
+            if attempt == attempts:
+                raise
+            time.sleep(2**attempt)
 
 
 def abbreviate_text(
@@ -100,29 +109,44 @@ def abbreviate_text(
     return result
 
 
-def extract_text(xml_string: bytes) -> str:
+def extract_text(
+    xml_string: bytes, excluded_languages: Optional[List[str]] = None
+) -> str:
     """
     Extract text from a TEI XML string and process it.
 
     Args:
         xml_string (bytes): A TEI XML content in bytes
+        excluded_languages: Language codes whose elements are dropped, including
+            their descendants
 
     Returns:
         str: Processed extracted text from the XML
     """
     # Load the TEI XML string
     content = etree.fromstring(xml_string)[1]
+    excluded = {language.lower() for language in (excluded_languages or [])}
+
+    # Collect every element covered by an excluded language section.
+    skipped: set[etree._Element] = set()
+    if excluded:
+        for element in content.iter():
+            language = element.get("lang")
+            if language and language.lower() in excluded:
+                skipped.add(element)
+                skipped.update(element.iter())
 
     # Initialize an empty string to store the extracted text
     extracted_text = ""
 
     # Collect all the text
     for node in content.iter():
-        if node.tag != "head":
-            if node.tag == "l" or node.tag == "p":
-                extracted_text += (node.text or "") + "\n"
-            else:
-                extracted_text += node.text or ""
+        if node in skipped or node.tag == "head":
+            continue
+        if node.tag == "l" or node.tag == "p":
+            extracted_text += (node.text or "") + "\n"
+        else:
+            extracted_text += node.text or ""
 
     # Remove every punctuation and number (characters that are not alphabetical nor whitespaces)
     extracted_text = re.sub(FORBIDDEN_CHARS, "", extracted_text)
@@ -153,6 +177,7 @@ def get_line_generator(
     cache_name: str = "biblio_cache",
     cache_days: int = 30,
     verbose: bool = False,
+    excluded_languages: Optional[List[str]] = None,
 ) -> Generator[str, None, None]:
     """
     Generate lines one by one as they are retrieved from the online database.
@@ -165,6 +190,8 @@ def get_line_generator(
         cache_name: Name for the requests cache
         cache_days: Number of days to keep the cache
         verbose: Whether to print status messages
+        excluded_languages: Languages that disqualify a document, even when an
+            allowed language is also present
 
     Yields:
         str: One line of text at a time
@@ -193,6 +220,8 @@ def get_line_generator(
 
     # Process documents and yield lines as they are found
     schede = js["response"]["docs"]
+    allowed = {language.lower() for language in allowed_languages}
+    excluded = {language.lower() for language in (excluded_languages or [])}
 
     for i, scheda in enumerate(schede):
         if verbose:
@@ -201,10 +230,14 @@ def get_line_generator(
         scheda = {k.lower(): v for k, v in scheda.items()}
 
         # Check if document language is in allowed languages
-        if (
-            len(set(scheda["resource_language_str"]).intersection(allowed_languages))
-            == 0
-        ):
+        languages = {
+            tag.strip().lower()
+            for value in scheda["resource_language_str"]
+            for tag in value.split(",")
+        }
+        if not languages.intersection(allowed):
+            continue
+        if excluded and languages.intersection(excluded):
             continue
 
         # Get TEI XML
@@ -219,7 +252,7 @@ def get_line_generator(
 
         # Extract text from XML
         try:
-            extracted_text = extract_text(tei_file.content)
+            extracted_text = extract_text(tei_file.content, list(excluded))
         except etree.XMLSyntaxError:
             if verbose:
                 print("\nXML Syntax Error, skipping one file")

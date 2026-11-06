@@ -123,7 +123,7 @@ The `--pretrain-samples` option sets the OMR page budget to one twentieth of the
 keep the two generation times similar. To write to another directory with exact line targets, run:
 
 ```bash
-./run.sh --task synthesis --pretrain-dir data/pretrain_data_bis \
+./run.sh --task synthesis --pretrain-dir data/pretrain_data \
   --ocr-lines 1000000 --omr-lines 900000 --workers 10
 ```
 
@@ -215,19 +215,30 @@ The OCR extender creates the split files and the annotation directory when the d
 empty. When the directory holds earlier output, the extender appends to the train and validation
 JSON files and the image directory, skips text already in
 those splits (after Unicode normalization, case-folding, and whitespace normalization), and creates
-PageXML for the resulting OCR splits. The raw Biblioteca Italiana corpus is loaded once, using
-the existing HTTP cache. Legal whole-word abbreviation combinations are enumerated exhaustively,
+PageXML for the resulting OCR splits. Periods are consumed in catalog order, from the earliest to
+the latest. Each period is exhausted before the next period is fetched, so the earliest sources are
+fully used first. The existing HTTP cache is reused for every fetch. Documents tagged with Latin are
+excluded by their catalog language. Latin-tagged sections inside Italian documents are removed
+before line extraction. Legal whole-word abbreviation combinations are enumerated exhaustively,
 smallest expansion first; lines that admit only one spelling are skipped, and a few very long
-paragraphs are skipped because their combination space is exponential and they are far too wide
-to render as a single line.
+paragraphs are skipped because their combination space is exponential and they are far too wide to
+render as a single line.
+After a period's variants are exhausted, long lines are cut into word-aligned windows (whole-word
+substrings) of at most 50 characters. Consecutive windows overlap by about a quarter of their
+length. Every plain window is yielded first. One extra spelling per window then replaces between
+one and four whole-word matches. Windows recover long paragraphs and lines without abbreviation
+hits.
 Every candidate is checked against normalized text already stored or reserved. Each page selects a
 font and size from the same configured ranges, then gathers only lines that fit that exact choice;
 too-wide candidates are discarded before image rendering, rather than wasting an image batch. This
 changes which unique candidates are selected, not the source corpus, abbreviation rules, fonts,
 font-size range, or augmentation pipeline.
 If the finite source is exhausted before the target, the command preserves progress and errors;
-another seed cannot create content beyond those legal variants. A new licensed source would be
-needed. The OMR extender applies the analogous uniqueness key to normalized chant notation.
+another seed cannot create content beyond those legal variants. The four earliest catalog periods
+alone stop near 388,000 rendered lines. Every catalog period is now in scope. The full catalog
+supplies more than 20 million legal variant strings, so the default targets complete without
+exhausting the source. The OMR extender applies the analogous uniqueness key to normalized chant
+notation.
 
 Image rendering uses 10 worker processes by default; `--workers` accepts values from 1 through 10.
 JSON is checkpointed every 200 generated images (adjustable with `--flush-images`).
