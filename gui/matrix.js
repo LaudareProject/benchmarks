@@ -27,6 +27,7 @@ const ROWS = [
   { id: 'trocr_small_ocr', task: 'ocr', framework: 'trocr', model: 'small', label: 'TrOCR (small) · OCR' },
   { id: 'trocr_large_ocr', task: 'ocr', framework: 'trocr', model: 'large', label: 'TrOCR (large) · OCR' },
   { id: 'paddleocr_vl_ocr', task: 'ocr', framework: 'paddleocr_vl', model: null, label: 'PaddleOCR-VL · OCR' },
+  { id: 'paddleocr_vl_e2e_ocr', task: 'ocr', framework: 'paddleocr_vl_e2e', model: null, label: 'PaddleOCR-VL E2E · OCR' },
   { id: 'vlt_ocr', task: 'ocr', framework: 'vlt', model: null, label: 'VLT · OCR' },
 
   { id: 'kraken_omr', task: 'omr', framework: 'kraken', model: null, label: 'Kraken · OMR' },
@@ -34,6 +35,7 @@ const ROWS = [
   { id: 'trocr_small_omr', task: 'omr', framework: 'trocr', model: 'small', label: 'TrOCR (small) · OMR' },
   { id: 'trocr_large_omr', task: 'omr', framework: 'trocr', model: 'large', label: 'TrOCR (large) · OMR' },
   { id: 'paddleocr_vl_omr', task: 'omr', framework: 'paddleocr_vl', model: null, label: 'PaddleOCR-VL · OMR' },
+  { id: 'paddleocr_vl_e2e_omr', task: 'omr', framework: 'paddleocr_vl_e2e', model: null, label: 'PaddleOCR-VL E2E · OMR' },
   { id: 'vlt_omr', task: 'omr', framework: 'vlt', model: null, label: 'VLT · OMR' },
   { id: 'bgk_omr', task: 'omr', framework: 'bgk', model: null, label: 'BGK · OMR' }
 ];

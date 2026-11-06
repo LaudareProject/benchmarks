@@ -22,7 +22,8 @@ python3 -m http.server -d gui 8000
 ## How the matrix works
 
 - **Rows** are framework · task combinations (model variants are separate rows), grouped by task:
-  Layout, OCR, OMR. Row ids are stable and live in `matrix.js` (`ROWS`).
+  Layout, OCR, OMR. Row ids are stable and live in `matrix.js` (`ROWS`). The OCR and OMR groups
+  include the two full-page E2E pipelines (`paddleocr_vl_e2e`), which need no layout stage.
 - **Columns** are experiment protocols A–I, grouped in the header:
   - `5-fold` — A diplomatic, B editorial (`--n-fold`)
   - `Sequential` — C diplomatic, D editorial (`--strategy random_sample`)
@@ -86,5 +87,5 @@ node gui/test_generate.cjs
 ```
 
 The test asserts the disable rules, exact command strings, command ordering/uniqueness, the empty
-selection case, and runs `bash -n` on both an empty and a full (139-command) script. It also writes a
+selection case, and runs `bash -n` on both an empty and a full (155-command) script. It also writes a
 representative sample to `/tmp/laudare-experiments.generated.sh`.

@@ -73,7 +73,7 @@ test('H is enabled for every row, including layout rows', () => {
 
 test('F is enabled for every OCR and OMR row', () => {
   const rows = M.ROWS.filter((row) => row.task === 'ocr' || row.task === 'omr');
-  assert.strictEqual(rows.length, 13, 'expected 13 ocr/omr rows');
+  assert.strictEqual(rows.length, 15, 'expected 15 ocr/omr rows');
   const column = M.findColumn('pretrain_synthetic_sequential');
   rows.forEach((row) => {
     assert.strictEqual(M.disabledReason(row, column), null,
@@ -106,14 +106,14 @@ test('all other cells are enabled', () => {
   });
 });
 
-test('matrix shape: 19 rows, 9 columns, 139 enabled cells of 171', () => {
-  assert.strictEqual(M.ROWS.length, 19);
+test('matrix shape: 21 rows, 9 columns, 155 enabled cells of 189', () => {
+  assert.strictEqual(M.ROWS.length, 21);
   assert.strictEqual(M.COLUMNS.length, 9);
-  assert.strictEqual(M.TOTAL_CELLS, 171);
+  assert.strictEqual(M.TOTAL_CELLS, 189);
   let enabled = 0;
   M.ROWS.forEach((row) => { enabled += M.enabledCellsInRow(row.id).length; });
-  assert.strictEqual(enabled, 139);
-  assert.strictEqual(M.TOTAL_CELLS - enabled, 32, 'expected 32 disabled cells');
+  assert.strictEqual(enabled, 155);
+  assert.strictEqual(M.TOTAL_CELLS - enabled, 34, 'expected 34 disabled cells');
   assert.strictEqual(M.LEGEND.length, 2, 'legend needs both disabled reasons');
   M.LEGEND.forEach((text) => {
     assert.ok(typeof text === 'string' && text.length > 10, 'legend entry must be a reason string');
@@ -280,7 +280,7 @@ test('Set and object selection forms are accepted', () => {
   assert.strictEqual(commandLines(a).length, 1);
 });
 
-test('full selection: 139 commands, no duplicates, bash -n passes', () => {
+test('full selection: 155 commands, no duplicates, bash -n passes', () => {
   const all = [];
   M.ROWS.forEach((row) => {
     M.COLUMNS.forEach((column) => {
@@ -288,11 +288,11 @@ test('full selection: 139 commands, no duplicates, bash -n passes', () => {
       if (M.isCellEnabled(row.id, column.id)) all.push(k);
     });
   });
-  assert.strictEqual(all.length, 139);
+  assert.strictEqual(all.length, 155);
   const script = M.buildScript(all);
   const lines = commandLines(script);
-  assert.strictEqual(lines.length, 139);
-  assert.strictEqual(new Set(lines).size, 139);
+  assert.strictEqual(lines.length, 155);
+  assert.strictEqual(new Set(lines).size, 155);
   bashSyntax(script, 'full');
 });
 
