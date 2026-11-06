@@ -249,6 +249,8 @@ def train(args, model, processor, train_dataset, val_dataset):
     # Tune formulas to match Huttner hyperparameters for the reference run:
     # ./run.sh --framework trocr --task ocr --model-name "small" --edition diplomatic --data-dir ./data/I-Ct_91
     # Reference output: adaptive batch size 5 -> target 8, adaptive workers 4 -> target 2.
+    batch_size_scale = 1.6
+    worker_scale = 0.5
     adaptive_batch = max(1, int(adaptive_batch * batch_size_scale))
     adaptive_workers = max(0, int(adaptive_workers * worker_scale))
     adaptive_batch = _cap_training_batch_size(adaptive_batch, args.model_name)
