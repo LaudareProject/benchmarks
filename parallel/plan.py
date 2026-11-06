@@ -38,6 +38,20 @@ FOLD_H = {
     ("calamari", "ocr", "default"): 7 / 60,
     ("trocr", "ocr", "small"): 250 / 60,
     ("trocr", "ocr", "large"): 340 / 60,
+    # Rows added by the 2026-11-06 matrix.
+    # e2e shares the PaddleOCR-VL backbone and training loop.
+    ("paddleocr_vl_e2e", "ocr", "default"): 36 / 60,
+    ("paddleocr_vl_e2e", "omr", "default"): 25 / 60,
+    # Recognition OMR has no measured fold; use the OCR fold, which is longer
+    # than the logged OMR medians (kraken 0.11 h, calamari 0.05 h).
+    ("kraken", "omr", "default"): 13 / 60,
+    ("calamari", "omr", "default"): 7 / 60,
+    ("trocr", "omr", "small"): 250 / 60,
+    ("trocr", "omr", "large"): 340 / 60,
+    # Layout models with no measured fold: inferred from the measured neighbours.
+    ("detr", "layout", "default"): 1.00,
+    ("faster_rcnn", "layout", "mobilenet"): 0.50,
+    ("faster_rcnn", "layout", "resnet50"): 0.83,
 }
 
 # Multipliers on the per-fold cost.
@@ -56,6 +70,20 @@ SYNTHETIC_H = {
     ("vlt", "ocr", "default"): 50396 * 210 / 60 / 3600,
     ("vlt", "omr", "default"): 59997 * 210 / 60 / 3600,
     ("bgk", "omr", "default"): 4000 * 68 / 42.7 / 3600,
+    # Rows added by the 2026-11-06 matrix: 100 epochs for kraken and calamari,
+    # 50 for trocr (patience 15), 2 for the PaddleOCR-VL e2e variant.
+    # Rates: kraken 215 lines/s (397 / 1.85 from the fold ratio), calamari 397,
+    # trocr 8.4 and 6.2, e2e 0.91.
+    ("kraken", "ocr", "default"): 50396 * 100 / 215 / 3600,
+    ("kraken", "omr", "default"): 59997 * 100 / 215 / 3600,
+    ("calamari", "ocr", "default"): 50396 * 100 / 397 / 3600,
+    ("calamari", "omr", "default"): 59997 * 100 / 397 / 3600,
+    ("trocr", "ocr", "small"): 50396 * 50 / 8.4 / 3600,
+    ("trocr", "ocr", "large"): 50396 * 50 / 6.2 / 3600,
+    ("trocr", "omr", "small"): 59997 * 50 / 8.4 / 3600,
+    ("trocr", "omr", "large"): 59997 * 50 / 6.2 / 3600,
+    ("paddleocr_vl_e2e", "ocr", "default"): 50396 * 2 / 0.91 / 3600,
+    ("paddleocr_vl_e2e", "omr", "default"): 59997 * 2 / 0.91 / 3600,
 }
 CATMUS_H = {
     # 152,816 lines, ~20 epochs before early stopping (patience 15, max 50/100/2/210).
@@ -67,6 +95,8 @@ CATMUS_H = {
     ("trocr", "ocr", "large"): 152816 * 20 / 6.2 / 3600,
     ("paddleocr_vl", "ocr", "default"): 152816 * 2 / 0.91 / 3600,
     ("vlt", "ocr", "default"): 152816 * 210 / 86 / 3600,
+    # The e2e variant shares the PaddleOCR-VL backbone.
+    ("paddleocr_vl_e2e", "ocr", "default"): 152816 * 2 / 0.91 / 3600,
 }
 
 OMR_SCALE_BR18 = 1.85
